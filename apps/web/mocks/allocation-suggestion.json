@@ -1,0 +1,11 @@
+{
+  "has_active_goal": true,
+  "suggested_goal_id": "goal_001",
+  "suggested_goal_name": "Beli Laptop",
+  "suggested_amount": 175000,
+  "suggested_pct": 35,
+  "alternative_goals": [
+    { "goal_id": "goal_002", "goal_name": "Dana Darurat", "rank": 2 },
+    { "goal_id": "goal_003", "goal_name": "Liburan ke Bali", "rank": 3 }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "expense_by_category": [
+    { "kategori_id": "cat_001", "nama_kategori": "Makan & Minum", "total": 850000, "pct": 35 },
+    { "kategori_id": "cat_002", "nama_kategori": "Transportasi", "total": 420000, "pct": 17 },
+    { "kategori_id": "cat_003", "nama_kategori": "Hiburan", "total": 380000, "pct": 16 },
+    { "kategori_id": "cat_004", "nama_kategori": "Keperluan Kuliah", "total": 300000, "pct": 12 },
+    { "kategori_id": "cat_005", "nama_kategori": "Tempat Tinggal", "total": 470000, "pct": 20 }
+  ],
+  "active_goals_summary": [
+    { "id_goal": "goal_001", "nama_goal": "Beli Laptop", "progress_pct": 40 },
+    { "id_goal": "goal_002", "nama_goal": "Dana Darurat", "progress_pct": 65 }
+  ],
+  "monthly_trend": [
+    { "month": "2026-04", "income": 2300000, "expense": 1950000 },
+    { "month": "2026-05", "income": 2500000, "expense": 1800000 },
+    { "month": "2026-06", "income": 2750000, "expense": 1650000 }
+  ],
+  "overspending_alert": {
+    "is_active": true,
+    "message": "Pengeluaran kategori Hiburan bulan ini sudah 16% dari total — lebih tinggi dari rata-rata 3 bulan terakhir."
+  },
+  "total_balance": 1900000
+}
