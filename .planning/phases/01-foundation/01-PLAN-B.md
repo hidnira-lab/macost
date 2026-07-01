@@ -36,6 +36,8 @@ user_setup:
         source: "Supabase Dashboard -> Project Settings -> API -> service_role secret key (NEVER expose to frontend)"
       - name: SUPABASE_JWT_SECRET
         source: "Supabase Dashboard -> Project Settings -> API -> JWT Settings -> JWT Secret"
+      - name: SUPABASE_ANON_KEY
+        source: "Supabase Dashboard -> Project Settings -> API -> anon public key"
     dashboard_config:
       - task: "Create dompet table via SQL Editor"
         location: "Supabase Dashboard -> SQL Editor"

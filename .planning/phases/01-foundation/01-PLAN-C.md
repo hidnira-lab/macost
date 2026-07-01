@@ -82,7 +82,7 @@ Owner: Khayyira — branch frontend/goals-foundation
 
     1. Read process.env.NEXT_PUBLIC_USE_MOCK to determine which data source to use. If the value is the string "true", route the call to the local mock resolver. If false, missing, or any other value, call the real API.
 
-    2. Mock resolver: map the API path to a local JSON file in apps/web/mocks/. Implement a simple switch or object map that converts paths like "/api/wallets" to "/mocks/wallets.json", "/api/goals" to "/mocks/goals.json", "/api/dashboard" to "/mocks/dashboard.json", "/api/transactions" to "/mocks/transactions.json". For paths containing an ID segment (e.g., "/api/transactions/abc123/allocation-suggestion"), match the pattern and return "/mocks/allocation-suggestion.json". Use fetch() to load the local file — in Next.js static export, files in the public directory are served as static assets; therefore, move mock JSON files from apps/web/mocks/ to apps/web/public/mocks/ OR use a direct import (import data from '@/mocks/goals.json' assert { type: 'json' }) — choose the approach that works best with the static export. Import-based mocks avoid a fetch round-trip and work in both dev and static export; recommended approach for reliability.
+    2. Mock resolver: map the API path to a local JSON file in apps/web/mocks/. Implement a simple switch or object map that converts paths like "/api/wallets" to the wallets mock, "/api/goals" to the goals mock, "/api/dashboard" to the dashboard mock, "/api/transactions" to the transactions mock, and "/api/transactions/{id}/allocation-suggestion" to the allocation-suggestion mock. Use static imports (e.g., import walletsData from '@/mocks/wallets.json') — this approach works reliably in both dev and static export without a fetch round-trip and requires no files to be moved to public/. All mock JSON files stay in apps/web/mocks/ (Track D creates wallets.json and dashboard.json there). Return the imported data directly from the mock branch.
 
     3. Real API caller: read process.env.NEXT_PUBLIC_API_BASE_URL as the base URL (e.g., "http://localhost:8000"). Call getToken() from @/lib/auth/session (this module is created by Track D; if it does not exist yet on this branch, create a stub that returns null — the real implementation will be merged from Track D). Set the Authorization header to "Bearer {token}" when a token is available; omit the header when token is null (for public endpoints like register and login). Forward the init object (method, body, headers) to the fetch call. On non-2xx response: parse the body as JSON and throw it as an error — the caller is responsible for catching and displaying the error.
 
@@ -140,7 +140,7 @@ Owner: Khayyira — branch frontend/goals-foundation
   </action>
 
   <verify>
-    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npx tsc --noEmit 2>&1 | grep -c "error TS" || echo "0 errors"</automated>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npx tsc --noEmit && echo "PASS: zero TypeScript errors"</automated>
   </verify>
 
   <acceptance_criteria>

@@ -113,7 +113,7 @@ Owner: Zarra — branch frontend/home-foundation
   </action>
 
   <verify>
-    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npx tsc --noEmit 2>&1 | grep -E "(session|auth)" | head -10 && echo "Type check done"</automated>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npx tsc --noEmit && echo "PASS: zero TypeScript errors"</automated>
   </verify>
 
   <acceptance_criteria>
@@ -159,7 +159,7 @@ Owner: Zarra — branch frontend/home-foundation
   </action>
 
   <verify>
-    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npm run build 2>&1 | tail -10</automated>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npm run build && test -f out/wallets/index.html && echo "PASS: wallets page in static output"</automated>
   </verify>
 
   <acceptance_criteria>
