@@ -1,9 +1,11 @@
-cat > .gitignore << 'EOF'
 # Dependencies
 node_modules/
 venv/
+backend/venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
 # Environment variables
 .env
@@ -31,4 +33,3 @@ Thumbs.db
 
 # Logs
 *.log
-EOF
