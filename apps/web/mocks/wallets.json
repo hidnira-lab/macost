@@ -1,0 +1,6 @@
+{
+  "wallets": [
+    { "id_dompet": "wallet_001", "nama_dompet": "Gopay", "saldo": 250000 },
+    { "id_dompet": "wallet_002", "nama_dompet": "Cash", "saldo": 50000 }
+  ]
+}
