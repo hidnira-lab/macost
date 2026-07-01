@@ -1,0 +1,247 @@
+---
+phase: 01-foundation
+plan: D
+type: execute
+wave: 1
+depends_on: []
+files_modified:
+  - apps/web/package.json
+  - apps/web/lib/auth/session.ts
+  - apps/web/app/(auth)/layout.tsx
+  - apps/web/app/(auth)/login/page.tsx
+  - apps/web/app/(auth)/register/page.tsx
+  - apps/web/app/wallets/page.tsx
+  - apps/web/mocks/wallets.json
+  - apps/web/mocks/dashboard.json
+autonomous: true
+requirements:
+  - AUTH-01
+  - AUTH-02
+  - AUTH-03
+  - AUTH-04
+  - WALL-01
+  - WALL-02
+  - WALL-03
+  - WALL-04
+
+must_haves:
+  truths:
+    - Register page collects nama, email, and password; calls POST /api/auth/register; on 201 stores access_token and redirects away from auth
+    - Login page collects email and password; calls POST /api/auth/login; on 200 stores access_token; shows "Terlalu banyak percobaan gagal" message on 423 response
+    - Logout clears the stored token and redirects to /login
+    - access_token is stored via session.ts which uses tauri-plugin-store in Tauri Android and localStorage in the browser
+    - Wallet management page reads wallet list from mock (USE_MOCK=true) or real API; supports add/rename/delete operations through the UI
+    - Auth pages match Figma color tokens (orange #ff8929/#f77e2d, blue #298dff, dark #1e1e1e) and font families (Neulis headings, Helvetica body)
+    - No dynamic [id] route segments used anywhere — all navigation uses query params or modals
+  artifacts:
+    - apps/web/lib/auth/session.ts with getToken(), setToken(token), and clearToken() async functions
+    - apps/web/app/(auth)/layout.tsx — shared layout for auth route group
+    - apps/web/app/(auth)/register/page.tsx — register form per Figma frame 156:1211
+    - apps/web/app/(auth)/login/page.tsx — login form per Figma frame 156:1322
+    - apps/web/app/wallets/page.tsx — wallet management page per Figma frame 156:1837
+    - apps/web/mocks/wallets.json — matching GET /api/wallets response shape
+  key_links:
+    - session.ts setToken() -> called after register/login success (missing = 401 on every subsequent API call)
+    - session.ts getToken() -> imported by apps/web/lib/api/client.ts for Authorization header (Track C imports this; must be merged before integration)
+    - (auth)/layout.tsx -> wrap both register and login pages with consistent auth UI frame
+    - mocks/wallets.json -> wallet page reads this when USE_MOCK=true (wrong shape = TypeError at render)
+---
+
+<objective>
+Build the auth pages (register, login, logout flow) and wallet management UI per Figma designs, with a session persistence layer that survives Tauri Android app restarts.
+
+Purpose: Delivers the user-facing entry point for all authentication and the first core data management screen. The session.ts module bridges Track A's tauri-plugin-store setup and Track C's API client Authorization header — it is the critical cross-track integration point.
+
+Output: Register, login, and wallet management pages per Figma design; session.ts for token persistence in both Tauri and browser; wallets.json and verified dashboard.json mock stubs.
+
+Owner: Zarra — branch frontend/home-foundation
+</objective>
+
+<execution_context>
+@C:/Users/hiday/WebstormProjects/Zephyra/macost/.claude/gsd-core/workflows/execute-plan.md
+@C:/Users/hiday/WebstormProjects/Zephyra/macost/.claude/gsd-core/templates/summary.md
+</execution_context>
+
+<context>
+@.planning/ROADMAP.md
+@API_CONTRACT.md
+@apps/web/AGENTS.md
+@apps/web/app/layout.tsx
+@apps/web/mocks/dashboard.json
+@.planning/research/PITFALLS.md
+</context>
+
+<tasks>
+
+<task type="auto">
+  <name>Task 1: Session persistence layer and auth pages (register, login, logout)</name>
+  <files>
+    apps/web/package.json,
+    apps/web/lib/auth/session.ts,
+    apps/web/app/(auth)/layout.tsx,
+    apps/web/app/(auth)/register/page.tsx,
+    apps/web/app/(auth)/login/page.tsx
+  </files>
+
+  <read_first>
+    apps/web/AGENTS.md — CRITICAL: read this note before writing any Next.js file; Next.js 16 may differ from training data; check node_modules/next/dist/docs/ for current API
+    API_CONTRACT.md — section "1. Auth": register request fields (nama, email, password), register response (id_pengguna, nama, email, access_token), login request (email, password), login response (access_token, id_pengguna), 423 ACCOUNT_LOCKED error shape
+    apps/web/app/layout.tsx — understand the root layout (fonts, body classNames) before creating the auth sub-layout
+    .planning/research/PITFALLS.md — Pitfall 5 (tauri-plugin-store required for session persistence; localStorage cleared on Android WebView restart); Pitfall 3 (no dynamic [id] route segments; use query params or modals for any detail navigation)
+  </read_first>
+
+  <action>
+    Install @tauri-apps/plugin-store npm package in apps/web/. Run npm install @tauri-apps/plugin-store from apps/web/. This is the JavaScript side of the Tauri plugin that Track A (Hidayat) registers on the Rust side in lib.rs.
+
+    Note for merge: Track C (Khayyira) is also modifying apps/web/package.json to add swr. Both additions are separate fields in the dependencies object — git merge will produce a simple conflict that is resolved by keeping both added lines.
+
+    Create apps/web/lib/auth/ directory and apps/web/lib/auth/session.ts. This module provides three async functions exported as named exports: getToken(): Promise<string | null>, setToken(token: string): Promise<void>, clearToken(): Promise<void>.
+
+    The implementation must detect the runtime environment. Use a check for window.__TAURI__ (check typeof window !== 'undefined' first to avoid SSR errors, then check '__TAURI__' in window) to distinguish between the Tauri Android runtime and a regular browser. If Tauri is detected: import Store from '@tauri-apps/plugin-store' and use const store = new Store('.session.dat') — call store.get<string>('access_token') for getToken, store.set('access_token', token) followed by store.save() for setToken, and store.delete('access_token') followed by store.save() for clearToken. If running in a browser (not Tauri): use localStorage.getItem, localStorage.setItem, and localStorage.removeItem respectively. All three functions must be async and handle both cases.
+
+    This file will be imported by apps/web/lib/api/client.ts (Track C) as getToken() for the Authorization header. The interface contract between Track C and Track D is: session.ts exports getToken(): Promise<string | null>.
+
+    Create apps/web/app/(auth)/layout.tsx as a server component (no 'use client' needed). This layout wraps the register and login pages with a centered full-height container using the Macost auth background style. Use the dark background color #1e1e1e and center the content vertically and horizontally. Import the Neulis font if it is available as a local font; otherwise fall back to system sans-serif for heading text. Apply Tailwind utility classes where possible.
+
+    Create apps/web/app/(auth)/register/page.tsx as a client component ('use client'). This page must match Figma frame 156:1211 (Register screen). Use Figma MCP: get design context for frame 156:1211 to extract exact layout, spacing, and component structure before implementing. The page renders a form with three inputs: nama (display name), email, and password. The submit handler calls apiMutate<RegisterResponse>('/api/auth/register', 'POST', { nama, email, password }) from @/lib/api/client — do NOT use a Server Action. On 201 success: call setToken(response.access_token) from @/lib/auth/session, then use useRouter().push('/wallets') to redirect to the wallet management page. On error: display the error.error.message string from the API response. Apply color tokens from the IDENTITY design system: primary orange #ff8929 for the CTA button, dark background #1e1e1e, white text on dark backgrounds. Do NOT use colors from the Stitch-generated layer in Figma — use the IDENTITY token values directly.
+
+    Create apps/web/app/(auth)/login/page.tsx as a client component ('use client'). This page must match Figma frame 156:1322 (Refined Login screen). Use Figma MCP: get design context for frame 156:1322. The form has two inputs: email and password. The submit handler calls apiMutate<LoginResponse>('/api/auth/login', 'POST', { email, password }). On 200 success: setToken(response.access_token), redirect to '/wallets'. On 401: display "Email atau password salah". On 423: display "Terlalu banyak percobaan gagal. Coba lagi dalam 30 menit." — use the exact text from API_CONTRACT.md ACCOUNT_LOCKED message. Include a link to /register for new users.
+
+    For logout: do NOT create a separate page or route. Logout is a client-side action — call clearToken() and then router.push('/login'). Implement this as a button or link in the wallet management page header (Task 2). There is no POST /api/auth/logout endpoint on the backend.
+
+    CRITICAL: Do NOT use any dynamic route segments like app/auth/[something]/page.tsx. Do NOT use Next.js Server Actions. All form submissions use fetch via the apiMutate helper.
+  </action>
+
+  <verify>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npx tsc --noEmit 2>&1 | grep -E "(session|auth)" | head -10 && echo "Type check done"</automated>
+  </verify>
+
+  <acceptance_criteria>
+    apps/web/lib/auth/session.ts exports getToken, setToken, clearToken as async functions; session.ts uses @tauri-apps/plugin-store when window.__TAURI__ is detected and localStorage otherwise; (auth)/register/page.tsx and (auth)/login/page.tsx exist and compile with zero TypeScript errors; login page shows the exact ACCOUNT_LOCKED message text on 423 response; no Server Action ('use server') is used anywhere; no dynamic route segments ([id]) are used in the auth pages.
+
+    Human check: Run npm run dev, navigate to /register and /login in browser. Verify the pages render correctly and match the Figma design for frame 156:1211 (Register) and frame 156:1322 (Refined Login) in terms of color scheme, layout, and typography.
+  </acceptance_criteria>
+</task>
+
+<task type="auto">
+  <name>Task 2: Wallet management UI page</name>
+  <files>apps/web/app/wallets/page.tsx</files>
+
+  <read_first>
+    apps/web/AGENTS.md — Next.js 16 breaking changes note
+    API_CONTRACT.md — section "2. Wallets / Dompet": GET response shape {wallets: [{id_dompet, nama_dompet, saldo}]}, POST request {nama_dompet}, PUT request {nama_dompet}, DELETE returns 204
+    apps/web/lib/auth/session.ts — getToken() function created in Task 1; clearToken() for the logout button
+    apps/web/lib/api/client.ts — apiFetch<T>('/api/wallets') for reading; apiMutate<T> for write operations (Track C creates this; import path is @/lib/api/client)
+    .planning/research/PITFALLS.md — Pitfall 3 (no dynamic routes; wallet detail view must NOT use /wallets/[id]/page.tsx — use a modal or inline edit instead)
+  </read_first>
+
+  <action>
+    Create apps/web/app/wallets/page.tsx as a client component ('use client'). This page must match Figma frame 156:1837 (Manage Wallets screen). Use Figma MCP: get design context for frame 156:1837 to extract the exact layout before implementing.
+
+    The page renders the authenticated user's wallet list. On mount (useEffect), call apiFetch<WalletsResponse>('/api/wallets') from @/lib/api/client — this call returns mock data when USE_MOCK=true, or calls the real backend when false. Display each wallet as a card or list item showing the nama_dompet and saldo formatted as "Rp {saldo.toLocaleString('id-ID')}".
+
+    Include a logout button in the header or top-right corner. The logout handler calls clearToken() from @/lib/auth/session and then router.push('/login').
+
+    Include a "Tambah Dompet" (Add Wallet) button. When clicked, show an inline form or modal (do NOT navigate to a new route — use React state to toggle a form section). The form has a single field: nama_dompet. On submit, call apiMutate<Wallet>('/api/wallets', 'POST', { nama_dompet }). On success, refresh the wallet list (re-fetch or optimistically add to state).
+
+    Include an edit (rename) action on each wallet item. When triggered, show an inline editable field for nama_dompet. On save, call apiMutate<Wallet>('/api/wallets/{id_dompet}', 'PUT', { nama_dompet }). On success, update the item in state.
+
+    Include a delete action on each wallet item. Show a confirmation prompt (an inline "Are you sure?" or a simple window.confirm is acceptable for MVP). On confirm, call apiMutate('/api/wallets/{id_dompet}', 'DELETE'). On 204 success, remove the item from state.
+
+    Apply the Macost IDENTITY design system color tokens: orange #ff8929 or #f77e2d for primary buttons (Tambah Dompet), blue #298dff for secondary actions or active states, dark #1e1e1e for the page background. Use Tailwind utility classes for layout. Use Neulis font for the page heading "Kelola Dompet" and Helvetica for body text and wallet names.
+
+    Route protection: if getToken() returns null on mount, redirect immediately to /login. This prevents unauthenticated users from viewing the wallet page.
+
+    Important constraints:
+    - Do NOT create apps/web/app/wallets/[id]/page.tsx — this would be a dynamic route incompatible with static export
+    - Do NOT use Server Actions
+    - The wallet ID for PUT/DELETE is the id_dompet string from the wallet object
+  </action>
+
+  <verify>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && npm run build 2>&1 | tail -10</automated>
+  </verify>
+
+  <acceptance_criteria>
+    apps/web/app/wallets/page.tsx is a client component; npm run build exits 0 and apps/web/out/wallets/index.html exists in the static output; the page imports apiFetch from @/lib/api/client and getToken/clearToken from @/lib/auth/session; no dynamic [id] segment appears in any wallets route; logout button is present.
+
+    Human check: Run npm run dev and navigate to /wallets in browser with NEXT_PUBLIC_USE_MOCK=true in .env.local. Verify the page renders the mock wallets from wallets.json (GoPay, Cash, Bank BCA), the add/rename/delete UI is interactive, and the page matches the Figma Manage Wallets frame 156:1837 in layout and color.
+  </acceptance_criteria>
+</task>
+
+<task type="auto">
+  <name>Task 3: Wallet and dashboard mock JSON stubs</name>
+  <files>apps/web/mocks/wallets.json, apps/web/mocks/dashboard.json</files>
+
+  <read_first>
+    API_CONTRACT.md — section "2. Wallets / Dompet": exact GET /api/wallets response shape: {"wallets": [{"id_dompet": string, "nama_dompet": string, "saldo": number}]}; all IDs are UUID strings; saldo is integer Rupiah with no decimal
+    apps/web/mocks/dashboard.json — existing mock file; verify it matches the dashboard KPI shape expected by Phase 2
+  </read_first>
+
+  <action>
+    Create apps/web/mocks/wallets.json with realistic student mock data that matches the GET /api/wallets response shape exactly. Include three wallets: one named "GoPay" with a saldo around 250000, one named "Cash" with a saldo around 50000, and one named "Bank BCA" with a saldo around 1600000. Use UUID-format strings (e.g., "d1e2f3a4-...") for id_dompet values — do NOT use "wallet_001" shorthand; the real API returns UUIDs and the mock should represent that accurately to catch frontend code that assumes a specific ID format.
+
+    The top-level JSON must be an object with a "wallets" key containing the array — matching the API_CONTRACT.md response shape exactly. Do NOT return a bare array.
+
+    Verify apps/web/mocks/dashboard.json: read the existing file and confirm it contains expense_by_category (array), active_goals_summary (array), monthly_trend (array), overspending_alert (object with is_active boolean and message string), and total_balance (number). These are the 5 KPIs required by DASH-01 in the research-validated sequence. The file already exists and appears correct; if any field name or type does not match this specification, update it. Note any changes made.
+
+    Both mock files must be valid JSON (no trailing commas, no comments). All saldo and nominal values must be integers (no decimal points). All date strings must be ISO 8601 format.
+  </action>
+
+  <verify>
+    <automated>cd "C:/Users/hiday/WebstormProjects/Zephyra/macost/apps/web" && node -e "const w=require('./mocks/wallets.json'); console.log('wallets:', w.wallets.length, 'entries'); console.log('first id_dompet:', w.wallets[0].id_dompet); console.log('first saldo type:', typeof w.wallets[0].saldo)" 2>&1</automated>
+  </verify>
+
+  <acceptance_criteria>
+    apps/web/mocks/wallets.json exists; top-level key is "wallets" (array); each entry has id_dompet (string UUID-format), nama_dompet (string), and saldo (integer number); at least 3 wallet entries; saldo is typeof "number" not "string"; apps/web/mocks/dashboard.json contains all 5 KPI keys: expense_by_category, active_goals_summary, monthly_trend, overspending_alert, total_balance.
+  </acceptance_criteria>
+</task>
+
+</tasks>
+
+<threat_model>
+## Trust Boundaries
+
+| Boundary | Description |
+|----------|-------------|
+| Auth form → POST /api/auth/register or /login | User-supplied credentials cross the network; the form must never log or display raw passwords |
+| session.ts storage → app state | The access_token in storage is the user's identity credential; must be stored in tauri-plugin-store in Tauri, not localStorage |
+| Unauthenticated user → /wallets page | Wallet page must redirect to /login if no token is present |
+
+## STRIDE Threat Register
+
+| Threat ID | Category | Component | Severity | Disposition | Mitigation Plan |
+|-----------|----------|-----------|----------|-------------|-----------------|
+| T-01-D-01 | Spoofing | Token stored in localStorage (browser) instead of tauri-plugin-store (Tauri) | high | mitigate | session.ts detects window.__TAURI__ and uses tauri-plugin-store for Tauri runtime; localStorage is only used in the browser dev environment where restart-persistence is not critical |
+| T-01-D-02 | Information Disclosure | access_token logged to console during development | medium | mitigate | Do not console.log the token; do not display it in error messages or page UI; only pass it in the Authorization header |
+| T-01-D-03 | Elevation of Privilege | Wallet page accessible without authentication | high | mitigate | wallets/page.tsx checks getToken() on mount and immediately redirects to /login if null; no server-side check is possible in static export |
+| T-01-D-04 | Information Disclosure | User email enumeration during registration (EMAIL_TAKEN error) | low | accept | Returns a clear "Email sudah digunakan" message; acceptable UX trade-off per AUTH-01 requirement |
+| T-01-D-SC | Tampering | @tauri-apps/plugin-store npm package supply chain | high | mitigate | Official @tauri-apps organization package (same as PLAN-A Rust crate); verify on npmjs.com/package/@tauri-apps/plugin-store before install; pin to ^2 |
+</threat_model>
+
+<verification>
+Overall phase checks for Track D:
+
+1. npm run build from apps/web/ exits 0 with static export output
+2. apps/web/out/register/index.html exists (auth page rendered statically)
+3. apps/web/out/login/index.html exists
+4. apps/web/out/wallets/index.html exists
+5. grep -r "use server" apps/web/app/ returns no output (no server actions)
+6. grep -r "\[id\]" apps/web/app/ returns no output (no dynamic route segments)
+7. apps/web/mocks/wallets.json valid JSON with "wallets" top-level key
+8. Human check: /register and /login render per Figma frames 156:1211 and 156:1322; /wallets shows mock data per Figma frame 156:1837
+</verification>
+
+<success_criteria>
+- Register page: submitting the form calls POST /api/auth/register (or mock equivalent), stores the token, and navigates away
+- Login page: shows exact ACCOUNT_LOCKED message on 423; stores token on 200 and navigates to /wallets
+- Logout: clears session token and redirects to /login
+- Wallet page: lists wallets from mock data (USE_MOCK=true); add/rename/delete operations update the UI state
+- session.ts: getToken, setToken, clearToken all async; tauri-plugin-store used in Tauri; localStorage used in browser
+- npm run build exits 0 with all three pages in out/
+- AUTH-01 (register), AUTH-02 (session persistence), AUTH-03 (logout), AUTH-04 (token forwarded in API calls), WALL-01 through WALL-04 (wallet UI CRUD) all have frontend implementations in this plan
+</success_criteria>
+
+<output>
+Create `.planning/phases/01-foundation/01-D-SUMMARY.md` when done
+</output>

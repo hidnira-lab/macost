@@ -30,7 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can create, view, rename, and delete wallets (e.g., GoPay, Cash, Bank BCA)
   4. Running `tauri android build` produces an APK that launches to the auth screen without a blank screen
   5. Frontend switches cleanly between mock data and the real API by toggling USE_MOCK — no other code changes required
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-PLAN-A.md — Track A: Next.js static export config, Tauri 2.0 Android scaffold, tauri-plugin-store, NDK verification (Hidayat)
+- [ ] 01-PLAN-B.md — Track B: FastAPI scaffold, CORS, PyJWT JWTBearer, auth endpoints, wallet CRUD (Fertika)
+- [ ] 01-PLAN-C.md — Track C: API client with USE_MOCK toggle, TypeScript interfaces, mock stubs (Khayyira)
+- [ ] 01-PLAN-D.md — Track D: Session persistence layer, auth pages per Figma, wallet management UI (Zarra)
 
 **Team ownership (parallel tracks):**
 - Hidayat (`apps/native/`): Add `output: export` and `images.unoptimized: true` to next.config.ts; configure Tauri CORS origins (tauri://localhost, http://localhost:3000); add tauri-plugin-store Supabase session adapter; verify Android NDK toolchain with one test APK build; set up UptimeRobot keep-alive on Render backend URL
@@ -126,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
 | 2. Core Product Loop | 0/TBD | Not started | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
