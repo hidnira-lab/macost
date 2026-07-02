@@ -6,9 +6,18 @@
     "beforeDevCommand": "cd ../web && npm run dev",
     "beforeBuildCommand": "cd ../web && npm run build",
     "devUrl": "http://localhost:3000",
-    "frontendDist": "../out"
+    "frontendDist": "../../web/out"
   },
   "app": {
+    "windows": [
+      {
+        "title": "Macost",
+        "width": 400,
+        "height": 800,
+        "resizable": true,
+        "visible": true
+      }
+    ],
     "security": {
       "csp": "default-src 'self' ipc: asset: https://macost-api.onrender.com; connect-src ipc: asset: https://macost-api.onrender.com https://*.supabase.co http://localhost:8000; style-src 'self' 'unsafe-inline'; img-src 'self' data: asset: blob:"
     }
