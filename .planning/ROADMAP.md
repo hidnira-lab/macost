@@ -22,23 +22,23 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### Phase 1: Foundation
 
-**Goal**: All four developers can work in parallel on a correctly-configured codebase — the Tauri Android APK builds and launches, JWT auth works end-to-end via Supabase, and users can register, log in, and manage wallets
+**Goal**: All four developers can work in parallel on a correctly-configured codebase — the Tauri desktop app builds and launches, JWT auth works end-to-end via Supabase, and users can register, log in, and manage wallets
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, WALL-01, WALL-02, WALL-03, WALL-04
 **Success Criteria** (what must be TRUE):
 
-  1. User can register a new account with name, email, and password; the session persists across Tauri Android app restarts without re-login
+  1. User can register a new account with name, email, and password; the session persists across Tauri desktop app restarts without re-login
   2. User can log in and log out; all protected API endpoints return 401 for requests that lack a valid Supabase JWT
   3. User can create, view, rename, and delete wallets (e.g., GoPay, Cash, Bank BCA)
-  4. Running `tauri android build` produces an APK that launches to the auth screen without a blank screen
+  4. Running `tauri build` produces a desktop app that launches to the auth screen without a blank screen (Tauri mobile/Android out of scope for MVP — see Phase 999.1)
   5. Frontend switches cleanly between mock data and the real API by toggling USE_MOCK — no other code changes required
 
-**Plans**: 3/4 plans executed (01-01 deferred to backlog — see Phase 999.1)
+**Plans**: 4/4 plans resolved (01-01 rescoped to desktop-only: Android build descoped to backlog Phase 999.1, desktop build/render verified 2026-07-02 via quick task 260702-qs7 — fixed missing `app.windows` config)
 
 Plans:
 
-- [ ] 01-01-PLAN.md — DEFERRED (native/APK blank-screen bug, see Phase 999.1)
+- [x] 01-01-PLAN.md — Desktop scope resolved 2026-07-02 (Tasks 1-2 done; Task 3 Android descoped to Phase 999.1)
 - [x] 01-02-PLAN.md
 - [x] 01-03-PLAN.md
 - [x] 01-04-PLAN.md
@@ -149,14 +149,14 @@ Plans:
 
 ## Backlog
 
-### Phase 999.1: Follow-up — Fix Tauri Android blank-screen bug (BACKLOG)
+### Phase 999.1: Follow-up — Tauri Android mobile (blank-screen bug, out of MVP scope) (BACKLOG)
 
 **Goal:** `tauri android build` produces an APK that actually renders (currently: builds and installs cleanly with zero crashes, but the WebView never attaches — `libmacost_lib.so` never loads into the process, confirmed via `/proc/pid/maps`)
 **Source phase:** 1 (Plan 01-01, Task 3)
-**Deferred at:** 2026-07-02 — user decision: the MVP is the website (apps/web); native APK polish can wait until core web/backend product loop is done
+**Deferred at:** 2026-07-02 — user decision: with ~1 week left before the demo and the Android build blocked/heavy on dev hardware, Tauri mobile is out of MVP scope entirely. MVP ships as web app (apps/web) + Tauri **desktop** build only; Android APK work (this backlog item) is revisited post-MVP if time allows.
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
-- [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working APK) blocked on the blank-screen bug above
+- [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
 
 ## Progress
 
@@ -167,7 +167,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 (01-01 deferred) | In Progress |  |
+| 1. Foundation | 4/4 (01-01 desktop-resolved) | Ready for verification |  |
 | 2. Core Product Loop | 0/TBD | Not started | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

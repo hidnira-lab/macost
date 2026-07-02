@@ -90,7 +90,7 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 - **API contract:** Setiap perubahan shape endpoint di `API_CONTRACT.md` harus dikomunikasikan ke 4 anggota tim sebelum diimplementasikan
 - **Source labeling:** Frontend tidak pernah mengirim field `source` — selalu baca `source_label` dari response backend
 - **SAW weights:** Default weights dari survey n=62 adalah baku; user hanya bisa override lewat FR-014 di goal-settings
-- **Tauri target:** Android APK dari static export Next.js; fallback PWA jika Tauri gagal
+- **Tauri target (revised 2026-07-02):** Web app (Next.js) adalah MVP utama; Tauri dipakai untuk compile desktop app saja. Tauri mobile/Android APK di-skip dari scope MVP — lihat Key Decisions.
 
 ## Key Decisions
 
@@ -100,7 +100,8 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 | Source labeling server-side | Mencegah drift semantik kategori di sisi frontend | ✓ Good |
 | Suggest-and-confirm allocation | Prinsip UX inti — user mempertahankan kendali keuangan | ✓ Good |
 | Tanpa API bank/e-wallet resmi | Kendala biaya & partnership untuk proyek akademik | ✓ Good |
-| Static export untuk Tauri | Android target butuh output statis dari Next.js | — Pending |
+| Static export untuk Tauri | Desktop & Android target butuh output statis dari Next.js | ✓ Good |
+| Skip Tauri mobile/Android, fokus web + Tauri desktop (2026-07-02) | Sisa waktu ~1 minggu ke expo; native Android build gagal (blank-screen, `libmacost_lib.so` never loads) dan berat untuk hardware dev; web app + Tauri desktop compile cukup untuk MVP & demo | ✓ Good |
 | Dashboard KPI order locked | Urutan dari riset — bukan asumsi; tidak boleh diubah tanpa justifikasi penelitian baru | ✓ Good |
 | AI insight satu arah | Chat interaktif di luar scope MVP; insight satu arah cukup untuk menambah nilai | ✓ Good |
 | Mock-first frontend dev | Memungkinkan paralel development frontend & backend tanpa blocking | ✓ Good |

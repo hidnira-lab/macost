@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Foundation
 status: verifying
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-07-02T03:07:11.299Z"
+stopped_at: Completed 01-01-PLAN.md (desktop scope, via quick task 260702-qs7)
+last_updated: "2026-07-02T19:35:00.000Z"
 last_activity: 2026-07-02
-last_activity_desc: "Completed quick task 260702-j95: Add Neulis and Helvetica local fonts to apps/web via next/font/local"
+last_activity_desc: "Completed quick task 260702-qs7: verified Tauri desktop build/render works (fixed missing app.windows config); Plan 01-01 resolved for desktop-only MVP scope, Android backlog-only"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 1 of 4 (Foundation)
-Plan: 4 of 4 in current phase (Plan 3 complete)
+Plan: 4 of 4 in current phase (all plans resolved: 01-01 via desktop-scoped quick task 260702-qs7)
 Status: Phase complete — ready for verification
-Last activity: 2026-07-01 — Completed 01-03-PLAN.md (Track C: API client + TypeScript interfaces)
+Last activity: 2026-07-02 — Completed quick task 260702-qs7 (Tauri desktop build/render verified, app.windows config fix)
 
 Progress: [███░░░░░░░] 25%
 
@@ -66,6 +66,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - [Pre-phase]: Static export for Tauri — `output: export` + `images.unoptimized: true` must be added to next.config.ts on Day 1; Tauri APK shows blank screen without it
+- [2026-07-02]: Scope revised — MVP is web app (apps/web) + Tauri **desktop** build only; Tauri mobile/Android APK is out of scope for this milestone (blocked by blank-screen bug + heavy on dev hardware, ~1 week left to demo). See PROJECT.md Key Decisions and ROADMAP.md Phase 999.1.
 - [Pre-phase]: PyJWT (not python-jose) for FastAPI JWT verification — python-jose is abandoned and broken on Python 3.10+
 - [Pre-phase]: tauri-plugin-store for Supabase session persistence — localStorage is unreliable in Tauri Android WebView
 - [Pre-phase]: AI/vision provider not yet selected — must decide at Phase 3 start; blocks SCAN-01 and AIINS-01
@@ -78,11 +79,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Verify Android NDK toolchain and build test APK (`.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`) — resolves Plan 01-01 Task 3
+- Verify Android NDK toolchain and build test APK (`.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`) — non-blocking, backlog only (Phase 999.1); Android is out of MVP scope as of 2026-07-02
 
 ### Blockers/Concerns
 
-- Plan 01-01 (Track A) Tasks 1-2 done and verified; Task 3 (Android NDK verify + APK build, blocking checkpoint) NOT resolved as of 2026-07-02 — env fully set up (ANDROID_HOME/JAVA_HOME, emulators API 34 + API 36, gen/android scaffolded), APK builds and installs cleanly with zero crashes, but WebView never renders (blank white screen). Root cause narrowed to `libmacost_lib.so` never loading into the process (confirmed via `/proc/pid/maps`) — ruled out stale build, corrupted gen/android, and API-level mismatch. See `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md` for full diagnostic trail and next steps (Android Studio debugger, Tauri version pinning). Phase 1 success criterion #4 and Phase 2's dependency on Phase 1 stay unmet until resolved.
+- ~~Plan 01-01 (Track A) Task 3 (Android APK) blank-screen bug~~ — no longer a blocker for Phase 1/2. Descoped from MVP on 2026-07-02: Tauri Android is backlog-only (Phase 999.1). Android `libmacost_lib.so` bug remains unresolved but out of scope.
+- ~~Tauri desktop build/render unverified~~ — RESOLVED 2026-07-02 via quick task 260702-qs7: found and fixed a missing `app.windows` array in `tauri.conf.json` (Tauri v2 never spawns a window without it — that's why only the debug console appeared). Rebuilt, Hidayat confirmed the window renders correctly. Commit `625da25`. Phase 1 success criterion #4 (desktop-scoped) is now met.
 - UptimeRobot keep-alive for Render backend must be active before Phase 2 integration testing (cold start = 30-60s) — also blocked on backend deploy (Track B) which hasn't happened yet
 - AI/vision provider selection (GPT-4o Vision vs Google Cloud Vision) must be resolved at Phase 3 start
 
@@ -91,6 +93,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260702-j95 | Add Neulis and Helvetica local fonts to apps/web via next/font/local | 2026-07-02 | 7576b46 | [260702-j95-add-neulis-and-helvetica-local-fonts-to-](./quick/260702-j95-add-neulis-and-helvetica-local-fonts-to-/) |
+| 260702-qs7 | Verify Tauri desktop build works (found + fixed missing app.windows config) | 2026-07-02 | 625da25 | [260702-qs7-verify-tauri-desktop-build-works](./quick/260702-qs7-verify-tauri-desktop-build-works/) |
 
 ## Deferred Items
 
