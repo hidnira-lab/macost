@@ -90,7 +90,7 @@ export async function apiFetch<T>(
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
   const url = `${baseUrl}${path}`;
 
-  const token = getToken();
+  const token = await getToken();
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(init?.headers ?? {}),
@@ -139,7 +139,7 @@ export async function apiMutate<T>(
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
   const url = `${baseUrl}${path}`;
 
-  const resolvedToken = token ?? getToken();
+  const resolvedToken = token ?? await getToken();
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(resolvedToken ? { Authorization: `Bearer ${resolvedToken}` } : {}),
