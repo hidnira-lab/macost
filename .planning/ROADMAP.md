@@ -34,11 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Running `tauri android build` produces an APK that launches to the auth screen without a blank screen
   5. Frontend switches cleanly between mock data and the real API by toggling USE_MOCK — no other code changes required
 
-**Plans**: 3/4 plans executed
+**Plans**: 3/4 plans executed (01-01 deferred to backlog — see Phase 999.1)
 
 Plans:
 
-- [ ] 01-01-PLAN.md
+- [ ] 01-01-PLAN.md — DEFERRED (native/APK blank-screen bug, see Phase 999.1)
 - [x] 01-02-PLAN.md
 - [x] 01-03-PLAN.md
 - [x] 01-04-PLAN.md
@@ -147,16 +147,27 @@ Plans:
 
 ---
 
+## Backlog
+
+### Phase 999.1: Follow-up — Fix Tauri Android blank-screen bug (BACKLOG)
+
+**Goal:** `tauri android build` produces an APK that actually renders (currently: builds and installs cleanly with zero crashes, but the WebView never attaches — `libmacost_lib.so` never loads into the process, confirmed via `/proc/pid/maps`)
+**Source phase:** 1 (Plan 01-01, Task 3)
+**Deferred at:** 2026-07-02 — user decision: the MVP is the website (apps/web); native APK polish can wait until core web/backend product loop is done
+**Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
+**Plans:**
+- [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working APK) blocked on the blank-screen bug above
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task (01-01) is deferred to Phase 999.1 backlog — Phase 2 proceeds without waiting on it, per the critical-path note below (the MVP is the website).
 
-**Critical path note:** If time is critically short before the July 9-10 demo, Phase 2 alone is the minimum shippable demo. Phase 3 and 4 add Expo differentiators.
+**Critical path note:** If time is critically short before the July 9-10 demo, Phase 2 alone is the minimum shippable demo. Phase 3 and 4 add Expo differentiators. The native Android APK (01-01 Task 3) is explicitly deprioritized behind Phase 2 web/backend work as of 2026-07-02.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 3/4 (01-01 deferred) | In Progress |  |
 | 2. Core Product Loop | 0/TBD | Not started | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
