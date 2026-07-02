@@ -13,17 +13,17 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Authentication
 
-- [ ] **AUTH-01**: User dapat mendaftar akun baru dengan nama, email, dan password
-- [ ] **AUTH-02**: User dapat login dengan email dan password; sesi persisten di Tauri Android (via tauri-plugin-store, bukan localStorage)
-- [ ] **AUTH-03**: User dapat logout dari aplikasi
-- [ ] **AUTH-04**: Semua endpoint terproteksi oleh JWT Supabase (HS256 + audience: "authenticated")
+- [x] **AUTH-01**: User dapat mendaftar akun baru dengan nama, email, dan password
+- [x] **AUTH-02**: User dapat login dengan email dan password; sesi persisten di Tauri Android (via tauri-plugin-store, bukan localStorage)
+- [x] **AUTH-03**: User dapat logout dari aplikasi
+- [x] **AUTH-04**: Semua endpoint terproteksi oleh JWT Supabase (HS256 + audience: "authenticated")
 
 #### Wallets
 
-- [ ] **WALL-01**: User dapat membuat dompet baru (nama, misal: Gopay, Cash, Bank BCA)
-- [ ] **WALL-02**: User dapat melihat daftar dompet beserta saldo masing-masing
-- [ ] **WALL-03**: User dapat mengedit nama dompet
-- [ ] **WALL-04**: User dapat menghapus dompet
+- [x] **WALL-01**: User dapat membuat dompet baru (nama, misal: Gopay, Cash, Bank BCA)
+- [x] **WALL-02**: User dapat melihat daftar dompet beserta saldo masing-masing
+- [x] **WALL-03**: User dapat mengedit nama dompet
+- [x] **WALL-04**: User dapat menghapus dompet
 
 #### Transactions
 
@@ -138,14 +138,14 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| WALL-01 | Phase 1 | Pending |
-| WALL-02 | Phase 1 | Pending |
-| WALL-03 | Phase 1 | Pending |
-| WALL-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| WALL-01 | Phase 1 | Complete |
+| WALL-02 | Phase 1 | Complete |
+| WALL-03 | Phase 1 | Complete |
+| WALL-04 | Phase 1 | Complete |
 | TRAN-01 | Phase 2 | Pending |
 | TRAN-02 | Phase 2 | Pending |
 | TRAN-03 | Phase 2 | Pending |
@@ -182,6 +182,7 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | OFF-02 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 42 total
 - Mapped to phases: 42
 - Unmapped: 0 ✓

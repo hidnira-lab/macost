@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 1
 current_phase_name: Foundation
-status: planning
-stopped_at: Roadmap initialized — 4 phases derived from 42 v1 requirements; STATE.md created
-last_updated: "2026-07-01T21:09:20.534Z"
-last_activity: 2026-06-30
-last_activity_desc: Roadmap created; REQUIREMENTS.md traceability confirmed (42/42 requirements mapped)
+status: executing
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-07-02T02:56:06.489Z"
+last_activity: 2026-07-01
+last_activity_desc: "Completed 01-03-PLAN.md (Track C: API client + TypeScript interfaces)"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 1 of 4 (Foundation)
-Plan: 3 of 4 in current phase (Plan 3 complete)
-Status: In Progress
+Plan: 4 of 4 in current phase (Plan 3 complete)
+Status: Ready to execute
 Last activity: 2026-07-01 — Completed 01-03-PLAN.md (Track C: API client + TypeScript interfaces)
 
 Progress: [███░░░░░░░] 25%
@@ -55,6 +55,7 @@ Progress: [███░░░░░░░] 25%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01-foundation P02 | 25m | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - [01-03]: Static JSON imports for mocks (not fetch) — works in static export/Tauri without moving files to public/
 - [01-03]: apiFetch handles reads (mock-able); apiMutate always calls real API — keeps mutation paths clean
 - [01-03]: getToken() stub returns null until Track D merges Supabase session persistence layer
+- [Phase ?]: Use PyJWT (not python-jose) for Supabase JWT verification
+- [Phase ?]: JWTBearer: algorithms=[HS256] + audience=authenticated both required for Supabase token validation
+- [Phase ?]: Separate admin client (SERVICE_ROLE_KEY) and anon client (ANON_KEY) — admin creates users, anon issues tokens
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-01T21:09:20.524Z
-Stopped at: Completed 01-03-PLAN.md (Track C: API client + TypeScript interfaces)
+Last session: 2026-07-02T02:56:06.478Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

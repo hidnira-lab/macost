@@ -34,12 +34,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Running `tauri android build` produces an APK that launches to the auth screen without a blank screen
   5. Frontend switches cleanly between mock data and the real API by toggling USE_MOCK — no other code changes required
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 
 Plans:
 
 - [ ] 01-01-PLAN.md
-- [ ] 01-02-PLAN.md
+- [x] 01-02-PLAN.md
 - [x] 01-03-PLAN.md
 - [ ] 01-04-PLAN.md
 - [ ] 01-PLAN-A.md — Track A: Next.js static export config, Tauri 2.0 Android scaffold, tauri-plugin-store, NDK verification (Hidayat)
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/4 | In Progress|  |
+| 1. Foundation | 2/4 | In Progress|  |
 | 2. Core Product Loop | 0/TBD | Not started | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
