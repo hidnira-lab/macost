@@ -82,7 +82,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- Plan 01-01 (Track A) Tasks 1-2 done and verified; Task 3 (Android NDK verify + APK build, blocking checkpoint) deferred by Hidayat on 2026-07-02 — ANDROID_HOME not set, `gen/android` not initialized, no APK built yet. Phase 1 success criterion #4 and Phase 2's dependency on Phase 1 stay unmet until resolved.
+- Plan 01-01 (Track A) Tasks 1-2 done and verified; Task 3 (Android NDK verify + APK build, blocking checkpoint) NOT resolved as of 2026-07-02 — env fully set up (ANDROID_HOME/JAVA_HOME, emulators API 34 + API 36, gen/android scaffolded), APK builds and installs cleanly with zero crashes, but WebView never renders (blank white screen). Root cause narrowed to `libmacost_lib.so` never loading into the process (confirmed via `/proc/pid/maps`) — ruled out stale build, corrupted gen/android, and API-level mismatch. See `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md` for full diagnostic trail and next steps (Android Studio debugger, Tauri version pinning). Phase 1 success criterion #4 and Phase 2's dependency on Phase 1 stay unmet until resolved.
 - UptimeRobot keep-alive for Render backend must be active before Phase 2 integration testing (cold start = 30-60s) — also blocked on backend deploy (Track B) which hasn't happened yet
 - AI/vision provider selection (GPT-4o Vision vs Google Cloud Vision) must be resolved at Phase 3 start
 
