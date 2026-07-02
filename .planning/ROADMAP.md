@@ -65,6 +65,17 @@ Plans:
 
 ---
 
+### Phase 01.1: Local dev & deployment infra: docker-compose for backend+frontend local dev, .env config for backend and apps/web (Supabase creds, JWT secret), and deployment setup for Vercel (frontend), Render (backend), and Supabase (database) (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 1
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 01.1 to break down)
+
 ### Phase 2: Core Product Loop
 
 **Goal**: A user can enter a side income transaction, receive an SAW-ranked allocation suggestion within 2 seconds, confirm or skip it, and watch their goal progress update — the complete product value proposition works end-to-end and is demoable as a standalone Expo presentation
@@ -74,7 +85,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
 
   1. User enters a transaction using 3 fields or fewer (amount, category, wallet); side income is automatically labeled "Side Income" by the server — the frontend never sends a source field
-  2. An allocation suggestion modal appears within 2 seconds of saving a side income transaction, recommending 30-40% of the income toward the top SAW-ranked goal; the system never executes allocation without explicit user confirmation
+  2. An allocation suggestion modal appears within 2 seconds of saving a side income transaction, recommending 29-40% of the income toward the top SAW-ranked goal; the system never executes allocation without explicit user confirmation
   3. User can confirm the suggested allocation (goal progress advances immediately) or skip it (suggestion is saved as a pending item visible on the pending allocations page)
   4. User can create a savings goal, see goals ranked by the SAW algorithm, and toggle between Quick Win and Importance-First strategy — the ranking order visibly changes on toggle
   5. Dashboard displays the 5 KPIs in the research-validated sequence (expense breakdown → goal progress → monthly trend → overspending alert → total balance) and updates when the user changes the period filter
@@ -84,7 +95,7 @@ Plans:
 **Team ownership (parallel tracks):**
 
 - Hidayat (integration): USE_MOCK=false integration sessions Days 6-8; end-to-end integration test verifying allocation modal appears ≤2 seconds after side income POST; Tauri APK smoke test of full allocation flow
-- Fertika (`backend/`): Transaction CRUD with auto source_label from flag_pemasukan; SAW engine with edge case guards (0 goals, 1 goal, identical criteria values); allocation_service computing 30-40% suggestion; dashboard aggregation endpoints (5 KPIs + period filter); pending allocations GET endpoint
+- Fertika (`backend/`): Transaction CRUD with auto source_label from flag_pemasukan; SAW engine with edge case guards (0 goals, 1 goal, identical criteria values); allocation_service computing 29-40% suggestion; dashboard aggregation endpoints (5 KPIs + period filter); pending allocations GET endpoint
 - Khayyira (`apps/web/` Goals area): Goal list, goal detail, goal create/edit/delete pages per Figma; allocation confirmation modal (Sitemap #16); pending allocations page (Sitemap #17); SAW strategy toggle
 - Zarra (`apps/web/` Home/Dashboard): Dashboard page with 5 KPIs and period filter per Figma; transaction input form (max 3 required fields); transaction history with filter, edit, delete; wallet balance updates after transaction
 
@@ -93,7 +104,7 @@ Plans:
 - SAW division-by-zero on 0 or 1 goals returns HTTP 500 for new users — SAW-02 edge case guards are mandatory before backend integration
 - API contract drift between TypeScript mock interfaces and real backend response shapes — validate against actual API responses on Day 6 integration session, not at the end
 - Allocation modal must appear ≤2 seconds on real backend (not just mock) — test on Render deployment, not localhost only
-- Render free tier cold start (30-60s) kills a live demo — UptimeRobot keep-alive must be verified active before Phase 2 integration testing begins
+- Render free tier cold start (29-60s) kills a live demo — UptimeRobot keep-alive must be verified active before Phase 2 integration testing begins
 
 **UI hint**: yes
 
@@ -145,10 +156,6 @@ Plans:
 
 **UI hint**: yes
 
----
-
-## Backlog
-
 ### Phase 999.1: Follow-up — Tauri Android mobile (blank-screen bug, out of MVP scope) (BACKLOG)
 
 **Goal:** `tauri android build` produces an APK that actually renders (currently: builds and installs cleanly with zero crashes, but the WebView never attaches — `libmacost_lib.so` never loads into the process, confirmed via `/proc/pid/maps`)
@@ -156,6 +163,7 @@ Plans:
 **Deferred at:** 2026-07-02 — user decision: with ~1 week left before the demo and the Android build blocked/heavy on dev hardware, Tauri mobile is out of MVP scope entirely. MVP ships as web app (apps/web) + Tauri **desktop** build only; Android APK work (this backlog item) is revisited post-MVP if time allows.
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
+
 - [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
 
 ## Progress
