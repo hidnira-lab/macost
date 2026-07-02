@@ -69,7 +69,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - Backend base URL dev: `http://localhost:8000`; prod: `https://macost-api.onrender.com`
 - `apps/web/next.config.ts` - Minimal config (no static export flag set yet; needed before Tauri integration)
 - `apps/web/tsconfig.json` - Strict TypeScript; path alias `@/*` maps to repo root of `apps/web/`
-- No Docker Compose file found in root (referenced in CLAUDE.md but not yet created)
+- Local dev now runs via `docker compose up` from the repo root — two services: backend on :8000, frontend on :3000; no local Postgres container, Supabase stays hosted-only (D-02)
 
 ## Platform Requirements
 
@@ -77,8 +77,8 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - Python 3.12
 - npm for frontend dependency management
 - Python venv (`backend/venv/`) for backend
-- Backend: Render.com (FastAPI via Uvicorn)
-- Frontend/Mobile: Tauri 2.0 Android APK (static Next.js export); fallback PWA
+- Backend: Render.com (FastAPI via Uvicorn) — auto-deploys on push to main (D-06); no manual approval step, no staging environment
+- Frontend/Mobile: Vercel (apps/web's static export, primary web deploy target, auto-deploys on push to main per D-06); Tauri 2.0 Android APK (static Next.js export); fallback PWA
 - Database: Supabase (managed PostgreSQL)
 
 <!-- GSD:stack-end -->
