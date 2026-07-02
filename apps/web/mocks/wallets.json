@@ -1,6 +1,7 @@
 {
   "wallets": [
-    { "id_dompet": "wallet_001", "nama_dompet": "Gopay", "saldo": 250000 },
-    { "id_dompet": "wallet_002", "nama_dompet": "Cash", "saldo": 50000 }
+    {"id_dompet": "d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a", "nama_dompet": "GoPay", "saldo": 250000},
+    {"id_dompet": "e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b", "nama_dompet": "Cash", "saldo": 50000},
+    {"id_dompet": "f3a4b5c6-d7e8-9f0a-1b2c-3d4e5f6a7b8c", "nama_dompet": "Bank BCA", "saldo": 1600000}
   ]
 }
