@@ -212,6 +212,12 @@ Response (200) — gagal ekstraksi (fallback FR-017):
 }
 ```
 
+> **Implementasi AI Vision:** Menggunakan Gemini Flash (free tier) via Google AI Studio API.
+> Model: `gemini-2.5-flash`. API key disimpan di `backend/.env` sebagai `AI_VISION_API_KEY`.
+> Model yang sama juga dipakai untuk `POST /api/transactions/upload-statement` (parsing PDF e-statement).
+> Fallback: jika ekstraksi gagal atau field tidak lengkap, kembalikan `extracted: false`
+> dan biarkan user isi manual (FR-017). JANGAN retry otomatis — langsung tampilkan fallback.
+
 ### POST /api/transactions/upload-statement
 *Covers: FR-003 (e-statement)*
 
