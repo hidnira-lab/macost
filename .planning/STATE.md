@@ -78,12 +78,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- Verify Android NDK toolchain and build test APK (`.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`) — resolves Plan 01-01 Task 3
 
 ### Blockers/Concerns
 
-- Android NDK/toolchain setup must be verified on Hidayat's machine on Day 1 before other Phase 1 work proceeds
-- UptimeRobot keep-alive for Render backend must be active before Phase 2 integration testing (cold start = 30-60s)
+- Plan 01-01 (Track A) Tasks 1-2 done and verified; Task 3 (Android NDK verify + APK build, blocking checkpoint) deferred by Hidayat on 2026-07-02 — ANDROID_HOME not set, `gen/android` not initialized, no APK built yet. Phase 1 success criterion #4 and Phase 2's dependency on Phase 1 stay unmet until resolved.
+- UptimeRobot keep-alive for Render backend must be active before Phase 2 integration testing (cold start = 30-60s) — also blocked on backend deploy (Track B) which hasn't happened yet
 - AI/vision provider selection (GPT-4o Vision vs Google Cloud Vision) must be resolved at Phase 3 start
 
 ## Deferred Items
