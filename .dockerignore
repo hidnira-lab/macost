@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+out/
+
+# Tauri
+apps/native/src-tauri/target/
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Git
+.git
+
+# Dockerfiles
+Dockerfile*
