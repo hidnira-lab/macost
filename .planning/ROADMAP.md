@@ -70,13 +70,13 @@ Plans:
 **Goal:** A team member can run `docker compose up` and get backend+frontend running locally against the shared Supabase project, unblocking the Phase 1 UAT flows (register/login/wallets); both Vercel (frontend) and Render (backend) auto-deploy on every push to `main`.
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06 (informal IDs — no formal REQUIREMENTS.md entries exist for this inserted phase; see 01.1-RESEARCH.md `## Phase Requirements`)
 **Depends on:** Phase 1
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01.1-01-PLAN.md — Docker Compose local dev stack: docker-compose.yml, both Dockerfiles, .dockerignore files, corrected-name .env.example files, apps/web/.gitignore fix
-- [ ] 01.1-02-PLAN.md — Backend CORS update for the Vercel origin + render.yaml Blueprint for Render deployment
+- [x] 01.1-01-PLAN.md — Docker Compose local dev stack: docker-compose.yml, both Dockerfiles, .dockerignore files, corrected-name .env.example files, apps/web/.gitignore fix
+- [x] 01.1-02-PLAN.md — Backend CORS update for the Vercel origin + render.yaml Blueprint for Render deployment
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
