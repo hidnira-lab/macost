@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-07-02T15:00:59.889Z",
+  "phase": "01.1",
+  "phase_name": "local-dev-deployment-infra-docker-compose-for-backend-fronte",
+  "phase_dir": ".planning/phases/01.1-local-dev-deployment-infra-docker-compose-for-backend-fronte",
+  "plan": 3,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Document Vercel + Render + docker-compose in .claude/CLAUDE.md", "status": "done", "commit": "cb09a79"}
+  ],
+  "remaining_tasks": [
+    {"id": 2, "name": "Connect Vercel, Render, and UptimeRobot dashboards", "status": "in_progress", "progress": "Vercel: live and connected. Render: blocked on billing verification, card being added, hit rate-limit. UptimeRobot: not started (depends on Render being live)."}
+  ],
+  "blockers": [
+    {"description": "Render now requires a verified credit card on file to deploy free-tier Web Services (confirmed real Render policy as of 2026, not a config bug — render.yaml already correctly sets plan: free, no charge expected while on Free plan)", "type": "external", "workaround": "User is adding a card to their Render account now"},
+    {"description": "Render rate-limited the account after \"too many attempts\" during card verification / deploy retries", "type": "external", "workaround": "Wait before retrying card verification or Blueprint connect"}
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {"action": "Finish adding verified card to Render account, then retry Blueprint connect (New -> Blueprint -> connect repo, reads committed render.yaml) once the rate-limit clears", "context": "Render Web Services on the Free plan require card verification for anti-abuse; render.yaml (plan: free) is already correct and pushed to origin/main", "blocking": true},
+    {"action": "Fill Render's 4 sync:false env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, SUPABASE_JWT_SECRET) with the same values as local backend/.env", "context": "D-07: one shared Supabase project for local + prod", "blocking": true},
+    {"action": "Set up UptimeRobot monitor targeting https://macost-api.onrender.com/health, interval under 15 minutes", "context": "D-08 keep-alive for Render free-tier cold start; only reachable once Render deploy is live", "blocking": true},
+    {"action": "Report back the live Vercel URL and confirm Render /health is live", "context": "Needed to run the plan's final verification (health check, CORS check) and write 01.1-03-SUMMARY.md", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "Stick with Render (add verified card) instead of migrating to Cloudflare Workers Python", "rationale": "Cloudflare Workers Python Free plan needs no card, but it runs on Pyodide/WASM (not a standard uvicorn ASGI process) — would require rewriting render.yaml into a wrangler config and verifying supabase-py / pydantic-core (Rust-based) compatibility in that runtime. Too risky with MVP due 2026-07-09/10 and expo 2026-07-14 (~1 week out at time of decision). Render path keeps all of Wave 1-2's committed work (render.yaml, CORS, docker-compose) valid with zero migration.", "phase": "01.1"},
+    {"decision": "Pushed all Wave 1 + Wave 2 Task 1 commits to origin/main before dashboard setup", "rationale": "Vercel's import and Render's Blueprint both read from the GitHub remote, not the local machine — render.yaml specifically must exist on origin for Render's Blueprint auto-detect to work", "phase": "01.1"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Once Day confirms Render's card verification succeeded and the Blueprint deploy is live: (1) verify GET https://macost-api.onrender.com/health returns {\"status\":\"ok\"}, (2) confirm the live Vercel origin can call the Render API without a CORS error, (3) walk Day through the UptimeRobot monitor setup, (4) spawn a continuation gsd-executor agent for plan 01.1-03 Task 2 to write 01.1-03-SUMMARY.md and complete the plan, (5) run gsd-verifier (verify_phase_goal step) for phase 01.1 goal achievement.",
+  "context_notes": "Wave 1 (01.1-01 docker-compose stack, 01.1-02 CORS+render.yaml) executed in parallel worktrees, merged clean, pushed. Wave 2 (01.1-03) Task 1 (CLAUDE.md docs) done and merged via fast-forward + pushed. Task 2 is the plan's only checkpoint:human-action gate. Docker Desktop was unreachable in the 01.1-01 executor's sandbox, so full `docker compose up --build` smoke test is still outstanding — worth a manual check once things are unblocked, though it's not what's currently blocking phase completion."
+}
