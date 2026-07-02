@@ -73,9 +73,13 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
 
 - [ ] 01.1-01-PLAN.md — Docker Compose local dev stack: docker-compose.yml, both Dockerfiles, .dockerignore files, corrected-name .env.example files, apps/web/.gitignore fix
 - [ ] 01.1-02-PLAN.md — Backend CORS update for the Vercel origin + render.yaml Blueprint for Render deployment
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01.1-03-PLAN.md — Deployment enablement: connect Vercel/Render/UptimeRobot dashboards, document the new setup in .claude/CLAUDE.md
 
 ### Phase 2: Core Product Loop
