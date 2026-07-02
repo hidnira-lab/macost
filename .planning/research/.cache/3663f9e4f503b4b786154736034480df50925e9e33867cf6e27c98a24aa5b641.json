@@ -1,0 +1,1 @@
+{"content":"Next.js NEXT_PUBLIC_ prefixed env vars are inlined into the client JS bundle at 'next build' time; with output:'export' this means values are frozen at build time and require a rebuild to change, not just a dashboard env var update.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-02T13:15:50.457Z","ttl":86400000,"kind":"web"}

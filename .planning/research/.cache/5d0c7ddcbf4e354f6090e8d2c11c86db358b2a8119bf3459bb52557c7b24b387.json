@@ -1,0 +1,1 @@
+{"content":"Vercel auto-detects Next.js output:'export' and serves the static bundle from its edge CDN; monorepo subfolder deploys require setting Root Directory (e.g. apps/web) in project settings.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-02T13:15:49.893Z","ttl":86400000,"kind":"web"}

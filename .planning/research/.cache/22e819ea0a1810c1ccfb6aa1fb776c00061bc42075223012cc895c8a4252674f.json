@@ -1,0 +1,1 @@
+{"content":"docker-compose.yml version: key is obsolete since Compose v2 (2022) — current Compose Specification files start directly with 'services:' at document root, no version declaration needed.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-02T13:15:50.238Z","ttl":86400000,"kind":"web"}

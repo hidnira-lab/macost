@@ -1,0 +1,1 @@
+{"content":"Render FastAPI deploy: buildCommand 'pip install -r requirements.txt', startCommand 'uvicorn main:app --host 0.0.0.0 --port $PORT' — must bind 0.0.0.0 and read the dynamic $PORT env var, not a hardcoded port.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-02T13:15:50.068Z","ttl":86400000,"kind":"web"}
