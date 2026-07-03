@@ -65,12 +65,12 @@ Plans:
 
 ---
 
-### Phase 01.1: Local dev & deployment infra: docker-compose for backend+frontend local dev, .env config for backend and apps/web (Supabase creds, JWT secret), and deployment setup for Vercel (frontend), Render (backend), and Supabase (database) (INSERTED)
+### Phase 01.1: Local dev & deployment infra: docker-compose for backend+frontend local dev, .env config for backend and apps/web (Supabase creds, JWT secret), and deployment setup for Vercel (frontend), Railway (backend, switched from Render mid-phase), and Supabase (database) (INSERTED)
 
-**Goal:** A team member can run `docker compose up` and get backend+frontend running locally against the shared Supabase project, unblocking the Phase 1 UAT flows (register/login/wallets); both Vercel (frontend) and Render (backend) auto-deploy on every push to `main`.
+**Goal:** A team member can run `docker compose up` and get backend+frontend running locally against the shared Supabase project, unblocking the Phase 1 UAT flows (register/login/wallets); both Vercel (frontend) and Railway (backend) auto-deploy on every push to `main`.
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06 (informal IDs — no formal REQUIREMENTS.md entries exist for this inserted phase; see 01.1-RESEARCH.md `## Phase Requirements`)
 **Depends on:** Phase 1
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -80,7 +80,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01.1-03-PLAN.md — Deployment enablement: connect Vercel/Render/UptimeRobot dashboards, document the new setup in .claude/CLAUDE.md
+- [x] 01.1-03-PLAN.md — Deployment enablement: connect Vercel/Render/UptimeRobot dashboards, document the new setup in .claude/CLAUDE.md
 
 ### Phase 2: Core Product Loop
 
