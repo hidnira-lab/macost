@@ -118,16 +118,17 @@ Plans:
 
 ### Phase 3: Differentiators
 
-**Goal**: Users can photograph a receipt to auto-populate a transaction, import an e-statement PDF for bulk entry, view AI financial insights in Bahasa Indonesia with actionable verbs, and fine-tune SAW criteria weights — directly targeting the two validated churn causes (47% friction, 19% non-actionable reporting)
+**Goal**: Users can photograph a receipt to auto-populate a transaction, import an e-statement PDF for bulk entry, view AI financial insights in Bahasa Indonesia with actionable verbs, fine-tune SAW criteria weights, and access a Quick Access Panel shortcut on Home — directly targeting the two validated churn causes (47% friction, 19% non-actionable reporting)
 **Mode:** mvp
 **Depends on**: Phase 2
-**Requirements**: SCAN-01, SCAN-02, SCAN-03, ESTAT-01, ESTAT-02, ESTAT-03, AIINS-01, AIINS-02, AIINS-03, SAW-04, SAW-05
+**Requirements**: SCAN-01, SCAN-02, SCAN-03, ESTAT-01, ESTAT-02, ESTAT-03, AIINS-01, AIINS-02, AIINS-03, SAW-04, SAW-05, QAP-01
 **Success Criteria** (what must be TRUE):
 
   1. User can photograph or upload a receipt image; the app pre-populates merchant, amount, date, and suggested category; user reviews and corrects any field before saving — extracted data is never auto-saved without review; if extraction fails or exceeds 10 seconds, a fallback message directs the user to manual input
   2. User can upload an e-statement PDF; the app displays extracted transactions with possible-duplicate flags; user selects which to import; after confirmation the app reports how many transactions were imported and how many were skipped
   3. User can open a financial insights page and read AI-generated insights in Bahasa Indonesia, each with an action verb (Alokasikan, Kurangi, Pertimbangkan) linking to a relevant goal or category; if the LLM does not respond within 15 seconds, a fallback message directs the user to the Goals page
   4. User can open SAW weight settings, adjust the five criteria weights (must sum to 100% ± 0.001), see goal ranking update in response, and reset all weights to the research-default values from the n=62 survey
+  5. User sees a Quick Access Panel at the top of the Home page (post-login) with exactly 4 shortcuts — add transaction, scan receipt, top active goal (name + progress %), and current balance summary — each shortcut navigating to its target in one tap
 
 **Plans**: TBD
 
@@ -136,6 +137,7 @@ Plans:
 - AI/vision provider is not yet selected — must decide between GPT-4o Vision and Google Cloud Vision at the very start of Phase 3; this decision gates SCAN-01 and AIINS-01 completely
 - Indonesian receipt OCR quality varies significantly by provider — run a spike test against 3-5 real struk images before committing to a provider
 - LLM latency must be capped at 15 seconds with graceful fallback — no infinite spinners; enforce hard timeout server-side, not only on the frontend
+- Quick Access Panel must stay clean/informative, not crowded — max 4 shortcuts, large thumb-reachable tap targets (per PRD Final design note)
 
 **UI hint**: yes
 
@@ -171,6 +173,17 @@ Plans:
 **Plans:**
 
 - [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
+
+### Phase 999.2: Follow-up — AI Agent Chatbot (Could Have, post-MVP stretch goal) (BACKLOG)
+
+**Goal:** A conversational AI interface (Bahasa Indonesia) lets the user execute financial actions directly via chat — log a transaction, scan a receipt, ask current balance, allocate funds to a goal — accessible as a shortcut from the Quick Access Panel (QAP-01, Phase 3).
+**Source:** PRD Final revision (2026-07-03, dosen feedback) — FR-019, requirement `AIAGENT-01`
+**Deferred at:** 2026-07-04 — explicit MoSCoW Could Have / post-MVP. Fundamentally more complex than AIINS-01 (one-way insight, Phase 3): requires conversation state, tool-calling into internal APIs, and multi-turn orchestration. Per PRD: "JANGAN dikerjakan sebelum semua Must Have dan Should Have selesai" — do not plan or execute this phase until every Must Have and Should Have requirement (Phases 1-4) is done **and** the user gives explicit instruction to start it.
+**Requirements**: AIAGENT-01 (informal — no formal Kelompok entry; tracked in REQUIREMENTS.md v2/backlog section)
+**Depends on:** All Must Have + Should Have requirements complete (Phases 1-4); QAP-01 (Quick Access Panel, Phase 3) as the entry point
+**Plans:**
+
+- [ ] Not planned — do not run `/gsd-plan-phase 999.2` until explicit user go-ahead per the note above
 
 ## Progress
 

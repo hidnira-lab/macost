@@ -102,6 +102,7 @@ Recent decisions affecting current work:
 ### Roadmap Evolution
 
 - Phase 01.1 inserted after Phase 1: Local dev & deployment infra (Docker, .env, Vercel/Render/Supabase) - discovered blocking Phase 1 UAT testing (URGENT)
+- 2026-07-04: PRD Final revision (dosen feedback, 2026-07-03) added FR-018 (Quick Access Panel) and FR-019 (AI Agent Chatbot). QAP-01 added to Phase 3 requirements/success criteria. New backlog Phase 999.2 created for AI Agent Chatbot (AIAGENT-01) — explicit post-MVP, do not plan/execute without direct user instruction.
 
 ## Deferred Items
 

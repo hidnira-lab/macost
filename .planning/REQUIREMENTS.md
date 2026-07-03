@@ -91,6 +91,10 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 - [ ] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.001) (FR-014)
 - [ ] **SAW-05**: User dapat mereset bobot ke default hasil riset (n=62)
 
+#### Quick Access Panel
+
+- [ ] **QAP-01**: User melihat panel shortcut di halaman Home (setelah login) berisi maksimal 4 aksi cepat: tambah transaksi, scan struk, goal aktif teratas (nama + progress %), dan ringkasan saldo terkini (FR-018, PRD v1.2/Final)
+
 ---
 
 ### Kelompok 4 — Polish (Kualitas & Ketahanan)
@@ -115,6 +119,7 @@ Diakui namun ditangguhkan ke rilis berikutnya.
 - **EXT-01**: Custom user-managed categories — merusak flag_pemasukan taxonomy yang menjadi basis source detection; defer post-MVP
 - **EXT-02**: Push notification real-time — butuh FCM infrastructure; halaman pending suggestions cukup untuk MVP
 - **EXT-03**: Social/shared wallets — berbeda product category; dilutes personal finance identity
+- **AIAGENT-01**: AI Agent Chatbot — antarmuka percakapan yang mengeksekusi aksi keuangan (catat transaksi, scan struk, tanya saldo, alokasi ke goal) via chat (FR-019, PRD v1.2/Final, Could Have). Diakses dari Quick Access Panel (QAP-01). Eksplisit post-MVP: JANGAN dikerjakan sebelum seluruh Must Have + Should Have selesai dan tanpa instruksi eksplisit user — butuh conversation state & tool-calling yang jauh lebih kompleks dari AIINS-01 (insight satu arah). Tracked di ROADMAP.md Phase 999.2 (backlog).
 
 ---
 
@@ -177,16 +182,19 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | AIINS-03 | Phase 3 | Pending |
 | SAW-04 | Phase 3 | Pending |
 | SAW-05 | Phase 3 | Pending |
+| QAP-01 | Phase 3 | Pending |
 | VIS-01 | Phase 4 | Pending |
 | OFF-01 | Phase 4 | Pending |
 | OFF-02 | Phase 4 | Pending |
+| AIAGENT-01 | Phase 999.2 (backlog) | Not started — post-MVP, do not start without explicit instruction |
 
 **Coverage:**
 
-- v1 requirements: 42 total
-- Mapped to phases: 42
+- v1 requirements: 43 total
+- Mapped to phases: 43
 - Unmapped: 0 ✓
+- v2/backlog requirements: 4 total (EXT-01, EXT-02, EXT-03, AIAGENT-01)
 
 ---
 *Requirements defined: 2026-06-30*
-*Last updated: 2026-06-30 after initial definition*
+*Last updated: 2026-07-04 — added QAP-01 (FR-018, Phase 3) and AIAGENT-01 (FR-019, backlog Phase 999.2) per PRD Final revision (dosen feedback, 2026-07-03)*
