@@ -2,7 +2,7 @@
 
 **Versi:** v0.1 (draft awal — review bersama Hidayat & Fertika sebelum dikunci)
 **Base URL (dev):** `http://localhost:8000`
-**Base URL (prod):** `https://macost-api.onrender.com` *(sesuaikan setelah deploy)*
+**Base URL (prod):** `https://macost-production.up.railway.app` (Railway, live)
 **Format:** REST, JSON. Semua request/response berikut adalah **body**, bukan termasuk header.
 **Auth:** Bearer token (Supabase Auth JWT) di header `Authorization: Bearer <token>` untuk semua endpoint kecuali Auth.
 

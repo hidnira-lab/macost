@@ -66,7 +66,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 
 - No `.env` files committed; environment variables are expected at runtime
 - Required vars (from `API_CONTRACT.md`): Supabase URL, Supabase anon/service key, JWT secret
-- Backend base URL dev: `http://localhost:8000`; prod: Railway URL — pending first deploy, see plan 01.1-03
+- Backend base URL dev: `http://localhost:8000`; prod: `https://macost-production.up.railway.app` (Railway, live)
 - `apps/web/next.config.ts` - Minimal config (no static export flag set yet; needed before Tauri integration)
 - `apps/web/tsconfig.json` - Strict TypeScript; path alias `@/*` maps to repo root of `apps/web/`
 - Local dev now runs via `docker compose up` from the repo root — two services: backend on :8000, frontend on :3000; no local Postgres container, Supabase stays hosted-only (D-02)
@@ -77,7 +77,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - Python 3.12
 - npm for frontend dependency management
 - Python venv (`backend/venv/`) for backend
-- Backend: Railway (FastAPI via Uvicorn) — auto-deploys on push to main (D-06); no manual approval step, no staging environment (Railway URL — pending first deploy, see plan 01.1-03)
+- Backend: Railway (FastAPI via Uvicorn) — auto-deploys on push to main (D-06); no manual approval step, no staging environment. Live at `https://macost-production.up.railway.app`
 - Frontend/Mobile: Vercel (apps/web's static export, primary web deploy target, auto-deploys on push to main per D-06); Tauri 2.0 Android APK (static Next.js export); fallback PWA
 - Database: Supabase (managed PostgreSQL)
 
