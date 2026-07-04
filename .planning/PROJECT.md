@@ -77,6 +77,7 @@ Keputusan arsitektur dan desain yang sudah dikunci sebelum pembangunan fitur:
 - Fertika → `backend/` (Claude Code)
 - Khayyira → `apps/web/` area Goals (Cline)
 - Zarra → `apps/web/` area Home/Dashboard (Cline)
+- Hidayat juga pemegang akun tunggal untuk Vercel, Railway, dan Supabase — lihat Constraints untuk aturan scoping task platform-only Phase 2/3/4.
 
 Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...`); PR ke `main` setelah modul selesai.
 
@@ -93,6 +94,7 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 - **Source labeling:** Frontend tidak pernah mengirim field `source` — selalu baca `source_label` dari response backend
 - **SAW weights:** Default weights dari survey n=62 adalah baku; user hanya bisa override lewat FR-014 di goal-settings
 - **Tauri target (revised 2026-07-02, final 2026-07-04):** MVP target = Web (Vercel) + Tauri Desktop saja. Tauri mobile/Android APK adalah **post-MVP** — dipindah ke backlog Phase 999.1, tidak dikerjakan dalam sprint saat ini (lihat Key Decisions). PWA fallback juga **post-MVP** — keputusan sudah final, bukan lagi rencana cadangan aktif jika Tauri gagal.
+- **Platform ownership (Vercel/Railway/Supabase, Phase 2/3/4):** Hidayat adalah pemegang akun tunggal untuk tiga platform eksternal ini. Task yang butuh env var baru atau ubah dashboard setting di salah satunya wajib di-scope terpisah khusus Hidayat — tidak boleh memblokir Fertika/Khayyira/Zarra; mereka pakai placeholder/mock dulu, baru wiring setelah Hidayat selesai setup. Alur detail: `docs/PANDUAN_TEKNIKAL_TIM.md` Section 2a.
 
 ## Key Decisions
 

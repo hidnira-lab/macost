@@ -90,6 +90,30 @@ Dikutip persis dari `.planning/ROADMAP.md` Phase 2 — **jangan ada nama task/ph
 
 **UI hint**: yes (Phase 2 butuh desain Figma — lihat Section 4 soal `/gsd-ui-phase`).
 
+### 2a. Platform Ownership — Vercel, Railway, Supabase (Hidayat-only, berlaku Phase 2/3/4)
+
+**Aturannya:** Hidayat adalah **pemegang akun tunggal** untuk tiga platform eksternal ini — Vercel (deploy frontend), Railway (deploy backend), dan Supabase (database + auth). Mulai Phase 2/3/4, **setiap task/worktree yang butuh env var baru atau ubah dashboard setting** di salah satu dari tiga platform itu **wajib di-scope sebagai task terpisah, khusus untuk Hidayat** — jangan dicampur ke task dev reguler Fertika/Khayyira/Zarra.
+
+**Kenapa aturan ini ada:** hanya Hidayat yang punya akses dashboard ke tiga platform tersebut. Ini bukan aturan baru dari nol — pola ini **sudah terjadi persis seperti ini di Phase 1/01.1**: pembuatan project Supabase + migration `001_create_dompet.sql` (Section 1), generate domain publik Railway (Section 1, tidak ada auto-assigned URL seperti Render), dan fix env var `NEXT_PUBLIC_API_BASE_URL` di Vercel (Section 1a) — semuanya dikerjakan Hidayat sendiri, terpisah dari kode fitur, sementara anggota tim lain tetap jalan tanpa nunggu.
+
+**Langkah konkret kalau kalian di tengah task menemukan butuh env var baru atau dashboard setting baru:**
+
+1. **Jangan berhenti kerja** — lanjut ke langkah 2 dan 3 secara paralel, jangan nunggu.
+2. **Pakai placeholder/mock dulu**:
+   - Kalau butuh env var baru: tambahkan value dummy di `.env`/`.env.local` lokal kalian (**jangan pernah commit** file itu), atau tambahkan fallback/stub aman di kode supaya tidak crash — ikuti pola `USE_MOCK` yang sudah ada di `apps/web/lib/api/client.ts` (`NEXT_PUBLIC_USE_MOCK=true` → data mock lokal, `false` → backend asli) sebagai template stubbing semacam ini.
+   - Kalau butuh perubahan dashboard (misal tabel/kolom baru di Supabase yang butuh migration di project live): tulis SQL migration-nya sebagai file siap-serah, tapi **jangan jalankan sendiri** terhadap project Supabase live.
+3. **Laporkan kebutuhannya ke Hidayat** lewat channel tim, sertakan **persis empat hal ini**:
+   - (a) nama env var atau dashboard setting yang dibutuhkan secara presisi
+   - (b) platform mana (Vercel/Railway/Supabase)
+   - (c) FR/fitur mana yang membutuhkannya
+   - (d) placeholder/mock apa yang sedang dipakai sementara, supaya Hidayat tahu kalian tidak sedang terblokir
+4. **Lanjut develop pakai placeholder** — jangan nunggu balasan sebelum lanjut kerja.
+5. Hidayat akan **mem-batch semua request platform-only** jadi task terpisah per checkpoint phase (bukan dicampur ke PR fitur manapun).
+6. Hidayat akan **memberi sinyal selesai** di channel tim — untuk env var, value asli ditambahkan ke halaman Notion workspace API Keys (lihat Section 3); untuk dashboard change, Hidayat menyebutkan hasil konkretnya (contoh: "kolom X sudah ditambahkan ke tabel Y, migration sudah dijalankan di Supabase live").
+7. Kalian **swap placeholder ke value/config asli**, re-test end-to-end, hapus stub kode sementara yang tadi ditambahkan, lalu lanjut ke `/gsd-verify-work` seperti biasa.
+
+**Catatan penutup:** contoh nyata pola ini sudah terjadi di Phase 1/01.1 — project Supabase + migration `001_create_dompet.sql`, generate domain Railway, dan fix `NEXT_PUBLIC_API_BASE_URL` di Vercel — ketiganya dikerjakan Hidayat terpisah dari kode fitur, sementara sisa tim tetap jalan tanpa terblokir menunggu.
+
 ---
 
 ## 3. Setup Awal Tiap Orang

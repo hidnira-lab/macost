@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 01.1
 status: completed
 stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-04T12:35:00.000Z"
+last_updated: "2026-07-04T17:39:00.595Z"
 last_activity: 2026-07-04
-last_activity_desc: "Completed quick task 260704-r45: Updated env var sourcing instructions in docs/PANDUAN_TEKNIKAL_TIM.md to reference the Notion workspace instead of asking Hidayat directly (placeholder pending page creation)."
+last_activity_desc: "Completed quick task 260704-d4c: Fixed Supabase JWT verification (JWKS-based), Phase 1 Auth+Wallet foundation now fully passing against live stack. Phase 2 unblocked."
 progress:
   total_phases: 5
   completed_phases: 2
@@ -80,6 +80,7 @@ Recent decisions affecting current work:
 - [01.1-03]: Backend deploy target switched from Render to Railway — Render's card verification kept failing; Railway deploys the same Dockerfile with a one-line CMD change for `${PORT:-8000}`. Live at `https://macost-production.up.railway.app`. render.yaml removed.
 - [01.1-03]: Railway requires manually generating a public domain per service (Settings -> Networking -> Generate Domain) — no auto-assigned URL like Render's
 - [01.1-03]: `/health` route must use `@app.api_route(methods=["GET","HEAD"])`, not `@app.get` alone — UptimeRobot's HEAD-based checks return 405 on GET-only routes
+- [Phase ?]: [2026-07-05, quick-260705-0mm]: Hidayat is sole account holder for Vercel/Railway/Supabase — Phase 2/3/4 tasks needing new env vars or dashboard settings must be scoped as separate Hidayat-only tasks, never blocking Fertika/Khayyira/Zarra (placeholder/mock first, wire real value after). Rule locked in CLAUDE.md/.claude/CLAUDE.md/.planning/PROJECT.md; workflow detail in docs/PANDUAN_TEKNIKAL_TIM.md Section 2a.
 
 ### Pending Todos
 
@@ -136,6 +137,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-03T07:32:44.005Z
+Last session: 2026-07-04T17:38:10.257Z
 Stopped at: Phase 01.1 complete — all 3 plans done (Vercel + Railway + UptimeRobot live and verified)
 Resume file: none — next step is planning Phase 2 (`/gsd-plan-phase 2`)

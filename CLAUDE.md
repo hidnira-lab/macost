@@ -47,6 +47,8 @@ macost/
 
 Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...`), PR ke `main` setelah modul selesai — bukan langsung commit ke `main`.
 
+**Platform ownership (Phase 2/3/4):** Hidayat adalah pemegang akun tunggal Vercel, Railway, dan Supabase — task yang butuh env var baru atau ubah dashboard setting di tiga platform itu wajib di-scope terpisah khusus Hidayat, tidak boleh memblokir Fertika/Khayyira/Zarra. Alur detail (termasuk cara pakai placeholder/mock sementara): `docs/PANDUAN_TEKNIKAL_TIM.md` Section 2a.
+
 ## Sumber Desain UI
 
 Desain UI Macost dibuat di Stitch, lalu di-export & di-refine di Figma — **Figma adalah sumber kebenaran visual**, bukan deskripsi teks atau asumsi. Figma MCP server sudah terhubung ke Claude Code.
