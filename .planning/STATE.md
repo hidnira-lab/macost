@@ -101,7 +101,7 @@ Recent decisions affecting current work:
 | 260702-qs7 | Verify Tauri desktop build works (found + fixed missing app.windows config) | 2026-07-02 | 625da25 | [260702-qs7-verify-tauri-desktop-build-works](./quick/260702-qs7-verify-tauri-desktop-build-works/) |
 | 260702-r8s | Document AI vision model decision (Gemini Flash) in API_CONTRACT.md and CLAUDE.md | 2026-07-02 | c90b077 | [260702-r8s-update-api-contract-md-and-claude-md-wit](./quick/260702-r8s-update-api-contract-md-and-claude-md-wit/) |
 | 260704-axu | Investigasi status Phase 1 (termasuk fix 01.1), roadmap, deployment, dan tulis docs/PANDUAN_TEKNIKAL_TIM.md untuk Fertika, Khayyira, Zarra | 2026-07-04 | f97c9dd | [260704-axu-investigasi-status-phase-1-termasuk-fix-](./quick/260704-axu-investigasi-status-phase-1-termasuk-fix-/) |
-| 260704-bud | Re-run UAT Phase 1 terhadap stack live dan update dokumentasi mobile post-MVP | 2026-07-04 | (pending) | [260704-bud-re-run-uat-phase-1-terhadap-stack-live-d](./quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/) |
+| 260704-bud | Re-run UAT Phase 1 terhadap stack live dan update dokumentasi mobile post-MVP | 2026-07-04 | fb2d452 | [260704-bud-re-run-uat-phase-1-terhadap-stack-live-d](./quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/) |
 
 ### Roadmap Evolution
 
