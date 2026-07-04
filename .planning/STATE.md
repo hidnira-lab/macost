@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 01.1
 status: completed
 stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-03T07:32:44.005Z"
-last_activity: 2026-07-03
-last_activity_desc: Phase 01.1 marked complete
+last_updated: "2026-07-04T05:40:00.000Z"
+last_activity: 2026-07-04
+last_activity_desc: "Completed quick task 260704-h5i: Ganti root page apps/web/app/page.tsx dari template create-next-app menjadi redirect ke /login"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -105,6 +105,7 @@ Recent decisions affecting current work:
 | 260704-bud | Re-run UAT Phase 1 terhadap stack live dan update dokumentasi mobile post-MVP | 2026-07-04 | fb2d452 | [260704-bud-re-run-uat-phase-1-terhadap-stack-live-d](./quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/) |
 | 260704-d4c | Fix JWT verification to use Supabase JWKS instead of hardcoded HS256 secret (found + fixed while helping Hidayat provision Supabase) | 2026-07-04 | ebadf7c | [260704-d4c-fix-jwt-verification-to-use-supabase-jwk](./quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/) |
 | 260704-dbh | Update docs/PANDUAN_TEKNIKAL_TIM.md dengan status terbaru Phase 1 (UAT passing) dan Android/PWA post-MVP final | 2026-07-04 | 1a81e3a | [260704-dbh-update-docs-panduan-teknikal-tim-md-deng](./quick/260704-dbh-update-docs-panduan-teknikal-tim-md-deng/) |
+| 260704-h5i | Ganti root page apps/web/app/page.tsx dari template create-next-app menjadi redirect ke /login | 2026-07-04 | 7a83828 | [260704-h5i-ganti-root-page-apps-web-app-page-tsx-da](./quick/260704-h5i-ganti-root-page-apps-web-app-page-tsx-da/) |
 
 ### Roadmap Evolution
 
