@@ -166,7 +166,39 @@ Dari root repo. Ini menjalankan backend di `:8000` dan frontend di `:3000` — t
    - Jalankan `/gsd-execute-phase 2` sendiri terhadap plan track kalian, ATAU
    - Kalau tool kalian justru mencoba menjalankan semua plan dalam satu phase sekaligus, minta assistant kalian langsung mengeksekusi file `{phase}-0N-PLAN.md` spesifik yang menyebut nama/area kalian — GSD sudah menjamin tidak ada overlap file antar plan dalam satu wave yang sama.
 4. Setelah implementasi selesai, jalankan `/gsd-verify-work` untuk bagian kalian sendiri.
-5. Jalankan `/gsd-ship` untuk membuka PR ke `main`. **Jangan merge PR sendiri tanpa minimal satu self-review pass**, dan umumkan di channel tim (lihat Section 6).
+5. Jalankan `/gsd-ship` untuk membuka PR ke `main`. **Jangan merge PR sendiri tanpa minimal satu self-review pass**, dan umumkan di channel tim (lihat Section 6). Detail teknis `/gsd-ship` dan cara merge-nya ada di **Section 4a** di bawah.
+
+### 4a. Setup GitHub CLI (`gh`) — wajib satu kali per orang sebelum `/gsd-ship` bisa jalan
+
+`/gsd-ship` **butuh `gh` CLI ter-install dan sudah login** di komputer kalian — kalau belum, command-nya akan berhenti dan minta setup dulu. Lakukan sekali saja per orang:
+
+**1. Install GitHub CLI:**
+```bash
+# Windows
+winget install --id GitHub.cli
+
+# Mac
+brew install gh
+
+# Linux (Debian/Ubuntu)
+sudo apt install gh
+```
+
+**2. Login (interaktif, ikuti instruksi di terminal):**
+```bash
+gh auth login
+```
+Pilih **GitHub.com** → **HTTPS** → **Login with a web browser**, lalu masukkan kode one-time yang muncul di browser.
+
+**Penting soal apa yang `/gsd-ship` benar-benar lakukan:** command ini **otomatis membuat Pull Request** ke `main` (lewat `gh pr create`), tapi **tidak pernah otomatis merge**. Merge tetap langkah manual terpisah, supaya selalu ada kesempatan review sebelum masuk `main`. Setelah PR dibuat dan sudah di-self-review, merge dengan salah satu cara ini:
+
+- **Lewat GitHub web** — buka link PR yang di-print `/gsd-ship`, klik tombol **"Merge pull request"**, atau
+- **Lewat command line:**
+  ```bash
+  gh pr merge <nomor-PR> --merge
+  ```
+
+Setelah merge, ikuti aturan Section 6: umumkan di channel tim dengan link PR-nya, supaya yang lain tahu harus `git pull origin main` dulu sebelum lanjut kerja.
 
 **Aturan enforcement penting**: `/gsd-execute-phase` adalah entry point wajib per aturan `GSD Workflow Enforcement` di `.claude/CLAUDE.md` repo ini — **tidak boleh** langsung `Edit`/`Write` file di luar command GSD.
 
