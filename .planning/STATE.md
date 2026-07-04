@@ -104,6 +104,7 @@ Recent decisions affecting current work:
 | 260704-axu | Investigasi status Phase 1 (termasuk fix 01.1), roadmap, deployment, dan tulis docs/PANDUAN_TEKNIKAL_TIM.md untuk Fertika, Khayyira, Zarra | 2026-07-04 | f97c9dd | [260704-axu-investigasi-status-phase-1-termasuk-fix-](./quick/260704-axu-investigasi-status-phase-1-termasuk-fix-/) |
 | 260704-bud | Re-run UAT Phase 1 terhadap stack live dan update dokumentasi mobile post-MVP | 2026-07-04 | fb2d452 | [260704-bud-re-run-uat-phase-1-terhadap-stack-live-d](./quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/) |
 | 260704-d4c | Fix JWT verification to use Supabase JWKS instead of hardcoded HS256 secret (found + fixed while helping Hidayat provision Supabase) | 2026-07-04 | ebadf7c | [260704-d4c-fix-jwt-verification-to-use-supabase-jwk](./quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/) |
+| 260704-dbh | Update docs/PANDUAN_TEKNIKAL_TIM.md dengan status terbaru Phase 1 (UAT passing) dan Android/PWA post-MVP final | 2026-07-04 | (pending) | [260704-dbh-update-docs-panduan-teknikal-tim-md-deng](./quick/260704-dbh-update-docs-panduan-teknikal-tim-md-deng/) |
 
 ### Roadmap Evolution
 

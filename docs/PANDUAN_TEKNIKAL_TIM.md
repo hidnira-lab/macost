@@ -1,13 +1,21 @@
 # Panduan Teknikal Tim Zephyra — Macost
 
-> Dokumen ini dibuat untuk Fertika, Khayyira, dan Zarra supaya bisa langsung setup environment dan mulai eksekusi Phase 2 tanpa perlu bertanya balik ke Hidayat soal "phase apa" atau "command apa yang harus dijalankan". Semua instruksi di bawah adalah perintah yang bisa langsung copy-paste. Ditulis: 2026-07-04.
+> Dokumen ini dibuat untuk Fertika, Khayyira, dan Zarra supaya bisa langsung setup environment dan mulai eksekusi Phase 2 tanpa perlu bertanya balik ke Hidayat soal "phase apa" atau "command apa yang harus dijalankan". Semua instruksi di bawah adalah perintah yang bisa langsung copy-paste. Ditulis: 2026-07-04, direvisi: 2026-07-04 (setelah re-run UAT Phase 1 + fix Supabase/JWT — lihat Section 1).
 
 ---
 
 ## 1. Ringkasan Status Project Saat Ini
 
-**Phase 1 (Foundation): COMPLETE — 4/4 plan selesai.**
-Semua requirement `AUTH-01..04` dan `WALL-01..04` sudah ditandai **Complete** di `.planning/REQUIREMENTS.md`. Auth (register/login/logout, JWT Supabase HS256) dan Wallet CRUD sudah jadi.
+**Phase 1 (Foundation): COMPLETE — 4/4 plan selesai, dan sekarang benar-benar terverifikasi jalan di deployment live (bukan cuma kode jadi, tapi sudah ditest end-to-end).**
+Semua requirement `AUTH-01..04` dan `WALL-01..04` sudah ditandai **Complete** di `.planning/REQUIREMENTS.md`. Auth (register/login/logout) dan Wallet CRUD sudah jadi **dan sudah lolos re-run UAT terhadap `https://macost-production.up.railway.app` + `https://macost.vercel.app` pada 2026-07-04** — lihat paragraf di bawah.
+
+**PENTING — JWT verification method berubah, catat kalau kalian pernah baca dokumentasi lama:** Backend **tidak lagi** pakai HS256 + shared secret manual (`SUPABASE_JWT_SECRET`) untuk verifikasi token. Project Supabase live-nya pakai sistem **JWT Signing Keys** yang lebih baru (asimetrik, saat ini ES256), dan Supabase **tidak pernah expose secret HS256 yang bisa di-copy** untuk sistem itu — jadi verifikasi sekarang lewat endpoint publik **JWKS** Supabase (`PyJWKClient`, di `backend/dependencies/auth.py`), bukan secret manual. Kalau kalian lihat referensi lama ke "HS256" atau `SUPABASE_JWT_SECRET` di dokumen lain, itu sudah usang — abaikan.
+
+**Dua bug ditemukan dan diperbaiki hari ini (2026-07-04), sebelum kalian mulai Phase 2:**
+1. **Supabase project belum pernah dibuat** — register/login di live deployment sempat 500 karena tidak ada database Supabase sungguhan di baliknya. Sudah diperbaiki: Hidayat bikin project Supabase (`zscrbzdpoklxenfmsanh`), jalankan migration `backend/migrations/001_create_dompet.sql` (bikin tabel `dompet` + RLS policy), dan set credentials di Railway.
+2. **Algoritma JWT tidak cocok** — sesaat setelah Supabase live, `GET /api/wallets` dengan token asli tetap 401 karena kode backend expect HS256 sementara Supabase issue token ES256. Diperbaiki dengan rewrite `backend/dependencies/auth.py` ke verifikasi berbasis JWKS (commit `ebadf7c`, sudah di-merge ke `main`).
+
+Detail lengkap kedua fix ini: `.planning/quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/` dan `.planning/quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/`.
 
 **Phase 01.1 (Local dev & deployment infra): COMPLETE — 3/3 plan selesai.**
 Docker Compose lokal, `.env.example` untuk backend & frontend, dan deployment Vercel+Railway+UptimeRobot sudah live dan terverifikasi.
@@ -28,11 +36,17 @@ Kedua gap ini **sudah diperbaiki oleh commit `03d185c`** ("docs: fix stale Railw
 **Status Tauri — desktop vs Android (poin yang sering bikin bingung, disimak baik-baik):**
 - **Tauri desktop** (`tauri build`, Windows/WebView2): sempat blank window, ditemukan dan diperbaiki lewat quick task `260702-qs7` (config `app.windows` yang hilang di `tauri.conf.json`, commit `625da25`). Hidayat sudah **verifikasi visual** window desktop render UI asli, bukan blank. Ini **sudah tervalidasi**.
 - **Tauri Android**: build & install APK berjalan **tanpa crash**, tapi WebView **tidak pernah render** — `libmacost_lib.so` tidak pernah ter-load ke proses (dikonfirmasi via `/proc/pid/maps`). Masalah ini **belum terselesaikan** dan **sudah di-descope dari MVP** sejak 2026-07-02 ke backlog **Phase 999.1** (lihat `.planning/PROJECT.md` Key Decisions dan `.planning/ROADMAP.md` Phase 999.1).
-- **Tidak ada build PWA fallback yang benar-benar dibuat.** PWA masih sebatas rencana cadangan nominal di constraint awal — belum pernah dibangun atau ditest.
-- **MVP yang benar-benar dipakai untuk demo**: web app (`apps/web`, target utama, live di Vercel) + Tauri **desktop** build saja.
+- **PWA fallback juga resmi post-MVP (keputusan final 2026-07-04).** Sebelumnya PWA tertulis sebagai rencana cadangan aktif kalau Tauri gagal — sekarang keputusan sudah final: MVP = Web + Tauri Desktop saja, PWA tidak lagi jadi cadangan yang dikerjakan sebelum MVP. Tidak ada build PWA yang pernah dibuat atau ditest.
+- **MVP yang benar-benar dipakai untuk demo**: web app (`apps/web`, target utama, live di Vercel) + Tauri **desktop** build saja. Android dan PWA dua-duanya **post-MVP** — jangan kerjakan salah satunya kecuali ada instruksi eksplisit baru.
 
-**Follow-up yang masih terbuka (belum ada bukti git bahwa ini sudah diselesaikan):**
-`.planning/phases/01-foundation/01-UAT.md` menunjukkan Phase 1 UAT berhenti di **1/8 pass, 7/8 blocked** — dicatat 2026-07-02, **sebelum** Phase 01.1 (Docker/env/deploy) selesai di 2026-07-03. 7 item yang blocked (register, login+session persist, logout+401, wallet CRUD ×3, toggle USE_MOCK) **belum pernah di-re-run** setelah infra live, sejauh yang tercatat di git. **Rekomendasi: re-run `01-UAT.md` terhadap stack live Vercel+Railway sebelum atau saat mulai Phase 2**, jangan asumsikan otomatis pass.
+**UAT Phase 1 — SUDAH di-re-run terhadap stack live (2026-07-04), hasil: 6/8 pass.**
+`.planning/phases/01-foundation/01-UAT.md` sebelumnya berhenti di 1/8 pass, 7/8 blocked (dicatat 2026-07-02, sebelum Phase 01.1 selesai). Sekarang sudah di-re-run penuh terhadap `https://macost.vercel.app` + `https://macost-production.up.railway.app`, hasil akhir:
+
+- ✅ **Pass (6/8)**: desktop app launch, register, logout+401 (termasuk invalid-token check), create/rename/delete wallet
+- 🟡 **Partial (1/8)**: login — API-nya sudah confirmed jalan (200, token valid), tinggal 1x manual test buka-tutup app desktop buat konfirmasi session persist across restart
+- ⏸️ **Blocked, non-blocking (1/8)**: toggle `USE_MOCK` — ini butuh rebuild terpisah (env var di-inline saat build time), bukan sesuatu yang bisa dites di satu live deployment snapshot; bukan blocker untuk Phase 2
+
+**Kesimpulan: fondasi Auth + Wallet aman dipakai buat mulai Phase 2.** Detail lengkap tiap item ada di `.planning/phases/01-foundation/01-UAT.md`.
 
 **Gap dokumentasi minor (belum diperbaiki, non-blocking):**
 Gemini Flash (`gemini-2.5-flash`) sudah terdokumentasi dengan benar di kedua file CLAUDE.md (root `CLAUDE.md` dan `.claude/CLAUDE.md`) di bagian "AI Vision & LLM". Tapi **FR-018 (Quick Access Panel) dan FR-019 (AI Agent Chatbot) belum disebut di kedua file CLAUDE.md itu** — per commit `a96a5ab`, hanya `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`, `.planning/STATE.md`, dan `context/Macost_PRD.md` yang di-update. Ini gap dokumentasi kecil, bukan blocker — jangan anggap sudah selesai.
@@ -97,7 +111,9 @@ git checkout main && git pull
 ```bash
 cp backend/.env.example backend/.env
 ```
-Isi 5 value asli di `backend/.env` (minta ke Hidayat / dashboard project Supabase bersama): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET`, `AI_VISION_API_KEY`. **Jangan pernah commit file ini** — sudah di-gitignore.
+Isi value asli di `backend/.env` (minta ke Hidayat — project Supabase-nya **sudah live** per 2026-07-04, bukan lagi placeholder): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `AI_VISION_API_KEY`. **Jangan pernah commit file ini** — sudah di-gitignore.
+
+> **Catatan `SUPABASE_JWT_SECRET`:** kalau masih ada di `backend/.env.example` sebagai baris terpisah, itu **sudah tidak dipakai kode** sejak commit `ebadf7c` (2026-07-04) — verifikasi JWT sekarang lewat JWKS endpoint Supabase, bukan secret manual. Boleh diisi apa saja atau dikosongkan, tidak berpengaruh.
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
@@ -151,7 +167,7 @@ Berdasarkan `.planning/config.json`:
 - **`git.branching_strategy: "none"`** — artinya command GSD **tidak** otomatis membuatkan branch phase untuk kalian. Setiap orang **harus manual** `git checkout -b <branch-sendiri>` (lihat Section 4 Tahap B).
 - **`workflow.use_worktrees`** tidak di-override di config (default: `true`) — artinya setiap kali seseorang menjalankan `/gsd-execute-phase` atau `/gsd-quick`, GSD **otomatis** membuat git worktree terisolasi dan berumur pendek per executor subagent, supaya eksekusi plan paralel tidak saling menimpa perubahan yang belum di-commit — lalu GSD otomatis merge branch worktree itu kembali dan membersihkannya setelah selesai. **Tidak perlu command `git worktree` manual** dari siapapun.
 
-**Branch yang benar-benar ada saat ini**: `main`, dan `phase-1-foundation-and-environment` (branch kerja Hidayat untuk Phase 1 + 01.1, saat ini secara efektif sinkron dengan `main` — bukan template yang harus di-copy, dan bukan branch permanen per-fitur). Fertika, Khayyira, dan Zarra: **branch baru dari `main`**, bukan dari `phase-1-foundation-and-environment`.
+**Branch yang benar-benar ada saat ini**: `main`, dan `phase-1-foundation-and-environment` (branch kerja Hidayat untuk Phase 1 + 01.1 + fix Supabase/JWT hari ini — sudah di-push langsung ke `main`, jadi keduanya sekarang identik; bukan template yang harus di-copy, dan bukan branch permanen per-fitur). Fertika, Khayyira, dan Zarra: **branch baru dari `main`**, bukan dari `phase-1-foundation-and-environment`.
 
 ---
 
@@ -192,4 +208,4 @@ Catatan critical-path dari `.planning/ROADMAP.md`, diulang persis — **jangan d
 
 ---
 
-*Dokumen ini dibuat oleh quick task `260704-axu` — 2026-07-04.*
+*Dokumen ini dibuat oleh quick task `260704-axu`, direvisi oleh quick task `260704-dbh` — 2026-07-04, setelah UAT Phase 1 re-run (`260704-bud`) dan fix JWT/Supabase (`260704-d4c`).*
