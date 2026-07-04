@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 01.1
 status: completed
 stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-04T05:40:00.000Z"
+last_updated: "2026-07-04T06:35:00.000Z"
 last_activity: 2026-07-04
-last_activity_desc: "Completed quick task 260704-h5i: Ganti root page apps/web/app/page.tsx dari template create-next-app menjadi redirect ke /login"
+last_activity_desc: "Completed quick task 260704-ili: Fix misleading login/register error messages (distinguish structured API errors from raw network failures)"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -93,6 +93,8 @@ Recent decisions affecting current work:
 - ~~AI/vision provider selection~~ — RESOLVED 2026-07-02: Gemini Flash (`gemini-2.5-flash`) via Google AI Studio, free tier, documented in `API_CONTRACT.md` and `CLAUDE.md` ## AI Vision & LLM. Used for both scan-receipt and upload-statement. Dual-path with manual fallback (no auto-retry). AI Financial Assistant (F6) provider still tentative — likely same model, not finalized.
 - ~~Supabase database/project not provisioned~~ — RESOLVED 2026-07-04 by Hidayat: created the Supabase project, ran `backend/migrations/001_create_dompet.sql`, set `SUPABASE_URL`/`SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` in Railway. Register/login now return 201/200 against the live deployment (previously 500).
 - ~~JWT verification 500 instead of 401 on invalid tokens~~ — RESOLVED 2026-07-04, quick task `260704-d4c`, commit `ebadf7c` (merged to `main`). Root cause: the live Supabase project uses the newer asymmetric "JWT Signing Keys" system (ES256), and `backend/dependencies/auth.py` was hardcoded for legacy HS256 + a manually-copied shared secret that Supabase doesn't expose for that key type at all (confirmed by inspecting the JWKS endpoint directly — it never published an HS256 key, only ES256). Fixed by rewriting the dependency to verify via Supabase's JWKS endpoint (`PyJWKClient`) instead — works regardless of which asymmetric algorithm is currently active. All wallet CRUD + auth checks now pass end-to-end against the live deployment (register 201, login 200, GET/POST/PUT/DELETE /api/wallets 200/201/200/204, no-token 401, invalid-token 401). Full detail: `.planning/phases/01-foundation/01-UAT.md`. **Phase 2 is now unblocked on the Auth+Wallet foundation.**
+- ~~Login on macost.vercel.app showed "Email atau password salah" for a valid test account~~ — RESOLVED 2026-07-04. Root cause: Vercel's `NEXT_PUBLIC_API_BASE_URL` env var was still baked with the old pre-pivot Render URL (`https://macost-api.onrender.com`, confirmed dead — 404) instead of the live Railway URL, discovered by extracting the deployed JS bundle and grepping for the inlined `apiMutate` base URL. Every login/register request silently failed as a raw network error. Fixed by Hidayat updating the Vercel env var + redeploy. Contributing bug also fixed in code: `apps/web/app/(auth)/login/page.tsx` and `register/page.tsx` blindly rendered any caught error (including raw `fetch()`/network exceptions) as a credentials-blaming fallback message — fixed via quick task `260704-ili` (commit `2d98e42`), adding an `isApiErrorBody` type guard so unstructured/network errors now show an honest "Tidak dapat terhubung ke server" message instead.
+- **OPEN:** Tauri desktop `.exe` still shows the old create-next-app scaffold — it was built before the `260704-h5i` root-page-redirect fix landed on `main`; needs a rebuild (`beforeBuildCommand` re-runs `cd ../web && npm run build`, bundles `apps/web/out`). Additionally, once rebuilt, `apps/native/src-tauri/tauri.conf.json`'s `security.csp` `connect-src` whitelist still only allows `https://macost-api.onrender.com` (the dead Render URL) + Supabase + `localhost:8000` — it does **not** include `https://macost-production.up.railway.app`, so the desktop webview will CSP-block any request to the real backend even after rebuilding. `apps/web/.env.local` (gitignored, per-dev) also still has a placeholder `NEXT_PUBLIC_API_BASE_URL=x`, and there's no `apps/web/.env.production`, so a plain `npm run build` for the Tauri bundle would inline whatever `.env.local` currently holds. Not yet fixed — pending user decision on how to source the production API URL for Tauri builds (fix CSP + add `.env.production`, or pass the URL via build-time shell env).
 
 ### Quick Tasks Completed
 
@@ -106,6 +108,7 @@ Recent decisions affecting current work:
 | 260704-d4c | Fix JWT verification to use Supabase JWKS instead of hardcoded HS256 secret (found + fixed while helping Hidayat provision Supabase) | 2026-07-04 | ebadf7c | [260704-d4c-fix-jwt-verification-to-use-supabase-jwk](./quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/) |
 | 260704-dbh | Update docs/PANDUAN_TEKNIKAL_TIM.md dengan status terbaru Phase 1 (UAT passing) dan Android/PWA post-MVP final | 2026-07-04 | 1a81e3a | [260704-dbh-update-docs-panduan-teknikal-tim-md-deng](./quick/260704-dbh-update-docs-panduan-teknikal-tim-md-deng/) |
 | 260704-h5i | Ganti root page apps/web/app/page.tsx dari template create-next-app menjadi redirect ke /login | 2026-07-04 | 7a83828 | [260704-h5i-ganti-root-page-apps-web-app-page-tsx-da](./quick/260704-h5i-ganti-root-page-apps-web-app-page-tsx-da/) |
+| 260704-ili | Perbaiki error handling menyesatkan di login/register (bedakan structured API error vs raw network failure) | 2026-07-04 | 2d98e42 | [260704-ili-perbaiki-error-handling-menyesatkan-di-l](./quick/260704-ili-perbaiki-error-handling-menyesatkan-di-l/) |
 
 ### Roadmap Evolution
 
