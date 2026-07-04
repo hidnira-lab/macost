@@ -1,6 +1,6 @@
 # Panduan Teknikal Tim Zephyra — Macost
 
-> Dokumen ini dibuat untuk Fertika, Khayyira, dan Zarra supaya bisa langsung setup environment dan mulai eksekusi Phase 2 tanpa perlu bertanya balik ke Hidayat soal "phase apa" atau "command apa yang harus dijalankan". Semua instruksi di bawah adalah perintah yang bisa langsung copy-paste. Ditulis: 2026-07-04, direvisi: 2026-07-04 (setelah re-run UAT Phase 1 + fix Supabase/JWT — lihat Section 1).
+> Dokumen ini dibuat untuk Fertika, Khayyira, dan Zarra supaya bisa langsung setup environment dan mulai eksekusi Phase 2 tanpa perlu bertanya balik ke Hidayat soal "phase apa" atau "command apa yang harus dijalankan". Semua instruksi di bawah adalah perintah yang bisa langsung copy-paste. Ditulis: 2026-07-04, direvisi: 2026-07-04 (setelah re-run UAT Phase 1 + fix Supabase/JWT — lihat Section 1), direvisi lagi: 2026-07-04 sore (setelah rangkaian fix bug Tauri desktop — login, CORS, session persistence — lihat Section 1a).
 
 ---
 
@@ -34,19 +34,31 @@ Kedua gap ini **sudah diperbaiki oleh commit `03d185c`** ("docs: fix stale Railw
 - Auto-deploy: push ke `main` otomatis men-deploy ulang Vercel (frontend) dan Railway (backend) — tidak ada staging, tidak ada approval manual
 
 **Status Tauri — desktop vs Android (poin yang sering bikin bingung, disimak baik-baik):**
-- **Tauri desktop** (`tauri build`, Windows/WebView2): sempat blank window, ditemukan dan diperbaiki lewat quick task `260702-qs7` (config `app.windows` yang hilang di `tauri.conf.json`, commit `625da25`). Hidayat sudah **verifikasi visual** window desktop render UI asli, bukan blank. Ini **sudah tervalidasi**.
+- **Tauri desktop** (`tauri build`, Windows/WebView2): sempat blank window, ditemukan dan diperbaiki lewat quick task `260702-qs7` (config `app.windows` yang hilang di `tauri.conf.json`, commit `625da25`). Hidayat sudah **verifikasi visual** window desktop render UI asli, bukan blank. **Update 2026-07-04 sore:** login + session persistence juga sempat bermasalah (rangkaian bug CORS, CSP, dan redirect logic — lihat Section 1a di atas), sekarang **semuanya sudah fix dan diverifikasi manual end-to-end oleh Hidayat**: login berhasil, dan session tetap login setelah app di-close dan dibuka lagi.
 - **Tauri Android**: build & install APK berjalan **tanpa crash**, tapi WebView **tidak pernah render** — `libmacost_lib.so` tidak pernah ter-load ke proses (dikonfirmasi via `/proc/pid/maps`). Masalah ini **belum terselesaikan** dan **sudah di-descope dari MVP** sejak 2026-07-02 ke backlog **Phase 999.1** (lihat `.planning/PROJECT.md` Key Decisions dan `.planning/ROADMAP.md` Phase 999.1).
 - **PWA fallback juga resmi post-MVP (keputusan final 2026-07-04).** Sebelumnya PWA tertulis sebagai rencana cadangan aktif kalau Tauri gagal — sekarang keputusan sudah final: MVP = Web + Tauri Desktop saja, PWA tidak lagi jadi cadangan yang dikerjakan sebelum MVP. Tidak ada build PWA yang pernah dibuat atau ditest.
 - **MVP yang benar-benar dipakai untuk demo**: web app (`apps/web`, target utama, live di Vercel) + Tauri **desktop** build saja. Android dan PWA dua-duanya **post-MVP** — jangan kerjakan salah satunya kecuali ada instruksi eksplisit baru.
 
-**UAT Phase 1 — SUDAH di-re-run terhadap stack live (2026-07-04), hasil: 6/8 pass.**
-`.planning/phases/01-foundation/01-UAT.md` sebelumnya berhenti di 1/8 pass, 7/8 blocked (dicatat 2026-07-02, sebelum Phase 01.1 selesai). Sekarang sudah di-re-run penuh terhadap `https://macost.vercel.app` + `https://macost-production.up.railway.app`, hasil akhir:
+**UAT Phase 1 — SUDAH di-re-run terhadap stack live (2026-07-04), hasil: 7/8 pass.**
+`.planning/phases/01-foundation/01-UAT.md` sebelumnya berhenti di 1/8 pass, 7/8 blocked (dicatat 2026-07-02, sebelum Phase 01.1 selesai). Sekarang sudah di-re-run penuh terhadap `https://macost.vercel.app` + `https://macost-production.up.railway.app`, dan setelah rangkaian fix Tauri desktop yang dijelaskan di bawah (Section 1a), hasil akhir:
 
-- ✅ **Pass (6/8)**: desktop app launch, register, logout+401 (termasuk invalid-token check), create/rename/delete wallet
-- 🟡 **Partial (1/8)**: login — API-nya sudah confirmed jalan (200, token valid), tinggal 1x manual test buka-tutup app desktop buat konfirmasi session persist across restart
+- ✅ **Pass (7/8)**: desktop app launch, register, **login (termasuk session persist across app restart — dikonfirmasi manual oleh Hidayat 2026-07-04)**, logout+401 (termasuk invalid-token check), create/rename/delete wallet
 - ⏸️ **Blocked, non-blocking (1/8)**: toggle `USE_MOCK` — ini butuh rebuild terpisah (env var di-inline saat build time), bukan sesuatu yang bisa dites di satu live deployment snapshot; bukan blocker untuk Phase 2
 
 **Kesimpulan: fondasi Auth + Wallet aman dipakai buat mulai Phase 2.** Detail lengkap tiap item ada di `.planning/phases/01-foundation/01-UAT.md`.
+
+### 1a. Rangkaian bug Tauri desktop yang ditemukan dan diperbaiki sore ini (2026-07-04, setelah revisi dokumen sebelumnya)
+
+Ini kronologis penuh supaya tidak ada yang bingung kalau baca commit log atau `.planning/quick/` dan menemukan beberapa quick task yang saling koreksi satu sama lain — semuanya bagian dari satu sesi debugging berantai, dan **semua sudah fix & terverifikasi jalan**:
+
+1. **Root page masih template Next.js** (`apps/web/app/page.tsx`) — diganti jadi redirect ke `/login` (`260704-h5i`, commit `7a83828`).
+2. **Login/register menampilkan pesan salah** ("Email atau password salah") padahal penyebabnya error jaringan, bukan kredensial salah. Root cause aslinya: env var `NEXT_PUBLIC_API_BASE_URL` di Vercel masih menunjuk domain Render lama yang sudah mati (`https://macost-api.onrender.com`, confirmed 404) — sudah diupdate manual oleh Hidayat ke URL Railway + redeploy. Bug UX-nya (pesan error yang menyesatkan) diperbaiki di `260704-ili` (commit `2d98e42`) dengan type guard `isApiErrorBody` — sekarang error jaringan menampilkan pesan jujur ("Tidak dapat terhubung ke server...") bukan menyalahkan kredensial.
+3. **CSP Tauri desktop** (`apps/native/src-tauri/tauri.conf.json`) juga masih whitelist domain Render lama, bukan Railway — diperbaiki di `260704-jd2` (commit `d31602f`), sekaligus menambahkan catatan di `apps/web/.env.example` soal env var yang wajib diisi sebelum build Tauri untuk pemakaian nyata.
+4. **Login di app Tauri desktop tetap gagal connect** meski URL sudah benar — root cause: CORS di `backend/main.py` cuma whitelist `https://tauri.localhost` (HTTPS), padahal WebView2 di Windows kirim origin `http://tauri.localhost` (HTTP, tanpa "s"). Ditemukan lewat devtools yang sempat diaktifkan sementara (`260704-o31`) untuk lihat error console asli, lalu diperbaiki di `260704-ogx` (commit `4fb3c2a`) — origin HTTP ditambahkan ke `allow_origins`.
+5. **Session tidak persist setelah app di-close dan dibuka lagi.** Hipotesis pertama (kurang tepat): Tauri Store plugin butuh file `capabilities/` yang memang belum ada — sudah ditambahkan di `260704-oux` (commit `b7e9f3c`), tapi ternyata bukan itu penyebab sebenarnya (token memang sudah tersimpan benar di localStorage — dikonfirmasi lewat inspeksi langsung ke file data WebView2). **Penyebab asli:** `page.tsx` (dari poin #1 di atas) redirect ke `/login` **unconditional**, tidak pernah cek dulu apakah ada token tersimpan — jadi user selalu diminta login ulang walau session-nya sebenarnya masih valid. Diperbaiki di `260704-pju` (commit `42d94cf`): root page sekarang cek token dulu, baru redirect ke `/wallets` (kalau ada) atau `/login` (kalau tidak ada).
+6. **Devtools yang sempat diaktifkan sementara** (poin #4) sudah **di-revert lagi** di `260704-pyx` (commit `caf2b4b`) setelah semua bug di atas selesai — release build sekarang tidak lagi bisa dibuka DevTools-nya (F12/Inspect tidak berfungsi lagi), sesuai standar app production.
+
+**Known issue non-blocking, belum diperbaiki (dicatat di `.planning/STATE.md`):** pengecekan `'__TAURI__' in window` di `apps/web/lib/auth/session.ts` sebenarnya bukan cara yang benar untuk deteksi runtime Tauri v2 (butuh `app.withGlobalTauri: true` di `tauri.conf.json`, yang saat ini tidak di-set) — jadi app selalu jatuh ke localStorage, bukan pernah benar-benar memakai Tauri Store plugin. Ini **tidak masalah untuk desktop** (localStorage WebView2 reliable), tapi relevan kalau nanti ada yang lanjut ke Tauri Android (masih backlog Phase 999.1) karena `CLAUDE.md` sendiri mencatat localStorage tidak reliable di WebView Android. Kalau ada yang mengerjakan Android nanti, perbaiki dulu deteksi ini sebelum mengandalkan session persistence di sana.
 
 **Gap dokumentasi minor (belum diperbaiki, non-blocking):**
 Gemini Flash (`gemini-2.5-flash`) sudah terdokumentasi dengan benar di kedua file CLAUDE.md (root `CLAUDE.md` dan `.claude/CLAUDE.md`) di bagian "AI Vision & LLM". Tapi **FR-018 (Quick Access Panel) dan FR-019 (AI Agent Chatbot) belum disebut di kedua file CLAUDE.md itu** — per commit `a96a5ab`, hanya `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`, `.planning/STATE.md`, dan `context/Macost_PRD.md` yang di-update. Ini gap dokumentasi kecil, bukan blocker — jangan anggap sudah selesai.
@@ -208,4 +220,4 @@ Catatan critical-path dari `.planning/ROADMAP.md`, diulang persis — **jangan d
 
 ---
 
-*Dokumen ini dibuat oleh quick task `260704-axu`, direvisi oleh quick task `260704-dbh` — 2026-07-04, setelah UAT Phase 1 re-run (`260704-bud`) dan fix JWT/Supabase (`260704-d4c`).*
+*Dokumen ini dibuat oleh quick task `260704-axu`, direvisi oleh quick task `260704-dbh` (setelah UAT Phase 1 re-run `260704-bud` dan fix JWT/Supabase `260704-d4c`), dan direvisi lagi oleh quick task `260704-q9r` — 2026-07-04 sore, setelah rangkaian fix Tauri desktop (`260704-ili`, `260704-jd2`, `260704-ogx`, `260704-oux`, `260704-pju`, `260704-pyx`) yang membuat login + session persistence Tauri desktop akhirnya fully pass.*
