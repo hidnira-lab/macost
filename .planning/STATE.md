@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 01.1
+current_phase: 2
+current_phase_name: Core Product Loop
 status: completed
-stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-04T17:39:00.595Z"
-last_activity: 2026-07-04
-last_activity_desc: "Completed quick task 260704-d4c: Fixed Supabase JWT verification (JWKS-based), Phase 1 Auth+Wallet foundation now fully passing against live stack. Phase 2 unblocked."
+stopped_at: Phase 1 and Phase 01.1 both verified passed and marked complete; platform-ownership rule (quick-260705-0mm) documented
+last_updated: "2026-07-05T00:10:00.000Z"
+last_activity: 2026-07-05
+last_activity_desc: Regenerated/re-verified VERIFICATION.md for Phase 1 and Phase 01.1 (both now passed); resolved final human-verification items; transitioned to Phase 2; completed quick task 260705-0mm (Hidayat platform-ownership rule for Vercel/Railway/Supabase, Phase 2/3/4)
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 7
   completed_plans: 7
   percent: 40
-current_phase_name: local-dev-deployment-infra-docker-compose-for-backend-fronte
 ---
 
 # Project State
@@ -24,14 +24,14 @@ current_phase_name: local-dev-deployment-infra-docker-compose-for-backend-fronte
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 01.1 — local-dev-deployment-infra-docker-compose-for-backend-fronte
+**Current focus:** Phase 2 — Core Product Loop
 
 ## Current Position
 
-Phase: 01.1 — COMPLETE
-Plan: 3 of 3
-Status: Phase 01.1 complete
-Last activity: 2026-07-04 - Completed quick task 260704-d4c: Fixed Supabase JWT verification (JWKS-based), Phase 1 Auth+Wallet foundation now fully passing against live stack. Phase 2 unblocked.
+Phase: 2 — Core Product Loop
+Plan: Not started
+Status: Phase 1 & 01.1 complete, ready to plan
+Last activity: 2026-07-05 — Phase 1 and 01.1 verification closed out, transitioned to Phase 2
 
 Progress: [██████████] 100%
 
@@ -39,7 +39,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 7
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -47,7 +47,8 @@ Progress: [██████████] 100%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 4 | - | - |
+| 01.1 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -121,6 +122,7 @@ Recent decisions affecting current work:
 | 260704-q9r | Update docs/PANDUAN_TEKNIKAL_TIM.md with Tauri debugging session findings (login CORS + session persistence) | 2026-07-04 | b9cec46 | [260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng](./quick/260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng/) |
 | 260704-quj | Add gh CLI setup and PR/merge flow explanation to docs/PANDUAN_TEKNIKAL_TIM.md | 2026-07-04 | 9c91bd5 | [260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-](./quick/260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-/) |
 | 260704-r45 | Reference Notion workspace for env var sourcing instead of asking Hidayat directly | 2026-07-04 | c98b096 | [260704-r45-update-sumber-env-var-di-panduan-teknika](./quick/260704-r45-update-sumber-env-var-di-panduan-teknika/) |
+| 260705-0mm | Tetapkan aturan platform ownership (Hidayat pegang akun Vercel/Railway/Supabase, Phase 2/3/4) di CLAUDE.md/PROJECT.md, tambah Section 2a di PANDUAN_TEKNIKAL_TIM.md | 2026-07-05 | b334c9d, 8ee48c0 | [260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku](./quick/260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku/) |
 
 ### Roadmap Evolution
 
@@ -137,6 +139,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-04T17:38:10.257Z
-Stopped at: Phase 01.1 complete — all 3 plans done (Vercel + Railway + UptimeRobot live and verified)
+Last session: 2026-07-05T00:10:00.000Z
+Stopped at: Phase 1 and Phase 01.1 both verified passed and marked complete (formal VERIFICATION.md regenerated for Phase 1, re-verified for Phase 01.1; last two human-verification items — Tauri desktop restart persistence, Supabase env var parity — confirmed by Hidayat 2026-07-05); quick task 260705-0mm (platform-ownership rule) completed
 Resume file: none — next step is planning Phase 2 (`/gsd-plan-phase 2`)
