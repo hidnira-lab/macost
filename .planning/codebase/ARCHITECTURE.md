@@ -34,7 +34,7 @@
 | Component | Responsibility | File/Path |
 |-----------|----------------|-----------|
 | Next.js Web App | UI rendering, routing, API calls to backend | `apps/web/` |
-| Tauri Native Wrapper | Packages web static export as Android app | `apps/native/` |
+| Tauri Native Wrapper | Packages web static export as Desktop app (MVP target); Android is post-MVP | `apps/native/` |
 | FastAPI Backend | Business logic, data access, AI/SAW engine | `backend/main.py` |
 | SAW Engine | Goal ranking via weighted multi-criteria scoring | `backend/services/saw_engine.py` (planned) |
 | Supabase | Auth (JWT), PostgreSQL database, RLS | External (managed) |
@@ -58,7 +58,7 @@
 - Location: `apps/web/app/`
 - Contains: Next.js pages (App Router), layouts, components
 - Depends on: Backend REST API (or mocks during dev)
-- Used by: End users via browser or Tauri-wrapped Android app
+- Used by: End users via browser or Tauri-wrapped desktop app (Android is post-MVP)
 
 **API Contract Layer:**
 - Purpose: Shared interface specification between frontend and backend
@@ -73,7 +73,7 @@
 - Depends on: Supabase (auth + DB)
 
 **Native Packaging Layer:**
-- Purpose: Wrap the Next.js static export for Android (target) and PWA (fallback)
+- Purpose: Wrap the Next.js static export for Desktop (MVP target). Android and PWA are post-MVP.
 - Location: `apps/native/`
 - Contains: Tauri 2.0 configuration (scaffold — not yet populated)
 

@@ -1,63 +1,63 @@
 ---
 status: partial
 phase: 01-foundation
-source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md]
+source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md, quick-260704-bud]
 started: 2026-07-02T13:00:00.000Z
-updated: 2026-07-02T13:15:00.000Z
+updated: 2026-07-04T01:40:00.000Z
 ---
 
 ## Current Test
 
-[testing paused — 7 items outstanding, blocked on local dev/deployment infra setup (Docker, .env, Vercel/Render/Supabase config)]
+[re-run 2026-07-04 against live stack — frontend https://macost.vercel.app, backend https://macost-production.up.railway.app. Previous blocker (missing Docker/env/deploy config) is resolved: both services are live. A NEW blocker was found at the backend auth layer — see Gaps. 2/8 pass, 0/8 issues (code-side), 6/8 blocked by the new backend defect.]
 
 ## Tests
 
 ### 1. Desktop app launches and renders
 expected: Running the Tauri desktop build opens a window that renders the app's auth screen, not a blank window.
 result: pass
-source: automated
+source: manual (user-confirmed, 2026-07-04) — re-verified after Phase 01.1, still opens to auth screen.
 
 ### 2. Register a new account
 expected: Filling name, email, and password on the register page and submitting creates an account and lands the user on an authenticated screen (or redirects to login with a success indicator).
 result: blocked
 blocked_by: server
-reason: "No docker-compose.yml, no backend/.env, no apps/web/.env — backend has no Supabase credentials to run against. User requested going back to set up Docker, env config, and deployment (Vercel/Render/Supabase) before continuing UAT."
+reason: "Live backend returns 500 Internal Server Error on POST /api/auth/register. Confirmed via direct curl against https://macost-production.up.railway.app/api/auth/register with a valid payload (reproduced twice, ~0.4s response — an application exception, not a timeout). Validation layer works fine (missing-field payload correctly returns 422), so routing/Pydantic are healthy; the failure is in the Supabase Admin API call itself, most likely a missing/invalid Supabase credential in Railway's env vars. User also reproduced this live in the browser at https://macost.vercel.app: 'muncul registrasi gagal saat tekan button daftar' — confirms the deployed frontend is calling the real backend (USE_MOCK=false in this build) and hitting the same failure."
 
 ### 3. Log in and session persists across restart
 expected: Logging in with valid credentials succeeds and grants access to protected pages. Closing and reopening the Tauri desktop app keeps the user logged in (no re-login required).
 result: blocked
 blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+reason: "POST /api/auth/login returns 500 Internal Server Error for any credentials (confirmed via curl), same root cause as Test 2 — Supabase Admin/Auth API call fails server-side. Since no account can be created or logged into, session-persistence behavior cannot be exercised."
 
 ### 4. Log out and protected routes are blocked
 expected: Logging out clears the session; visiting a protected page (e.g., wallets) without a valid session is blocked/redirected, and calling a protected API endpoint without a JWT returns 401.
-result: blocked
+result: partial
 blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+reason: "The API-level check passes on its own: GET /api/wallets with no Authorization header correctly returns 401 {\"detail\":\"Not authenticated\"}. However, the full logout flow (establishing a session, logging out, confirming redirect) cannot be exercised end-to-end because login is broken (Test 3). Additionally, GET /api/wallets with an invalid/malformed bearer token returns 500 Internal Server Error instead of 401 — the JWT verification path does not catch invalid-token errors gracefully. This is a separate defect from the register/login issue and should be fixed alongside it."
 
 ### 5. Create a wallet
 expected: On the wallets page, creating a wallet (e.g., name "GoPay") adds it to the visible wallet list.
 result: blocked
 blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+reason: "Downstream of Test 3 — no valid session can be established to reach the wallets page as an authenticated user."
 
 ### 6. Rename a wallet
 expected: Editing a wallet's name and saving updates the displayed name.
 result: blocked
 blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+reason: "Same as Test 5 — blocked on login."
 
 ### 7. Delete a wallet
 expected: Deleting a wallet (after confirming) removes it from the visible wallet list.
 result: blocked
 blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+reason: "Same as Test 5 — blocked on login."
 
 ### 8. USE_MOCK toggle switches data source cleanly
 expected: Toggling the USE_MOCK env flag switches the frontend between mock JSON data and real backend API calls without requiring any other code changes.
 result: blocked
-blocked_by: server
-reason: "Same as Test 2 — backend/frontend not runnable without env + Docker setup."
+blocked_by: other
+reason: "Not independently exercised in this live re-run — toggling NEXT_PUBLIC_USE_MOCK requires a separate rebuild (it's inlined at Next.js build time, apps/web/lib/api/client.ts), which is outside the scope of testing a single live deployment. Code inspection confirms the branch logic is implemented correctly (apiFetch resolves to static mock JSON when USE_MOCK=true, always calls the real API for mutations). The current production build at https://macost.vercel.app is confirmed running with USE_MOCK=false, evidenced by the register failure surfacing the real backend's 500 error in the UI (Test 2) rather than mock success."
 
 ## Summary
 
@@ -67,8 +67,11 @@ issues: 0
 pending: 0
 skipped: 0
 blocked: 7
+partial: 1
 
 ## Gaps
 
-[none — blocked items are prerequisite gates, not code defects]
-</content>
+- **NEW blocker (backend):** `POST /api/auth/register` and `POST /api/auth/login` both return `500 Internal Server Error` on the live Railway deployment. Validation (422 on bad payload) works, so this is not a routing/Pydantic issue — it's the Supabase Admin/Auth API call itself failing, most likely a missing or invalid Supabase credential (service role key / project URL) in Railway's environment variables. Response time is fast (~0.4s), ruling out a Supabase free-tier cold-start/pause timeout as the cause.
+- **NEW blocker (backend):** Any protected endpoint call with an invalid/malformed bearer token (`GET /api/wallets` tested) returns `500 Internal Server Error` instead of `401`. The JWT verification path lacks exception handling for invalid tokens.
+- **Impact on Phase 2:** These are backend-only defects in the Auth layer that Phase 2 (per the team's ownership split, Fertika's area) would build directly on top of. Building goal/transaction/allocation endpoints on an Auth foundation that cannot issue or validate real sessions would compound the problem — any Phase 2 endpoint requiring `Authorization: Bearer <token>` is untestable end-to-end until this is fixed. **Recommend fixing both auth defects first** (check Railway env vars for Supabase credentials; add a try/except around JWT verification to return 401 on any invalid-token error) before starting Phase 2 work that depends on authenticated requests.
+- Wallet CRUD endpoints (POST/PUT/DELETE /api/wallets) were not reachable for testing at all — no valid token could be obtained. Once auth is fixed, these need a full re-run.

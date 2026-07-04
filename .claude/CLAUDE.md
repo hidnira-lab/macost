@@ -16,7 +16,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - **API contract:** Setiap perubahan shape endpoint di `API_CONTRACT.md` harus dikomunikasikan ke 4 anggota tim sebelum diimplementasikan
 - **Source labeling:** Frontend tidak pernah mengirim field `source` — selalu baca `source_label` dari response backend
 - **SAW weights:** Default weights dari survey n=62 adalah baku; user hanya bisa override lewat FR-014 di goal-settings
-- **Tauri target:** Android APK dari static export Next.js; fallback PWA jika Tauri gagal
+- **MVP target (final, 2026-07-04):** Web (Vercel) + Tauri Desktop saja. Android (Tauri Mobile) dan PWA: post-MVP, dikerjakan setelah MVP solid — lihat ROADMAP.md Phase 999.1.
 
 <!-- GSD:project-end -->
 
@@ -48,7 +48,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - ESLint 9.x with `eslint-config-next` 16.2.9 (`apps/web/`) - Linting
 - TypeScript strict mode (`apps/web/tsconfig.json` — `"strict": true`)
 - Uvicorn 0.49.0 (`backend/`) - ASGI server for FastAPI
-- Tauri 2.0 (`apps/native/`) - Android mobile wrapper (directory planned; not yet scaffolded)
+- Tauri 2.0 (`apps/native/`) - Desktop wrapper for MVP; Android mobile target is post-MVP (Phase 999.1)
 - Not yet configured (no test framework found in either `apps/web/package.json` or backend venv)
 
 ## Key Dependencies
@@ -78,7 +78,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - npm for frontend dependency management
 - Python venv (`backend/venv/`) for backend
 - Backend: Railway (FastAPI via Uvicorn) — auto-deploys on push to main (D-06); no manual approval step, no staging environment. Live at `https://macost-production.up.railway.app`
-- Frontend/Mobile: Vercel (apps/web's static export, primary web deploy target, auto-deploys on push to main per D-06); Tauri 2.0 Android APK (static Next.js export); fallback PWA
+- Frontend: Vercel (apps/web's static export, primary web deploy target, auto-deploys on push to main per D-06); Tauri 2.0 Desktop build (static Next.js export). Android APK and PWA fallback: post-MVP, not part of current deploy targets.
 - Database: Supabase (managed PostgreSQL)
 
 <!-- GSD:stack-end -->
@@ -177,7 +177,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 | Component | Responsibility | File/Path |
 |-----------|----------------|-----------|
 | Next.js Web App | UI rendering, routing, API calls to backend | `apps/web/` |
-| Tauri Native Wrapper | Packages web static export as Android app | `apps/native/` |
+| Tauri Native Wrapper | Packages web static export as Desktop app (MVP target); Android is post-MVP | `apps/native/` |
 | FastAPI Backend | Business logic, data access, AI/SAW engine | `backend/main.py` |
 | SAW Engine | Goal ranking via weighted multi-criteria scoring | `backend/services/saw_engine.py` (planned) |
 | Supabase | Auth (JWT), PostgreSQL database, RLS | External (managed) |
@@ -197,7 +197,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - Location: `apps/web/app/`
 - Contains: Next.js pages (App Router), layouts, components
 - Depends on: Backend REST API (or mocks during dev)
-- Used by: End users via browser or Tauri-wrapped Android app
+- Used by: End users via browser or Tauri-wrapped desktop app (Android is post-MVP)
 - Purpose: Shared interface specification between frontend and backend
 - Location: `API_CONTRACT.md` (repo root)
 - Contains: All endpoint definitions, request/response shapes, error formats
@@ -206,7 +206,7 @@ Pocket Management Information System (MIS) untuk mahasiswa Indonesia yang berpen
 - Location: `backend/`
 - Contains: FastAPI app, route handlers, service modules (planned)
 - Depends on: Supabase (auth + DB)
-- Purpose: Wrap the Next.js static export for Android (target) and PWA (fallback)
+- Purpose: Wrap the Next.js static export for Desktop (MVP target). Android and PWA are post-MVP.
 - Location: `apps/native/`
 - Contains: Tauri 2.0 configuration (scaffold — not yet populated)
 

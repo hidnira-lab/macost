@@ -377,6 +377,8 @@ Antarmuka Macost harus memenuhi standar WCAG 2.1 Level AA, terutama rasio kontra
 
 Seluruh *workflows* harus responsif & berfungsi penuh pada orientasi *portrait* dengan lebar layar minimal 360px (*Android-first approach*). Elemen pixel art pada Visual Progress harus dioptimasi agar ringan & tidak menyebabkan lag pada perangkat mid-range. Fitur Scan Struk (F1) harus mendukung akses kamera langsung dari dalam aplikasi. Mengingat MVP berbasis Tauri (target Android) dengan *fallback* PWA, aplikasi harus tetap berfungsi baik pada rentang layar 360px hingga 1440px.
 
+> **Update keputusan (final, 2026-07-04):** MVP target sekarang Web (Vercel) + Tauri Desktop saja — Android (Tauri Mobile) dan PWA fallback dipindah ke post-MVP (lihat `.planning/ROADMAP.md` Phase 999.1, `.planning/PROJECT.md`). Constraint lebar layar 360px–1440px di atas **tetap berlaku** sebagai target responsive web design, tapi bukan lagi untuk keperluan build APK Android — tidak ada lagi kebutuhan "Android-first" untuk MVP saat ini.
+
 ### VIII.III. UX Goal
 
 Pengguna baru harus dapat menyelesaikan *onboarding* (pembuatan goal pertama & pencatatan transaksi pertama) tanpa panduan eksternal, divalidasi via *unmoderated usability test*. Friction pada form input transaksi harian ditekan seminimal mungkin — saat proses dimulai dari membuka form hingga "Simpan" ditargetkan < 20 detik. Saran alokasi dari Smart Allocation (F5) harus ditampilkan sebagai *suggest & confirm*, bukan *auto-execute*, agar pengguna tidak merasa kontrol keuangannya diambil alih sistem (sesuai mitigasi R6 di Project Brief).
@@ -408,7 +410,7 @@ Antarmuka Macost memiliki *dual-identity* yang harus dijaga konsistensinya. Untu
 | **NFR-06** [Reliability] | Sistem harus menampilkan *fallback* input manual atau template response bila API AI vision (scan) tidak merespons dalam 10 detik atau API LLM (assistant) dalam 15 detik (FR-017), tanpa membuat alur pengguna terhenti. |
 | **NFR-07** [Availability] | Sistem harus memiliki *uptime* ≥ 99% di luar jadwal maintenance, dipantau via *monitoring tools* dengan laporan mingguan hingga Project EXPO. Khusus backend (Render free tier), endpoint di-*ping* sebelum sesi demo untuk menghindari *spin-down delay*. |
 | **NFR-08** [Accuracy] | Hasil ekstraksi AI vision/OCR atas nominal pada foto struk yang jelas harus mencapai akurasi ≥ 90% dibanding nilai aktual, diverifikasi pada sampel uji minimum 50 struk. |
-| **NFR-09** [Portability] | Aplikasi harus dapat diakses & berfungsi responsif pada lebar layar 360px (smartphone entry-level) hingga 1440px (laptop/desktop), mengingat MVP berbasis Tauri (Android) dengan fallback PWA. |
+| **NFR-09** [Portability] | Aplikasi harus dapat diakses & berfungsi responsif pada lebar layar 360px (smartphone entry-level) hingga 1440px (laptop/desktop), mengingat MVP berbasis Tauri (Android) dengan fallback PWA. **(Update final 2026-07-04: MVP = Web + Tauri Desktop saja; rentang 360px–1440px tetap berlaku untuk responsive web, Android/PWA post-MVP — lihat catatan di VIII.II.)** |
 
 ## X. Data Entity
 

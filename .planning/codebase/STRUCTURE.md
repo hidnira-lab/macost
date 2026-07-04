@@ -53,7 +53,7 @@ macost/                         # Monorepo root
 - Note: Replace API calls with real fetch calls once backend endpoint is live; remove mock import
 
 **`apps/native/`:**
-- Purpose: Tauri 2.0 project that wraps the Next.js static export as an Android app (fallback: PWA)
+- Purpose: Tauri 2.0 project that wraps the Next.js static export as a Desktop app (MVP target). Android and PWA fallback are post-MVP.
 - Contains: Tauri config, Rust source (scaffold — currently empty directory)
 - Owner: Hidayat
 

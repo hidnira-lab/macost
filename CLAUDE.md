@@ -11,8 +11,10 @@ Konteks project ini dibaca otomatis oleh Claude Code di setiap sesi. Selalu ruju
 - Frontend: Next.js (App Router, TypeScript, Tailwind) — static export untuk Tauri
 - Backend: FastAPI (Python)
 - Database & Auth: Supabase (PostgreSQL)
-- Mobile wrapper: Tauri 2.0 (target Android), fallback PWA
+- Desktop wrapper: Tauri 2.0 (target: desktop build)
 - Local dev: Docker Compose
+
+**MVP target (final, 2026-07-04): Web (Vercel) + Tauri Desktop saja.** Android (Tauri Mobile) dan PWA fallback: **post-MVP**, dikerjakan setelah MVP solid — lihat `.planning/ROADMAP.md` Phase 999.1 dan `.planning/PROJECT.md` Constraints/Out of Scope.
 
 ## Struktur Folder
 

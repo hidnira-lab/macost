@@ -67,6 +67,8 @@ Keputusan arsitektur dan desain yang sudah dikunci sebelum pembangunan fitur:
 - User-managed categories — kategori read-only untuk MVP, di-seed dari data riset
 - Auto-execute allocation — prinsip UX inti produk melarang ini tanpa pengecualian
 - Push notification real-time — pending suggestion cukup ditampilkan di halaman Notifikasi (Sitemap #17)
+- **Tauri Android APK (post-MVP, final 2026-07-04)** — dipindah ke backlog Phase 999.1; tidak dikerjakan dalam sprint MVP saat ini. Lihat Constraints & Key Decisions.
+- **PWA fallback (post-MVP, final 2026-07-04)** — sebelumnya tercatat sebagai rencana cadangan aktif jika Tauri gagal; keputusan sudah final bahwa MVP = Web (Vercel) + Tauri Desktop saja, jadi PWA bukan lagi cadangan yang dikerjakan sebelum MVP. Tidak ada build PWA yang pernah dibuat atau ditest.
 
 ## Context
 
@@ -90,7 +92,7 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 - **API contract:** Setiap perubahan shape endpoint di `API_CONTRACT.md` harus dikomunikasikan ke 4 anggota tim sebelum diimplementasikan
 - **Source labeling:** Frontend tidak pernah mengirim field `source` — selalu baca `source_label` dari response backend
 - **SAW weights:** Default weights dari survey n=62 adalah baku; user hanya bisa override lewat FR-014 di goal-settings
-- **Tauri target (revised 2026-07-02):** Web app (Next.js) adalah MVP utama; Tauri dipakai untuk compile desktop app saja. Tauri mobile/Android APK di-skip dari scope MVP — lihat Key Decisions.
+- **Tauri target (revised 2026-07-02, final 2026-07-04):** MVP target = Web (Vercel) + Tauri Desktop saja. Tauri mobile/Android APK adalah **post-MVP** — dipindah ke backlog Phase 999.1, tidak dikerjakan dalam sprint saat ini (lihat Key Decisions). PWA fallback juga **post-MVP** — keputusan sudah final, bukan lagi rencana cadangan aktif jika Tauri gagal.
 
 ## Key Decisions
 
@@ -102,6 +104,7 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 | Tanpa API bank/e-wallet resmi | Kendala biaya & partnership untuk proyek akademik | ✓ Good |
 | Static export untuk Tauri | Desktop & Android target butuh output statis dari Next.js | ✓ Good |
 | Skip Tauri mobile/Android, fokus web + Tauri desktop (2026-07-02) | Sisa waktu ~1 minggu ke expo; native Android build gagal (blank-screen, `libmacost_lib.so` never loads) dan berat untuk hardware dev; web app + Tauri desktop compile cukup untuk MVP & demo | ✓ Good |
+| PWA fallback dipindah ke post-MVP (final, 2026-07-04) | Sejalan dengan keputusan skip Android: MVP hanya Web + Tauri Desktop, jadi PWA tidak perlu jadi cadangan aktif; belum pernah dibangun/ditest sebelumnya | ✓ Good |
 | Dashboard KPI order locked | Urutan dari riset — bukan asumsi; tidak boleh diubah tanpa justifikasi penelitian baru | ✓ Good |
 | AI insight satu arah | Chat interaktif di luar scope MVP; insight satu arah cukup untuk menambah nilai | ✓ Good |
 | Mock-first frontend dev | Memungkinkan paralel development frontend & backend tanpa blocking | ✓ Good |

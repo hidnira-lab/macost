@@ -46,7 +46,7 @@
 
 **Hosting:**
 - Backend: Render.com (`https://macost-api.onrender.com`)
-- Frontend: Tauri 2.0 Android APK (static Next.js export); fallback PWA (hosting TBD)
+- Frontend: Vercel (web, primary MVP target); Tauri 2.0 Desktop build (static Next.js export). Android APK and PWA fallback: post-MVP.
 
 **CI Pipeline:**
 - `.github/workflows/` directory referenced in CLAUDE.md; no workflow files found yet

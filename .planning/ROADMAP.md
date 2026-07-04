@@ -164,11 +164,14 @@ Plans:
 
 **UI hint**: yes
 
-### Phase 999.1: Follow-up — Tauri Android mobile (blank-screen bug, out of MVP scope) (BACKLOG)
+### Phase 999.1: Follow-up — Tauri Android mobile (blank-screen bug, out of MVP scope) (BACKLOG — POST-MVP)
+
+**Status: post-MVP. Not being worked in the current sprint.** MVP target is Web (Vercel) + Tauri Desktop only.
 
 **Goal:** `tauri android build` produces an APK that actually renders (currently: builds and installs cleanly with zero crashes, but the WebView never attaches — `libmacost_lib.so` never loads into the process, confirmed via `/proc/pid/maps`)
 **Source phase:** 1 (Plan 01-01, Task 3)
 **Deferred at:** 2026-07-02 — user decision: with ~1 week left before the demo and the Android build blocked/heavy on dev hardware, Tauri mobile is out of MVP scope entirely. MVP ships as web app (apps/web) + Tauri **desktop** build only; Android APK work (this backlog item) is revisited post-MVP if time allows.
+**Final (2026-07-04):** Decision locked — Android (Tauri Mobile) is post-MVP, not started until after MVP ships. **PWA fallback is also post-MVP** as of this date: it was previously named as an active contingency plan if Tauri failed, but that's no longer the case — MVP = Web + Tauri Desktop only, with no PWA build ever produced or tested. Revisit both Android and PWA after the MVP is solid.
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
 

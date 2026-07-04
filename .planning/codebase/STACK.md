@@ -35,7 +35,7 @@
 - ESLint 9.x with `eslint-config-next` 16.2.9 (`apps/web/`) - Linting
 - TypeScript strict mode (`apps/web/tsconfig.json` — `"strict": true`)
 - Uvicorn 0.49.0 (`backend/`) - ASGI server for FastAPI
-- Tauri 2.0 (`apps/native/`) - Android mobile wrapper (directory planned; not yet scaffolded)
+- Tauri 2.0 (`apps/native/`) - Desktop wrapper for MVP; Android mobile target is post-MVP (Phase 999.1)
 
 **Testing:**
 - Not yet configured (no test framework found in either `apps/web/package.json` or backend venv)
@@ -76,7 +76,7 @@
 
 **Production:**
 - Backend: Render.com (FastAPI via Uvicorn)
-- Frontend/Mobile: Tauri 2.0 Android APK (static Next.js export); fallback PWA
+- Frontend: Vercel (web, primary MVP target); Tauri 2.0 Desktop build (static Next.js export). Android APK and PWA fallback: post-MVP, not current deploy targets.
 - Database: Supabase (managed PostgreSQL)
 
 ---
