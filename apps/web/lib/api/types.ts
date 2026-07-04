@@ -371,3 +371,20 @@ export interface ApiErrorBody {
     message: string;
   };
 }
+
+/**
+ * Narrows an unknown catch-block value to ApiErrorBody.
+ *
+ * apiFetch/apiMutate throw the parsed `{error:{code,message}}` body on a real
+ * non-ok HTTP response from the backend. A raw fetch() failure (network down,
+ * dead host, invalid URL, CORS, DNS) throws a plain Error/TypeError instead,
+ * which has no `error` property at all — this guard tells the two apart so
+ * callers never mistake a connectivity failure for a structured backend error.
+ */
+export function isApiErrorBody(value: unknown): value is ApiErrorBody {
+  if (typeof value !== "object" || value === null) return false;
+  const maybeError = (value as { error?: unknown }).error;
+  if (typeof maybeError !== "object" || maybeError === null) return false;
+  const { code, message } = maybeError as { code?: unknown; message?: unknown };
+  return typeof code === "string" && typeof message === "string";
+}
