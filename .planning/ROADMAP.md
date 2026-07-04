@@ -13,7 +13,7 @@ Macost delivers its MVP across four vertical phases on a 10-day timeline (target
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Working Tauri APK with auth and wallet management; all 4 developers unblocked for parallel work
+- [x] **Phase 1: Foundation** - Working Tauri APK with auth and wallet management; all 4 developers unblocked for parallel work (completed 2026-07-04)
 - [ ] **Phase 2: Core Product Loop** - Complete end-to-end flow: side income in → SAW ranks goals → allocation suggested → user confirms → goal advances
 - [ ] **Phase 3: Differentiators** - Receipt scan, e-statement import, AI financial insights, and SAW weight customization
 - [ ] **Phase 4: Polish** - Pixel art goal visualization and offline transaction cache for demo-day reliability
@@ -175,7 +175,7 @@ Plans:
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
 
-- [ ] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
+- [x] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
 
 ### Phase 999.2: Follow-up — AI Agent Chatbot (Could Have, post-MVP stretch goal) (BACKLOG)
 
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 4/4 (01-01 desktop-resolved) | Ready for verification |  |
+| 1. Foundation | 4/4 | Complete    | 2026-07-04 |
 | 2. Core Product Loop | 0/TBD | Not started | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

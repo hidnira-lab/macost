@@ -3,7 +3,7 @@ status: pass
 phase: 01-foundation
 source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md, quick-260704-bud, quick-260704-d4c]
 started: 2026-07-02T13:00:00.000Z
-updated: 2026-07-04T02:35:00.000Z
+updated: 2026-07-05T00:00:00.000Z
 ---
 
 ## Current Test
@@ -25,9 +25,8 @@ note: "Fixed in this session — see Gaps for the two root causes (Supabase not 
 
 ### 3. Log in and session persists across restart
 expected: Logging in with valid credentials succeeds and grants access to protected pages. Closing and reopening the Tauri desktop app keeps the user logged in (no re-login required).
-result: partial
-source: automated (curl) — POST /api/auth/login returns 200 with a working `access_token` that successfully authorizes subsequent /api/wallets calls, confirmed 2026-07-04.
-reason: "The API-level login + token-validity check now fully passes. The 'session persists across Tauri desktop app restart' half of this test still needs a manual desktop-app run (close app, reopen, confirm no re-login) — not exercised in this API-level re-verification. Recommend a quick manual pass before Phase 2 sign-off, but this is no longer blocked by any known defect."
+result: pass
+source: automated (curl, 2026-07-04) + manual (user-confirmed, 2026-07-05) — API-level login/token-validity check passes; Hidayat manually closed and reopened the Tauri desktop app and confirmed the session remained logged in, no re-login required.
 
 ### 4. Log out and protected routes are blocked
 expected: Logging out clears the session; visiting a protected page (e.g., wallets) without a valid session is blocked/redirected, and calling a protected API endpoint without a JWT returns 401.
@@ -52,24 +51,23 @@ source: automated (curl, 2026-07-04) — DELETE /api/wallets/{id} returns 204, f
 
 ### 8. USE_MOCK toggle switches data source cleanly
 expected: Toggling the USE_MOCK env flag switches the frontend between mock JSON data and real backend API calls without requiring any other code changes.
-result: blocked
-blocked_by: other
-reason: "Not independently exercised in this live re-run — toggling NEXT_PUBLIC_USE_MOCK requires a separate rebuild (it's inlined at Next.js build time, apps/web/lib/api/client.ts), which is outside the scope of testing a single live deployment. Code inspection confirms the branch logic is implemented correctly (apiFetch resolves to static mock JSON when USE_MOCK=true, always calls the real API for mutations). The current production build at https://macost.vercel.app is confirmed running with USE_MOCK=false (real backend calls), which now succeed end-to-end since the fixes in this session. Not a blocker for Phase 2 — this is a dev-workflow toggle, not a live-deployment behavior."
+result: pass
+source: code inspection (2026-07-04, re-affirmed 2026-07-05) — `apps/web/lib/api/client.ts` implements `apiFetch` as deterministic conditional branching on `process.env.NEXT_PUBLIC_USE_MOCK` (not a runtime state machine), so static code presence is sufficient evidence: `USE_MOCK=true` resolves to static mock JSON, anything else calls the real API. Exercising this live would require a separate Next.js build with the flag flipped (it's inlined at build time), which is a dev-workflow check rather than a live-deployment behavior — the current production build (`USE_MOCK=false`) is confirmed working end-to-end. Accepted by Hidayat as sufficient evidence, 2026-07-05.
 
 ## Summary
 
 total: 8
-passed: 6
+passed: 8
 issues: 0
 pending: 0
 skipped: 0
-blocked: 1
-partial: 1
+blocked: 0
+partial: 0
 
 ## Gaps
 
 - **RESOLVED (2026-07-04):** Supabase project/database was never provisioned. Fixed by Hidayat: created the Supabase project, ran `backend/migrations/001_create_dompet.sql` (creates `dompet` table + RLS policies), and set `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` in Railway env vars.
 - **RESOLVED (2026-07-04):** JWT verification in `backend/dependencies/auth.py` was hardcoded for legacy HS256 + a manually-copied shared secret. The live Supabase project uses the newer asymmetric "JWT Signing Keys" system, which doesn't expose a copyable secret for HS256 keys (confirmed by inspecting the JWKS response directly — it never listed the HS256 key, only ES256). Fixed by rewriting the dependency to verify via Supabase's JWKS endpoint (`PyJWKClient`) instead, keyed by the token's `kid` header — works regardless of which asymmetric algorithm Supabase has active. Commit `ebadf7c`, quick task `.planning/quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/`, merged to `main` (`0a918d3..ebadf7c`).
-- Item 8 (USE_MOCK toggle) remains not independently verified in a live pass — this requires a separate build with the flag flipped, which is a dev-workflow check rather than something a single live deployment snapshot can confirm. Not a blocker.
-- Item 3's "session persists across Tauri desktop app restart" needs one manual desktop-app pass (close/reopen, confirm no re-login) — the underlying API behavior (login issuing a working token) is confirmed, only the desktop persistence layer's actual restart behavior is untested in this pass.
+- **RESOLVED (2026-07-05):** Item 3's "session persists across Tauri desktop app restart" manually confirmed by Hidayat — closed and reopened the desktop app, session remained logged in.
+- **RESOLVED (2026-07-05):** Item 8 (USE_MOCK toggle) accepted on code-inspection evidence alone (deterministic conditional branching, not a runtime state machine) — a separate build with the flag flipped was judged unnecessary for this dev-workflow toggle.
 - **Impact on Phase 2:** Auth + Wallet CRUD are now confirmed working end-to-end against the live deployment. **Safe for Fertika to start Phase 2** on top of this foundation — any endpoint requiring `Authorization: Bearer <token>` can now be built and tested against a real, working Supabase-backed auth flow.

@@ -30,6 +30,9 @@ Keputusan arsitektur dan desain yang sudah dikunci sebelum pembangunan fitur:
 - ✓ Smart Allocation: selalu suggest-and-confirm, tidak pernah auto-execute
 - ✓ UI di-desain di Figma (21 halaman, hasil refine dari Stitch) — Figma adalah sumber kebenaran visual
 - ✓ Dashboard KPI order research-validated: expense breakdown → goal progress → monthly trend → overspending alert → total balance
+- ✓ Auth: User dapat register, login, dan logout via Supabase Auth — Phase 1 (AUTH-01–04), diverifikasi live 2026-07-04/05, termasuk session persistence lintas restart Tauri desktop
+- ✓ FR-018: User dapat mengelola dompet (wallet) — CRUD nama & saldo — Phase 1 (WALL-01–04), diverifikasi live end-to-end terhadap deployment production
+- ✓ Local dev & deployment infra: docker-compose lokal, Vercel (frontend) + Railway (backend, dipindah dari Render) auto-deploy, UptimeRobot keep-alive — Phase 01.1 (INFRA-01–06)
 
 ### Active
 
@@ -37,8 +40,6 @@ Keputusan arsitektur dan desain yang sudah dikunci sebelum pembangunan fitur:
 - [ ] FR-001: User dapat input transaksi manual (nominal, jenis, kategori, tanggal, catatan)
 - [ ] FR-005: Sistem otomatis melabeli pemasukan sebagai Allowance/Side Income dari kategori (server-side)
 - [ ] FR-006: Dashboard dengan urutan KPI spesifik hasil riset
-- [ ] FR-018: User dapat mengelola dompet (wallet) — CRUD nama & saldo
-- [ ] Auth: User dapat register, login, dan logout via Supabase Auth
 
 **Kelompok 2 — Inti Produk (nilai utama):**
 - [ ] FR-007: User dapat membuat goal baru (nama, target nominal, deadline, skor keinginan)
@@ -77,6 +78,7 @@ Keputusan arsitektur dan desain yang sudah dikunci sebelum pembangunan fitur:
 - Fertika → `backend/` (Claude Code)
 - Khayyira → `apps/web/` area Goals (Cline)
 - Zarra → `apps/web/` area Home/Dashboard (Cline)
+- Hidayat juga pemegang akun tunggal untuk Vercel, Railway, dan Supabase — lihat Constraints untuk aturan scoping task platform-only Phase 2/3/4.
 
 Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...`); PR ke `main` setelah modul selesai.
 
@@ -93,6 +95,7 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 - **Source labeling:** Frontend tidak pernah mengirim field `source` — selalu baca `source_label` dari response backend
 - **SAW weights:** Default weights dari survey n=62 adalah baku; user hanya bisa override lewat FR-014 di goal-settings
 - **Tauri target (revised 2026-07-02, final 2026-07-04):** MVP target = Web (Vercel) + Tauri Desktop saja. Tauri mobile/Android APK adalah **post-MVP** — dipindah ke backlog Phase 999.1, tidak dikerjakan dalam sprint saat ini (lihat Key Decisions). PWA fallback juga **post-MVP** — keputusan sudah final, bukan lagi rencana cadangan aktif jika Tauri gagal.
+- **Platform ownership (Vercel/Railway/Supabase, Phase 2/3/4):** Hidayat adalah pemegang akun tunggal untuk tiga platform eksternal ini. Task yang butuh env var baru atau ubah dashboard setting di salah satunya wajib di-scope terpisah khusus Hidayat — tidak boleh memblokir Fertika/Khayyira/Zarra; mereka pakai placeholder/mock dulu, baru wiring setelah Hidayat selesai setup. Alur detail: `docs/PANDUAN_TEKNIKAL_TIM.md` Section 2a.
 
 ## Key Decisions
 
@@ -108,6 +111,8 @@ Setiap orang kerja di branch sendiri (`backend/...`, `frontend/...`, `native/...
 | Dashboard KPI order locked | Urutan dari riset — bukan asumsi; tidak boleh diubah tanpa justifikasi penelitian baru | ✓ Good |
 | AI insight satu arah | Chat interaktif di luar scope MVP; insight satu arah cukup untuk menambah nilai | ✓ Good |
 | Mock-first frontend dev | Memungkinkan paralel development frontend & backend tanpa blocking | ✓ Good |
+| Backend deploy pindah Render → Railway (Phase 01.1) | Render mewajibkan verifikasi kartu kredit untuk free-tier Web Services dan sempat rate-limit akun; Railway men-deploy Dockerfile yang sama dengan perubahan minimal (`${PORT:-8000}`) | ✓ Good |
+| JWT verification via Supabase JWKS endpoint, bukan hardcoded HS256 secret (Phase 1) | Supabase project asli pakai "JWT Signing Keys" asimetris (ES256) yang tidak pernah expose secret HS256 — pendekatan original di plan (HS256 + shared secret) secara struktural tidak kompatibel. `PyJWKClient` + `kid` header bekerja untuk algoritma apa pun yang aktif | ✓ Good |
 
 ## Evolution
 
@@ -127,4 +132,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-30 after initialization*
+*Last updated: 2026-07-05 after Phase 1 & Phase 01.1*
