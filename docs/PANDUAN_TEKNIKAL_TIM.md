@@ -123,7 +123,9 @@ git checkout main && git pull
 ```bash
 cp backend/.env.example backend/.env
 ```
-Isi value asli di `backend/.env` (minta ke Hidayat — project Supabase-nya **sudah live** per 2026-07-04, bukan lagi placeholder): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `AI_VISION_API_KEY`. **Jangan pernah commit file ini** — sudah di-gitignore.
+Isi value asli di `backend/.env` (project Supabase-nya **sudah live** per 2026-07-04, bukan lagi placeholder): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`, `AI_VISION_API_KEY`. **Jangan pernah commit file ini** — sudah di-gitignore.
+
+> **Ambil value-nya dari Notion workspace Zephyra**, halaman khusus API Keys — *[Nama/link halaman Notion API Keys — TBD, akan diisi Hidayat setelah page-nya dibuat]*. Kalau halamannya belum kalian temukan, tanya di channel tim, jangan tebak-tebak isi credential sendiri.
 
 > **Catatan `SUPABASE_JWT_SECRET`:** kalau masih ada di `backend/.env.example` sebagai baris terpisah, itu **sudah tidak dipakai kode** sejak commit `ebadf7c` (2026-07-04) — verifikasi JWT sekarang lewat JWKS endpoint Supabase, bukan secret manual. Boleh diisi apa saja atau dikosongkan, tidak berpengaruh.
 

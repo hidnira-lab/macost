@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 01.1
 status: completed
 stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-04T12:25:00.000Z"
+last_updated: "2026-07-04T12:35:00.000Z"
 last_activity: 2026-07-04
-last_activity_desc: "Completed quick task 260704-quj: Added gh CLI setup and PR/merge flow explanation to docs/PANDUAN_TEKNIKAL_TIM.md."
+last_activity_desc: "Completed quick task 260704-r45: Updated env var sourcing instructions in docs/PANDUAN_TEKNIKAL_TIM.md to reference the Notion workspace instead of asking Hidayat directly (placeholder pending page creation)."
 progress:
   total_phases: 5
   completed_phases: 2
@@ -119,6 +119,7 @@ Recent decisions affecting current work:
 | 260704-pyx | Revert temporary Tauri devtools feature after debugging session | 2026-07-04 | caf2b4b | [260704-pyx-revert-devtools-feature-di-cargo-toml-se](./quick/260704-pyx-revert-devtools-feature-di-cargo-toml-se/) |
 | 260704-q9r | Update docs/PANDUAN_TEKNIKAL_TIM.md with Tauri debugging session findings (login CORS + session persistence) | 2026-07-04 | b9cec46 | [260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng](./quick/260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng/) |
 | 260704-quj | Add gh CLI setup and PR/merge flow explanation to docs/PANDUAN_TEKNIKAL_TIM.md | 2026-07-04 | 9c91bd5 | [260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-](./quick/260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-/) |
+| 260704-r45 | Reference Notion workspace for env var sourcing instead of asking Hidayat directly | 2026-07-04 | c98b096 | [260704-r45-update-sumber-env-var-di-panduan-teknika](./quick/260704-r45-update-sumber-env-var-di-panduan-teknika/) |
 
 ### Roadmap Evolution
 
