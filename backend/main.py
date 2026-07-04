@@ -11,6 +11,7 @@ app.add_middleware(
     allow_origins=[
         "tauri://localhost",
         "https://tauri.localhost",
+        "http://tauri.localhost",
         "http://localhost",
         "http://localhost:3000",
         "https://macost.vercel.app",
