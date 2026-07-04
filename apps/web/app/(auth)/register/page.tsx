@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiMutate } from '@/lib/api/client'
 import { setToken } from '@/lib/auth/session'
-import type { RegisterResponse, ApiErrorBody } from '@/lib/api/types'
+import { isApiErrorBody } from '@/lib/api/types'
+import type { RegisterResponse } from '@/lib/api/types'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -29,8 +30,11 @@ export default function RegisterPage() {
       await setToken(response.access_token)
       router.push('/wallets')
     } catch (err: unknown) {
-      const apiErr = err as ApiErrorBody
-      setError(apiErr?.error?.message ?? 'Registrasi gagal')
+      if (isApiErrorBody(err)) {
+        setError(err.error.message)
+      } else {
+        setError('Tidak dapat terhubung ke server. Periksa koneksi internetmu dan coba lagi.')
+      }
     } finally {
       setLoading(false)
     }

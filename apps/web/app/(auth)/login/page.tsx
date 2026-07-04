@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiMutate } from '@/lib/api/client'
 import { setToken } from '@/lib/auth/session'
-import type { LoginResponse, ApiErrorBody } from '@/lib/api/types'
+import { isApiErrorBody } from '@/lib/api/types'
+import type { LoginResponse } from '@/lib/api/types'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,11 +29,14 @@ export default function LoginPage() {
       await setToken(response.access_token)
       router.push('/wallets')
     } catch (err: unknown) {
-      const apiErr = err as ApiErrorBody
-      if (apiErr?.error?.code === 'ACCOUNT_LOCKED') {
-        setError('Terlalu banyak percobaan gagal. Coba lagi dalam 30 menit.')
+      if (isApiErrorBody(err)) {
+        if (err.error.code === 'ACCOUNT_LOCKED') {
+          setError('Terlalu banyak percobaan gagal. Coba lagi dalam 30 menit.')
+        } else {
+          setError(err.error.message)
+        }
       } else {
-        setError(apiErr?.error?.message ?? 'Email atau password salah')
+        setError('Tidak dapat terhubung ke server. Periksa koneksi internetmu dan coba lagi.')
       }
     } finally {
       setLoading(false)
