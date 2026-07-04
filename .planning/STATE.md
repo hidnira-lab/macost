@@ -5,9 +5,9 @@ milestone_name: milestone
 current_phase: 01.1
 status: completed
 stopped_at: Phase 01.1 complete — Vercel + Railway + UptimeRobot live and verified
-last_updated: "2026-07-04T11:45:00.000Z"
+last_updated: "2026-07-04T11:55:00.000Z"
 last_activity: 2026-07-04
-last_activity_desc: "Completed quick task 260704-pyx: Reverted temporary Tauri devtools feature — Tauri desktop debugging session (login CORS + session persistence) closed out, user-confirmed working end-to-end."
+last_activity_desc: "Completed quick task 260704-q9r: Updated docs/PANDUAN_TEKNIKAL_TIM.md with the full Tauri debugging session findings (login CORS + session persistence chain)."
 progress:
   total_phases: 5
   completed_phases: 2
@@ -117,6 +117,7 @@ Recent decisions affecting current work:
 | 260704-oux | Fix Tauri session persistence: add capabilities/default.json (core:default + store:default) | 2026-07-04 | b7e9f3c | [260704-oux-fix-tauri-session-persistence-tambah-cap](./quick/260704-oux-fix-tauri-session-persistence-tambah-cap/) |
 | 260704-pju | Fix root page.tsx to check session token before redirecting (actual root cause of session-persistence bug) | 2026-07-04 | 42d94cf | [260704-pju-fix-root-page-tsx-cek-session-token-dulu](./quick/260704-pju-fix-root-page-tsx-cek-session-token-dulu/) |
 | 260704-pyx | Revert temporary Tauri devtools feature after debugging session | 2026-07-04 | caf2b4b | [260704-pyx-revert-devtools-feature-di-cargo-toml-se](./quick/260704-pyx-revert-devtools-feature-di-cargo-toml-se/) |
+| 260704-q9r | Update docs/PANDUAN_TEKNIKAL_TIM.md with Tauri debugging session findings (login CORS + session persistence) | 2026-07-04 | b9cec46 | [260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng](./quick/260704-q9r-revisi-docs-panduan-teknikal-tim-md-deng/) |
 
 ### Roadmap Evolution
 
