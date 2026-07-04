@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 Phase: 01.1 — COMPLETE
 Plan: 3 of 3
 Status: Phase 01.1 complete
-Last activity: 2026-07-04 - Completed quick task 260704-bud: Re-run UAT Phase 1 terhadap stack live (found new backend auth blocker) dan update dokumentasi Android/PWA post-MVP
+Last activity: 2026-07-04 - Completed quick task 260704-d4c: Fixed Supabase JWT verification (JWKS-based), Phase 1 Auth+Wallet foundation now fully passing against live stack. Phase 2 unblocked.
 
 Progress: [██████████] 100%
 
@@ -75,7 +75,7 @@ Recent decisions affecting current work:
 - [01-03]: apiFetch handles reads (mock-able); apiMutate always calls real API — keeps mutation paths clean
 - [01-03]: getToken() stub returns null until Track D merges Supabase session persistence layer
 - [Phase ?]: Use PyJWT (not python-jose) for Supabase JWT verification
-- [Phase ?]: JWTBearer: algorithms=[HS256] + audience=authenticated both required for Supabase token validation
+- [2026-07-04, superseded]: ~~JWTBearer: algorithms=[HS256] + audience=authenticated both required for Supabase token validation~~ — superseded by JWKS-based verification (see 260704-d4c below); `audience="authenticated"` check still required regardless of algorithm.
 - [Phase ?]: Separate admin client (SERVICE_ROLE_KEY) and anon client (ANON_KEY) — admin creates users, anon issues tokens
 - [01.1-03]: Backend deploy target switched from Render to Railway — Render's card verification kept failing; Railway deploys the same Dockerfile with a one-line CMD change for `${PORT:-8000}`. Live at `https://macost-production.up.railway.app`. render.yaml removed.
 - [01.1-03]: Railway requires manually generating a public domain per service (Settings -> Networking -> Generate Domain) — no auto-assigned URL like Render's
@@ -91,7 +91,8 @@ Recent decisions affecting current work:
 - ~~Tauri desktop build/render unverified~~ — RESOLVED 2026-07-02 via quick task 260702-qs7: found and fixed a missing `app.windows` array in `tauri.conf.json` (Tauri v2 never spawns a window without it — that's why only the debug console appeared). Rebuilt, Hidayat confirmed the window renders correctly. Commit `625da25`. Phase 1 success criterion #4 (desktop-scoped) is now met.
 - ~~UptimeRobot keep-alive for backend~~ — RESOLVED 2026-07-03: Vercel, Railway, and UptimeRobot all connected and verified live (Plan 01.1-03). Backend deploy target is Railway (`https://macost-production.up.railway.app`), not the originally-planned Render. UptimeRobot monitor confirmed "Up" at a 5-minute interval after fixing a `/health` HEAD-request 405 bug.
 - ~~AI/vision provider selection~~ — RESOLVED 2026-07-02: Gemini Flash (`gemini-2.5-flash`) via Google AI Studio, free tier, documented in `API_CONTRACT.md` and `CLAUDE.md` ## AI Vision & LLM. Used for both scan-receipt and upload-statement. Dual-path with manual fallback (no auto-retry). AI Financial Assistant (F6) provider still tentative — likely same model, not finalized.
-- **NEW (2026-07-04, UAT re-run against live stack), root cause confirmed by user: the Supabase database/project has not been created/provisioned yet.** This is why `POST /api/auth/register` and `POST /api/auth/login` both return `500 Internal Server Error` on the live Railway backend (validation/422 works fine, so it's not routing — there's simply no real Supabase instance behind it yet). Also, `GET /api/wallets` with an invalid/malformed bearer token returns `500` instead of `401` (JWT verification has no exception handling for bad tokens) — needs re-check once Supabase exists. Reproduced via curl and confirmed live in the browser (register fails from the UI too). **Action item: provision the Supabase project (tables + auth) and set its credentials in Railway env vars before Phase 2 work depends on authenticated requests.** Full detail: `.planning/phases/01-foundation/01-UAT.md`.
+- ~~Supabase database/project not provisioned~~ — RESOLVED 2026-07-04 by Hidayat: created the Supabase project, ran `backend/migrations/001_create_dompet.sql`, set `SUPABASE_URL`/`SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` in Railway. Register/login now return 201/200 against the live deployment (previously 500).
+- ~~JWT verification 500 instead of 401 on invalid tokens~~ — RESOLVED 2026-07-04, quick task `260704-d4c`, commit `ebadf7c` (merged to `main`). Root cause: the live Supabase project uses the newer asymmetric "JWT Signing Keys" system (ES256), and `backend/dependencies/auth.py` was hardcoded for legacy HS256 + a manually-copied shared secret that Supabase doesn't expose for that key type at all (confirmed by inspecting the JWKS endpoint directly — it never published an HS256 key, only ES256). Fixed by rewriting the dependency to verify via Supabase's JWKS endpoint (`PyJWKClient`) instead — works regardless of which asymmetric algorithm is currently active. All wallet CRUD + auth checks now pass end-to-end against the live deployment (register 201, login 200, GET/POST/PUT/DELETE /api/wallets 200/201/200/204, no-token 401, invalid-token 401). Full detail: `.planning/phases/01-foundation/01-UAT.md`. **Phase 2 is now unblocked on the Auth+Wallet foundation.**
 
 ### Quick Tasks Completed
 
@@ -102,6 +103,7 @@ Recent decisions affecting current work:
 | 260702-r8s | Document AI vision model decision (Gemini Flash) in API_CONTRACT.md and CLAUDE.md | 2026-07-02 | c90b077 | [260702-r8s-update-api-contract-md-and-claude-md-wit](./quick/260702-r8s-update-api-contract-md-and-claude-md-wit/) |
 | 260704-axu | Investigasi status Phase 1 (termasuk fix 01.1), roadmap, deployment, dan tulis docs/PANDUAN_TEKNIKAL_TIM.md untuk Fertika, Khayyira, Zarra | 2026-07-04 | f97c9dd | [260704-axu-investigasi-status-phase-1-termasuk-fix-](./quick/260704-axu-investigasi-status-phase-1-termasuk-fix-/) |
 | 260704-bud | Re-run UAT Phase 1 terhadap stack live dan update dokumentasi mobile post-MVP | 2026-07-04 | fb2d452 | [260704-bud-re-run-uat-phase-1-terhadap-stack-live-d](./quick/260704-bud-re-run-uat-phase-1-terhadap-stack-live-d/) |
+| 260704-d4c | Fix JWT verification to use Supabase JWKS instead of hardcoded HS256 secret (found + fixed while helping Hidayat provision Supabase) | 2026-07-04 | ebadf7c | [260704-d4c-fix-jwt-verification-to-use-supabase-jwk](./quick/260704-d4c-fix-jwt-verification-to-use-supabase-jwk/) |
 
 ### Roadmap Evolution
 
