@@ -608,20 +608,58 @@ def get_allocation_suggestion(transaction: dict, current_user_id: str) -> dict:
 
 **Deprecated/outdated:** None directly applicable — this is greenfield work on a current stack (FastAPI 0.138, Pydantic 2.13, Supabase-py 2.x).
 
+## Team-Confirmed Decisions (2026-07-05, post-research — SUPERSEDES conflicting formulas above)
+
+The user (Hidayat) confirmed the following during plan-phase, resolving the ASSUMED items below before planning. These are now locked inputs for `saw_engine.py` — treat them as authoritative over any earlier `[ASSUMED]` text in this document.
+
+- **TC-01 (supersedes A4 — strategy toggle mechanism):** The Quick Win ↔ Importance-First toggle is **NOT** a sort-key override. It is implemented as **temporary re-weighting at computation time only**:
+  - `quick_win`: multiply `progress_gap` weight ×2.0, `saving_capacity` weight ×1.5, `personal_importance` and `urgency` weights ×0.7, `target_amount` weight ×1.0 — then **renormalize** (divide each by the new sum) so the effective weights used in the SAW score sum to 1.0.
+  - `importance_first`: multiply `personal_importance` weight ×2.0, `urgency` weight ×2.0, `progress_gap` and `saving_capacity` weights ×0.7, `target_amount` weight ×1.0 — then renormalize the same way.
+  - **Critical constraint:** this re-weighting happens ONLY inside `saw_engine.rank_goals()`'s internal computation. The weights **persisted in `goal_settings` and returned by `GET/PUT /api/goal-settings`** stay exactly as stored (the base 5 weights, unchanged by strategy) — this satisfies D-05 literally ("weights unchanged" refers to the stored/displayed weights, not the internal computation multipliers). `rank_goals(goals, weights, strategy)` should compute `effective_weights = renormalize(apply_strategy_multipliers(weights, strategy))` internally and use `effective_weights` for scoring, while the function's `weights` parameter and any `/api/goal-settings` response remain the raw stored values.
+  - This **replaces** the "SAW Strategy Toggle Mechanism" section's sort-override proposal above and the A4 row in the Assumptions Log — do not implement the sort-override version.
+
+- **TC-02 (confirms A1 — `skor_kepentingan` formula):** Use the proposed bucket thresholds exactly as written: `days_remaining <= 30 → 5`, `<= 90 → 4`, `<= 180 → 3`, `<= 365 → 2`, `else → 1`. Computed fresh on every read, never persisted.
+
+- **TC-03 (confirms A2 — `saving_capacity` formula):** Use the proposed feasibility-ratio formula exactly as written: `min(1, (months_remaining × avg_monthly_side_income) / remaining_amount)`. Requires an additional query: average nominal of the user's `Pemasukan` transactions with `source_label == "Flexible Side Income"` grouped by month (or a simple average over the last N months of side-income transactions — planner/executor's implementation choice, given no PRD-specified window; recommend last 3 months or all-time average if fewer than 3 months of data exist, to avoid a zero-division on brand-new accounts with 0-1 months of history).
+
+- **TC-04 (REVERSES A3 — `target_amount` direction):** `target_amount` is a **BENEFIT** criterion, not cost — **goals with a LARGER `nominal_target` score HIGHER** on this criterion (opposite of the research's original recommendation). Use `normalize_benefit(nominal_target_values)`, not `normalize_cost`. This changes the SAW engine's criteria-type table: `target_amount` type = Benefit, raw value = `nominal_target` directly (larger target → higher normalized score, larger contribution to weighted total).
+
+- **TC-05 (confirms A6 — category seed data):** Use the mock-fixture-derived taxonomy exactly as proposed: expense categories `Makan & Minum`, `Transportasi`, `Hiburan`, `Keperluan Kuliah`, `Tempat Tinggal`; income `source_label` values `"Fixed Routine"` (Allowance) / `"Flexible Side Income"` (Side Income). No further team sign-off needed before writing the seed migration — proceed as the final MVP seed list (revisable post-MVP if a formal survey taxonomy doc surfaces).
+
+**Updated criteria table (post-TC-01/TC-04):**
+
+| Criterion | Weight (stored, unchanged) | Type | Raw value |
+|-----------|------|------|-----------|
+| `personal_importance` | 22.5% | Benefit | `skor_keinginan` (1-5) |
+| `progress_gap` | 21.9% | Cost | `(nominal_target - nominal_terkumpul) / nominal_target` |
+| `saving_capacity` | 21.5% | Benefit | `min(1, (months_remaining × avg_monthly_side_income) / remaining_amount)` — TC-03 |
+| `urgency` | 17.8% | Benefit | `skor_kepentingan` (1-5, from deadline buckets — TC-02) |
+| `target_amount` | 16.2% | **Benefit** (was Cost in original research) | `nominal_target` directly — TC-04 |
+
+**Strategy-effective weight multipliers (TC-01, applied then renormalized, computation-only):**
+
+| Criterion | `quick_win` multiplier | `importance_first` multiplier |
+|-----------|------------------------|-------------------------------|
+| `personal_importance` | ×0.7 | ×2.0 |
+| `progress_gap` | ×2.0 | ×0.7 |
+| `saving_capacity` | ×1.5 | ×0.7 |
+| `urgency` | ×0.7 | ×2.0 |
+| `target_amount` | ×1.0 | ×1.0 |
+
 ## Assumptions Log
 
-| # | Claim | Section | Risk if Wrong |
-|---|-------|---------|---------------|
-| A1 | `skor_kepentingan` bucket thresholds (≤30/90/180/365 days → 5/4/3/2/1) | `skor_kepentingan` Derivation | Low-medium — affects urgency criterion's relative ordering; easy to retune later since it's computed, not persisted |
-| A2 | `saving_capacity` formula (feasibility ratio: projected achievable savings vs. amount still needed) | SAW Engine — criteria table | Medium — this criterion currently has **no stored data source at all**; if the team intends something different (e.g., a manual per-goal input, or based on a different metric), the whole criterion needs rework, not just retuning |
-| A3 | `target_amount` treated as a cost criterion (smaller goal = higher priority) | SAW Engine — criteria table | Medium — if the intended semantics are the opposite (bigger financial commitments deserve more attention), ranking order for this criterion inverts |
-| A4 | Strategy toggle mechanism: Quick Win = sort override by `progress_gap` ascending; Importance-First = pure weighted-score sort | SAW Strategy Toggle Mechanism | **High** — this is the literal SAW-03 acceptance criterion ("ranking order visibly changes on toggle"); if this mechanism is wrong, the demo's core toggle behavior won't match user/grader expectations |
-| A5 | Fixed 35% allocation suggestion (matches existing `apps/web/mocks/allocation-suggestion.json`: 175000/500000 = 35%) | Allocation Service | Low — trivially satisfies the documented 29-40% range; only a risk if graders expect a formula that visibly varies per transaction |
-| A6 | Category seed list (5 expense + income categories derived from mock fixtures, not the actual n=62 survey taxonomy) | Category Seed Data | Medium — demo-visible if category names look inconsistent with the rest of the UI/Figma designs; recommend team confirmation before finalizing seed migration |
-| A7 | `dompet.saldo` should become a derived SUM once `transaksi` exists (currently a stored column with no transaction linkage) | Pitfall 9 | Medium — if left as a manually-incremented column instead, every transaction CRUD path (create/edit/delete) must remember to adjust it correctly, which is a common source of balance-drift bugs |
-| A8 | Goal deletion blocked (not cascaded) when allocation history exists | Pitfall 10 | Low — mostly a UX/data-safety choice; either direction is defensible, but must be a deliberate decision, not an accidental default from `ON DELETE CASCADE` |
+| # | Claim | Section | Risk if Wrong | Status |
+|---|-------|---------|---------------|--------|
+| A1 | `skor_kepentingan` bucket thresholds (≤30/90/180/365 days → 5/4/3/2/1) | `skor_kepentingan` Derivation | Low-medium | **CONFIRMED as TC-02** — user approved as-is 2026-07-05 |
+| A2 | `saving_capacity` formula (feasibility ratio: projected achievable savings vs. amount still needed) | SAW Engine — criteria table | Medium | **CONFIRMED as TC-03** — user approved as-is 2026-07-05 |
+| A3 | `target_amount` treated as a cost criterion (smaller goal = higher priority) | SAW Engine — criteria table | Medium | **REVERSED as TC-04** — user chose BENEFIT direction (bigger goal = higher priority) 2026-07-05, opposite of this row's original claim |
+| A4 | Strategy toggle mechanism: Quick Win = sort override by `progress_gap` ascending; Importance-First = pure weighted-score sort | SAW Strategy Toggle Mechanism | **High** | **REPLACED as TC-01** — user specified re-weighting mechanism instead (per PRD/dosen guidance), not a sort override. See "Team-Confirmed Decisions" above for the exact multiplier table. |
+| A5 | Fixed 35% allocation suggestion (matches existing `apps/web/mocks/allocation-suggestion.json`: 175000/500000 = 35%) | Allocation Service | Low | Not raised during confirmation — still open, low risk; planner may proceed with this default |
+| A6 | Category seed list (5 expense + income categories derived from mock fixtures, not the actual n=62 survey taxonomy) | Category Seed Data | Medium | **CONFIRMED as TC-05** — user approved mock-fixture-derived list as final MVP seed data 2026-07-05 |
+| A7 | `dompet.saldo` should become a derived SUM once `transaksi` exists (currently a stored column with no transaction linkage) | Pitfall 9 | Medium | Not raised during confirmation — still open; planner should decide (derived SUM recommended for consistency, see Pitfall 9) |
+| A8 | Goal deletion blocked (not cascaded) when allocation history exists | Pitfall 10 | Low | Not raised during confirmation — still open; planner should decide (block recommended, see Pitfall 10) |
 
-**If this table is empty:** N/A — see entries above. All Macost-specific business formulas in this research (as opposed to generic SAW/FastAPI/Supabase mechanics) are assumptions requiring confirmation before Fertika builds the SAW engine and allocation service.
+**Status summary:** A1, A2, A3, A4, A6 were reviewed with the user during plan-phase (2026-07-05) and are now locked as TC-01 through TC-05 in "Team-Confirmed Decisions" above — the planner must use those values, not the original proposals in the body sections above (which are left in place for rationale/history but are superseded where they conflict). A5, A7, A8 remain open implementation-level calls the planner/executor may resolve using the "Recommended" option already stated in their respective sections.
 
 ## Open Questions
 
