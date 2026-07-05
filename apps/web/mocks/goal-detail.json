@@ -1,0 +1,25 @@
+{
+  "id_goal": "goal_001",
+  "nama_goal": "Beli Laptop",
+  "nominal_target": 8000000,
+  "nominal_terkumpul": 3200000,
+  "deadline": "2026-12-31",
+  "skor_keinginan": 5,
+  "skor_kepentingan": 4,
+  "progress_pct": 40,
+  "rank": 1,
+  "allocation_history": [
+    {
+      "id_alokasi": "alloc_001",
+      "nominal_alokasi": 1500000,
+      "tanggal_alokasi": "2026-07-01",
+      "transaksi_id": "txn_001"
+    },
+    {
+      "id_alokasi": "alloc_002",
+      "nominal_alokasi": 1700000,
+      "tanggal_alokasi": "2026-06-15",
+      "transaksi_id": "txn_002"
+    }
+  ]
+}
