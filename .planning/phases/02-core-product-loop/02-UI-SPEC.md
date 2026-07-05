@@ -53,7 +53,7 @@ Declared values (must be multiples of 4) — confirmed against existing usage in
 
 Exceptions:
 - `mt-0.5` (2px) already appears in `wallets/page.tsx` for the balance-line micro-offset under a wallet name — acceptable as a one-off text-baseline nudge, not a general-purpose token. Do not introduce new sub-4px values beyond this kind of micro-nudge.
-- 44px minimum touch target for icon-only buttons (filter icon, edit/delete icon buttons on Transaction history rows) — this phase introduces icon-only actions for the first time (existing pages use text-label buttons like "Edit"/"Hapus"); if icon-only buttons are used instead of text labels, they must meet 44×44px minimum hit area regardless of visual icon size.
+- 44px minimum touch target for icon-only buttons (filter icon, edit/delete icon buttons on Transaction history rows) — this phase introduces icon-only actions for the first time (existing pages use text-label buttons like "Edit"/"Hapus"); if icon-only buttons are used instead of text labels, they must meet 44×44px minimum hit area regardless of visual icon size. Every icon-only button must also carry an `aria-label` matching its text-equivalent action (e.g., `aria-label="Hapus transaksi"`) — icons alone are not an accessible label.
 
 ---
 
@@ -170,6 +170,7 @@ Beyond visual tokens, the following interaction sequences are locked by CONTEXT.
 ### Dashboard (DASH-01, DASH-02)
 - The 5 KPIs render in this exact order, top to bottom (or left-to-right if a grid — Figma frame will clarify, but order is locked regardless of layout): (1) expense breakdown per category, (2) active goal progress, (3) monthly income vs expense trend, (4) overspending alert, (5) total balance. This order is research-validated and must not be reordered even if it looks better rearranged in the Figma frame the executor eventually pulls — flag any Figma discrepancy on this specific point back to the team rather than silently deviating.
 - Period filter (this month / last month / custom range) is a single control that governs all 5 KPIs simultaneously — changing it must refetch/recompute all KPIs together, not per-KPI independent filters.
+- **Focal point:** the total balance KPI (#5) is the primary visual anchor — render it as the largest/most prominent card on the page (e.g., full-width or largest card in the grid), even though it renders last in the fixed KPI order. The other 4 KPIs are secondary in visual weight, ordered but not competing for primary attention.
 
 ---
 
@@ -186,11 +187,11 @@ Until those links are supplied, the executor should build against **this documen
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS (2 non-blocking recommendations applied: Dashboard focal point, icon-button aria-label rule)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-07-05
