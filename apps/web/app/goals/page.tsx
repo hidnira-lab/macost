@@ -52,9 +52,13 @@ export default function GoalsPage() {
     await clearToken()
     router.push('/login')
   }
-
+  
   async function handleStrategyToggle(newStrategy: 'quick_win' | 'importance_first') {
-    if (newStrategy === strategy || !weights) return
+    if (newStrategy === strategy) return
+    if (!weights) {
+      setError('Pengaturan belum termuat, coba refresh halaman')
+      return
+    }
     setToggleLoading(true)
     setError(null)
     try {
@@ -64,7 +68,6 @@ export default function GoalsPage() {
       }
       await apiMutate<GoalSettings>('/api/goal-settings', 'PUT', body)
       setStrategy(newStrategy)
-      // Refetch goals to get freshly re-ranked list
       const data = await apiFetch<GoalsResponse>('/api/goals')
       setGoals(data.goals)
     } catch {
