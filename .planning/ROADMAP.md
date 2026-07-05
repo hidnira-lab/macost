@@ -101,7 +101,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
+- [x] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
 - [ ] 02-02-PLAN.md — Goals list (SAW-ranked) + strategy toggle + mock plumbing (Khayyira, Wave 1)
 - [ ] 02-03-PLAN.md — Dashboard page: 5 KPIs fixed order + period filter (Zarra, Wave 1)
 
@@ -209,7 +209,7 @@ Plans:
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
 
-- [x] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
+1/15 plans executed
 
 ### Phase 999.2: Follow-up — AI Agent Chatbot (Could Have, post-MVP stretch goal) (BACKLOG)
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 0/15 | Planned | - |
+| 2. Core Product Loop | 1/15 | In Progress|  |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
