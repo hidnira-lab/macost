@@ -22,10 +22,13 @@ import { getToken } from "@/lib/auth/session";
 
 // Static mock imports — all mock JSON files stay in apps/web/mocks/
 import goalsData from "@/mocks/goals.json";
+import goalDetailData from "@/mocks/goal-detail.json";
+import goalSettingsData from "@/mocks/goal-settings.json";
 import allocationSuggestionData from "@/mocks/allocation-suggestion.json";
 import transactionsData from "@/mocks/transactions.json";
 import walletsData from "@/mocks/wallets.json";
 import dashboardData from "@/mocks/dashboard.json";
+import allocationsPendingData from "@/mocks/allocations-pending.json";
 
 // ---------------------------------------------------------------------------
 // Mock resolver
@@ -36,8 +39,19 @@ import dashboardData from "@/mocks/dashboard.json";
  * Supports exact matches and simple parametrized patterns.
  */
 function resolveMock(path: string): unknown {
+  // /api/goals/{id} — single goal detail (must be checked BEFORE /api/goals)
+  if (/^\/api\/goals\/[^/]+$/.test(path)) {
+    return goalDetailData;
+  }
+
   // /api/goals
   if (path === "/api/goals") return goalsData;
+
+  // /api/goal-settings
+  if (path === "/api/goal-settings") return goalSettingsData;
+
+  // /api/allocations/pending
+  if (path === "/api/allocations/pending") return allocationsPendingData;
 
   // /api/transactions — list (with optional query params)
   if (path === "/api/transactions" || path.startsWith("/api/transactions?")) {

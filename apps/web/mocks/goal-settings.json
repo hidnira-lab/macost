@@ -1,0 +1,10 @@
+{
+  "strategy": "quick_win",
+  "weights": {
+    "personal_importance": 0.225,
+    "progress_gap": 0.219,
+    "saving_capacity": 0.215,
+    "urgency": 0.178,
+    "target_amount": 0.162
+  }
+}

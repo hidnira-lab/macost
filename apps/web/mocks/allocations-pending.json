@@ -1,0 +1,10 @@
+{
+  "pending": [
+    {
+      "transaksi_id": "txn_003",
+      "nominal": 250000,
+      "suggested_goal_name": "Beli Laptop",
+      "expires_at": "2026-07-12T00:00:00Z"
+    }
+  ]
+}
