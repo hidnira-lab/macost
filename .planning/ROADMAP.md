@@ -96,7 +96,25 @@ Plans:
   4. User can create a savings goal, see goals ranked by the SAW algorithm, and toggle between Quick Win and Importance-First strategy — the ranking order visibly changes on toggle
   5. Dashboard displays the 5 KPIs in the research-validated sequence (expense breakdown → goal progress → monthly trend → overspending alert → total balance) and updates when the user changes the period filter
 
-**Plans**: TBD
+**Plans**: 15 plans across 6 waves
+
+Plans:
+
+- [ ] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
+- [ ] 02-02-PLAN.md — Goals list (SAW-ranked) + strategy toggle + mock plumbing (Khayyira, Wave 1)
+- [ ] 02-03-PLAN.md — Dashboard page: 5 KPIs fixed order + period filter (Zarra, Wave 1)
+- [ ] 02-04-PLAN.md — saw_engine.py: pure SAW ranking, edge-case guards, TC-01 strategy re-weighting (Fertika, TDD, Wave 2)
+- [ ] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
+- [ ] 02-06-PLAN.md — [BLOCKING] Push Phase 2 Supabase migrations to live project (Hidayat-only, Wave 2)
+- [ ] 02-07-PLAN.md — Goal detail + create/edit form (Khayyira, Wave 2)
+- [ ] 02-08-PLAN.md — AllocationSuggestionModal + Pending Allocations page (Khayyira, Wave 2)
+- [ ] 02-09-PLAN.md — Transactions edit/delete + wallet balance derived-SUM (Fertika, Wave 3)
+- [ ] 02-10-PLAN.md — Goal Settings + Goals CRUD with real-time SAW ranking (Fertika, Wave 3)
+- [ ] 02-11-PLAN.md — Transaction quick-entry form + allocation-suggestion save sequencing (Zarra, Wave 3)
+- [ ] 02-12-PLAN.md — Smart Allocation service + suggest/confirm/skip/pending endpoints (Fertika, Wave 4)
+- [ ] 02-13-PLAN.md — Transaction history/filter/edit/delete + wallet balance refresh (Zarra, Wave 4)
+- [ ] 02-14-PLAN.md — Dashboard aggregation + central router wiring into main.py (Fertika, Wave 5)
+- [ ] 02-15-PLAN.md — USE_MOCK=false integration test + latency measurement + Tauri desktop smoke test (Hidayat, Wave 6)
 
 **Team ownership (parallel tracks):**
 
@@ -198,6 +216,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 0/TBD | Not started | - |
+| 2. Core Product Loop | 0/15 | Planned | - |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
