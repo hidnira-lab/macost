@@ -242,7 +242,7 @@ Beyond visual tokens, the following interaction sequences are locked by CONTEXT.
 
 ### Visual Layout — Dashboard (`156:198`)
 
-Header: avatar + "Dashboard" H1 (Bricolage Grotesque) + period filter pill ("This Month" dropdown) + bell icon. Overspending Alert banner (red/pink, dismissible) appears at the TOP of the content area in this frame — see Open Questions #1 for the conflict with this spec's locked KPI order. Expense Breakdown: donut chart + total in center ("Rp 2.4M / TOTAL") + legend rows (icon chip, label, %) per category. Goal Progress: stacked cards per active goal (icon chip, name, %, progress bar). Trend (Last 4 Mo): grouped bar chart (In/Out per month), legend at bottom. Available Balance: low-visual-weight centered text at the very bottom (muted color, not a card). Bottom nav present, Dashboard tab active. Node-ID `156:198` can be re-pulled for pixel-level detail (exact chart library/rendering approach is not specified — Figma shows a visual mock, not a real chart-lib output).
+Header: avatar + "Dashboard" H1 (Bricolage Grotesque) + period filter pill ("This Month" dropdown) + bell icon. Overspending Alert banner (red/pink, dismissible) appears at the TOP of the content area in this frame — resolved 2026-07-06 Round 2 — see "Resolved Decisions" section above; the page-level KPI order still follows RESEARCH.md, not this frame's literal layout. Expense Breakdown: donut chart + total in center ("Rp 2.4M / TOTAL") + legend rows (icon chip, label, %) per category. Goal Progress: stacked cards per active goal (icon chip, name, %, progress bar). Trend (Last 4 Mo): grouped bar chart (In/Out per month), legend at bottom. Available Balance: low-visual-weight centered text at the very bottom (muted color, not a card). Bottom nav present, Dashboard tab active. Node-ID `156:198` can be re-pulled for pixel-level detail (exact chart library/rendering approach is not specified — Figma shows a visual mock, not a real chart-lib output).
 
 ### Visual Layout — Transactions (`156:65`, `156:3`, `156:366`, `156:1526`)
 
@@ -264,7 +264,7 @@ Header: avatar + "Dashboard" H1 (Bricolage Grotesque) + period filter pill ("Thi
 
 **Goal Prioritization Settings (`156:824`):** Header: back arrow + "Prioritization" + help (?) icon. Strategy toggle: segmented control "Quick Win" / "Importance First" (pill, active = solid blue), sitting directly below the header, above the weight sliders — **this resolves the FR-014 strategy-toggle question and confirms this spec's "Goals list + SAW strategy toggle" contract below: it's a top-level 2-option segmented control**, matching D-05. "Total Weight Distribution" — big "100%" readout + a single horizontal multi-segment bar (color-coded per criterion, segment width = weight %) directly below. 5 weight sliders, one per SAW criterion, each in its own card: colored dot + label + %, slider track. **The default % values shown in this frame (Personal Importance 25%, Progress Gap 20%, Saving Capacity 20%, Urgency 15%, Target Amount 20%) are mockup placeholders only — see Open Questions #2, do NOT adopt these as the real defaults.** CTA: full-width solid blue "Apply Weights" button. Bottom nav: Goals tab active.
 
-**Create First Goal / empty state (`156:1438`):** Full-page onboarding-style empty state — icon badge, "Set Your First Goal" H1 (blue, bold), subtitle "Let's build a habit of saving. What are you aiming for?". Inline form directly on this screen: Goal Name, Target Amount, Target Date, "Importance" slider (1–5, current selection shown as text e.g. "High Priority" in orange). Primary CTA: "Create Goal →", plus a secondary text-only "Skip for now" link below. See Open Questions #3 for the conflict with D-06's lightweight section-scoped empty-state contract.
+**Create First Goal / empty state (`156:1438`):** Full-page onboarding-style empty state — icon badge, "Set Your First Goal" H1 (blue, bold), subtitle "Let's build a habit of saving. What are you aiming for?". Inline form directly on this screen: Goal Name, Target Amount, Target Date, "Importance" slider (1–5, current selection shown as text e.g. "High Priority" in orange). Primary CTA: "Create Goal →", plus a secondary text-only "Skip for now" link below. See "Open Questions / Flagged Discrepancies (Still Open)" below for the conflict with D-06's lightweight section-scoped empty-state contract — still unresolved.
 
 ### Visual Layout — Allocation modal (`156:653`)
 
@@ -272,25 +272,31 @@ Bottom-anchored card modal over a dimmed background, `rounded-3xl` top corners, 
 
 ---
 
-## Open Questions / Flagged Discrepancies (Post-Figma-Extraction, 2026-07-06)
+## Resolved Decisions (2026-07-06, Round 2 — User-Directed)
 
-The following 5 items were surfaced by the Figma extraction (quick task 260706-jaq) and are **explicitly unresolved** — none of them is silently decided one way or the other by this update. Each needs a team decision before the affected area is executed.
+The following 4 items were flagged open in the round-1 Figma extraction (2026-07-06, quick task 260706-jaq) and are now resolved by explicit user instruction in round 2 (same date):
 
-1. **Dashboard KPI order.** Figma's `156:198` frame shows the Overspending Alert positioned first/top, while this spec's locked KPI order (from DASH-01/DASH-02 research, see "Dashboard" under Interaction & State Contracts above) is (1) expense breakdown, (2) goal progress, (3) trend, (4) overspending alert, (5) balance. This is a direct conflict — do not silently reorder either the spec or the Figma layout; needs a team decision.
+**Dashboard KPI order — RESOLVED (2026-07-06, Round 2):** RESEARCH.md's locked order wins over Figma's visual placement — the page-level SECTION ORDER of the 5 KPIs stays (1) expense breakdown, (2) goal progress, (3) monthly trend, (4) overspending alert, (5) total balance. Figma's `156:198` frame visually places the Overspending Alert directly below the header/period filter, above Expense Breakdown, but this placement is explicitly overridden by the user. Only the Overspending Alert component's own visual card styling is taken from Figma: `#ffdad6` background, `#ba1a1a` border, `#93000a` text, dismissible via an "X" button.
 
-2. **SAW default weights.** The Goal Prioritization Settings frame (`156:824`) shows Personal Importance 25%, Progress Gap 20%, Saving Capacity 20%, Urgency 15%, Target Amount 20% — versus the canonical CLAUDE.md/survey-n=62 weights (personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2%). The Figma numbers are rounder placeholder values in the mockup. `backend/services/saw_engine.py` default weights remain the canonical values unless the user explicitly overrides them — **do not adopt the Figma numbers as real defaults.**
+**SAW default weights — RESOLVED (2026-07-06, Round 2, reconfirmed):** the canonical survey n=62 values are final: personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2%. The Goal Prioritization Settings frame (`156:824`) shows illustrative-only placeholder values (25/20/20/15/20) that must never be adopted as `saw_engine.py` defaults.
 
-3. **"Create First Goal" full onboarding page vs. D-06's lightweight empty state.** `156:1438` is a full dedicated onboarding page (icon badge, H1, inline form, "Skip for now" link) — this conflicts with D-06 in `02-CONTEXT.md`, which specifies a lightweight, section-scoped empty state for "no goals yet." These may represent two different moments (first-ever app onboarding vs. a later empty Goals list) — flag for team confirmation; do not silently merge or pick one.
+**Pending Suggestions scope — RESOLVED (2026-07-06, Round 2):** the Pending Suggestions page is the Smart Allocation confirmation queue (per PRD/CONTEXT.md), not the AI Assistant nudge feed shown in Figma frame `156:1646`. The page reuses `156:1646`'s visual card/list pattern (icon chip + title + description + amount + pill-shaped CTA + "Dismiss all" text link at the bottom) but with different content semantics: each card represents one queued side-income allocation suggestion — goal name, suggested amount + percentage, and a "Review"/"Confirm" action that opens the Smart Allocation modal (`156:653`) for that specific item, not a spending-pattern nudge. Full visual detail is added in the new "Visual Layout — Pending Suggestions (`156:1646`)" subsection below.
 
-4. **"Pending Suggestions" scope mismatch.** `156:1646` appears to be an AI Assistant proactive-nudge feed (F6 feature), not Smart Allocation's pending-confirmations queue implied by the original 4-area scope. Recommendation: narrow "Allocation modal" scope to `156:653` only and treat `156:1646` as out-of-scope-for-now — pending team confirmation, not decided here.
+**Transaction History nav tab — RESOLVED (2026-07-06, Round 2):** "History" IS its own bottom-nav destination (confirmed by the 5th-tab-position variant in frame `156:1526`), not a pushed sub-page reached from Home.
 
-5. **Transaction History bottom-nav tab labeling.** The Transaction History frame (`156:1526`) shows its bottom-nav tab labeled "History" rather than matching the standard 5-tab set (Home/Dashboard/Goals/AI Assistant/Profile) seen in other frames. Clarify whether Transaction History is its own nav destination or a pushed sub-page reached from Home — not resolved here.
+---
+
+## Open Questions / Flagged Discrepancies (Still Open)
+
+Only 1 item remains open (down from the original 5 — 4 were resolved 2026-07-06 Round 2, see "Resolved Decisions" section above):
+
+1. **"Create First Goal" full onboarding page vs. D-06's lightweight empty state.** `156:1438` is a full dedicated onboarding page (icon badge, H1, inline form, "Skip for now" link) — this conflicts with D-06 in `02-CONTEXT.md`, which specifies a lightweight, section-scoped empty state for "no goals yet." These may represent two different moments (first-ever app onboarding vs. a later empty Goals list) — flag for team confirmation; do not silently merge or pick one.
 
 ---
 
 ## Checker Sign-Off
 
-> **Addendum (2026-07-06, quick task 260706-jaq):** This spec was updated 2026-07-06 with real Figma-sourced visual detail. The sign-off below reflects the pre-Figma-detail approval (2026-07-05); the 5 discrepancies in "Open Questions / Flagged Discrepancies" above are pending team resolution before final execution of the affected areas.
+> **Addendum (2026-07-06, quick task 260706-jaq, updated Round 2):** This spec was updated 2026-07-06 with real Figma-sourced visual detail (Round 1), then further updated 2026-07-06 Round 2 with user-directed resolutions, full per-page visual detail, and a Palette A/B color-token discrepancy flag. The sign-off below reflects the pre-Figma-detail approval (2026-07-05); of the original 5 discrepancies, 4 (Dashboard KPI order, SAW default weights, Pending Suggestions scope, Transaction History nav tab) were resolved 2026-07-06 Round 2 by explicit user instruction — see "Resolved Decisions (2026-07-06, Round 2 — User-Directed)" above. Only 1 (Create First Goal vs D-06) remains pending team resolution before execution of the affected area.
 
 - [x] Dimension 1 Copywriting: PASS
 - [x] Dimension 2 Visuals: PASS (2 non-blocking recommendations applied: Dashboard focal point, icon-button aria-label rule)
