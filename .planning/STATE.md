@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: core-product-loop
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-07-06T22:50:44.557Z"
+stopped_at: Completed 02-12-PLAN.md
+last_updated: "2026-07-06T23:11:49.796Z"
 last_activity: 2026-07-06
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 13
+  completed_plans: 14
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 02 (core-product-loop) — EXECUTING
-Plan: 5 of 15
+Plan: 6 of 15
 Status: Ready to execute
 Last activity: 2026-07-06 -- Phase 02 execution started
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 02-core-product-loop P05 | 30min | 2 tasks | 6 files |
 | Phase 02-core-product-loop P09 | 5min | 2 tasks | 4 files |
 | Phase 02 P10 | 25min | 2 tasks | 8 files |
+| Phase 02 P12 | 6min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase ?]: dompet.saldo stored column left in schema/insert path (legacy, cosmetic) but no read path uses it anymore; GET /api/wallets computes saldo live as derived SUM over transaksi
 - [Phase ?]: PUT /api/transactions/{id} re-derives tipe_transaksi/source_label from kategori exactly like POST, never trusting body.tipe_transaksi (T-2-02)
 - [Phase ?]: [02-10]: Widened PUT /api/goal-settings weight-sum tolerance from 0.001 to 0.002 -- CLAUDE.md's locked default weights (22.5/21.9/21.5/17.8/16.2%) sum to a real 0.999, not floating-point dust; 0.001 would reject the exact default weights re-sent via the D-05 strategy-toggle flow (Pitfall 7's own warning sign).
+- [Phase ?]: [02-12]: Pending allocation state derived implicitly (absence of alokasi row), not a new skipped_suggestion table -- keeps schema scope at exactly the 6 already-pushed migrations; skip is a pure read+compute echo with zero DB writes
+- [Phase ?]: [02-12]: GET /transactions/{id}/allocation-suggestion independently re-validates tipe_transaksi/source_label server-side rather than trusting allocation_suggestion_available from creation time
 
 ### Pending Todos
 
@@ -153,6 +156,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-06T22:49:45.653Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-core-product-loop/02-UI-SPEC.md
+Last session: 2026-07-06T23:11:49.790Z
+Stopped at: Completed 02-12-PLAN.md
+Resume file: None

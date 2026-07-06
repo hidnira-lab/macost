@@ -58,11 +58,11 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Smart Allocation
 
-- [ ] **ALLOC-01**: Saat transaksi Side Income tersimpan, sistem menampilkan modal saran alokasi ke goal prioritas tertinggi dalam ≤2 detik (FR-010)
-- [ ] **ALLOC-02**: Saran alokasi menganjurkan ≈30-40% dari nominal transaksi side income, dengan goal alternatif tersedia
-- [ ] **ALLOC-03**: User wajib mengkonfirmasi alokasi melalui modal — sistem tidak pernah auto-execute alokasi tanpa persetujuan eksplisit (FR-011)
-- [ ] **ALLOC-04**: User dapat melewati (skip) saran alokasi; suggestion tersimpan sebagai pending
-- [ ] **ALLOC-05**: User dapat melihat daftar pending allocation suggestion yang belum direspons
+- [x] **ALLOC-01**: Saat transaksi Side Income tersimpan, sistem menampilkan modal saran alokasi ke goal prioritas tertinggi dalam ≤2 detik (FR-010)
+- [x] **ALLOC-02**: Saran alokasi menganjurkan ≈30-40% dari nominal transaksi side income, dengan goal alternatif tersedia
+- [x] **ALLOC-03**: User wajib mengkonfirmasi alokasi melalui modal — sistem tidak pernah auto-execute alokasi tanpa persetujuan eksplisit (FR-011)
+- [x] **ALLOC-04**: User dapat melewati (skip) saran alokasi; suggestion tersimpan sebagai pending
+- [x] **ALLOC-05**: User dapat melihat daftar pending allocation suggestion yang belum direspons
 
 ---
 
@@ -166,11 +166,11 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | SAW-01 | Phase 2 | Complete |
 | SAW-02 | Phase 2 | Complete |
 | SAW-03 | Phase 2 | Complete |
-| ALLOC-01 | Phase 2 | Pending |
-| ALLOC-02 | Phase 2 | Pending |
-| ALLOC-03 | Phase 2 | Pending |
-| ALLOC-04 | Phase 2 | Pending |
-| ALLOC-05 | Phase 2 | Pending |
+| ALLOC-01 | Phase 2 | Complete |
+| ALLOC-02 | Phase 2 | Complete |
+| ALLOC-03 | Phase 2 | Complete |
+| ALLOC-04 | Phase 2 | Complete |
+| ALLOC-05 | Phase 2 | Complete |
 | SCAN-01 | Phase 3 | Pending |
 | SCAN-02 | Phase 3 | Pending |
 | SCAN-03 | Phase 3 | Pending |
