@@ -44,11 +44,11 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Goals
 
-- [ ] **GOAL-01**: User dapat membuat goal baru (nama, nominal target, deadline, skor keinginan 1-5) (FR-007)
-- [ ] **GOAL-02**: User dapat melihat daftar goal dengan nominal terkumpul dan progress percentage (dihitung dari SUM Alokasi) (FR-008)
-- [ ] **GOAL-03**: User dapat melihat detail goal termasuk riwayat alokasi
-- [ ] **GOAL-04**: User dapat mengedit goal yang sudah ada
-- [ ] **GOAL-05**: User dapat menghapus goal
+- [x] **GOAL-01**: User dapat membuat goal baru (nama, nominal target, deadline, skor keinginan 1-5) (FR-007)
+- [x] **GOAL-02**: User dapat melihat daftar goal dengan nominal terkumpul dan progress percentage (dihitung dari SUM Alokasi) (FR-008)
+- [x] **GOAL-03**: User dapat melihat detail goal termasuk riwayat alokasi
+- [x] **GOAL-04**: User dapat mengedit goal yang sudah ada
+- [x] **GOAL-05**: User dapat menghapus goal
 
 #### SAW Engine & Prioritization
 
@@ -158,11 +158,11 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | TRAN-05 | Phase 2 | Complete |
 | DASH-01 | Phase 2 | Pending |
 | DASH-02 | Phase 2 | Pending |
-| GOAL-01 | Phase 2 | Pending |
-| GOAL-02 | Phase 2 | Pending |
-| GOAL-03 | Phase 2 | Pending |
-| GOAL-04 | Phase 2 | Pending |
-| GOAL-05 | Phase 2 | Pending |
+| GOAL-01 | Phase 2 | Complete |
+| GOAL-02 | Phase 2 | Complete |
+| GOAL-03 | Phase 2 | Complete |
+| GOAL-04 | Phase 2 | Complete |
+| GOAL-05 | Phase 2 | Complete |
 | SAW-01 | Phase 2 | Complete |
 | SAW-02 | Phase 2 | Complete |
 | SAW-03 | Phase 2 | Complete |
