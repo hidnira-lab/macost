@@ -272,7 +272,25 @@ Bottom-anchored card modal over a dimmed background, `rounded-3xl` top corners, 
 
 ---
 
+## Open Questions / Flagged Discrepancies (Post-Figma-Extraction, 2026-07-06)
+
+The following 5 items were surfaced by the Figma extraction (quick task 260706-jaq) and are **explicitly unresolved** — none of them is silently decided one way or the other by this update. Each needs a team decision before the affected area is executed.
+
+1. **Dashboard KPI order.** Figma's `156:198` frame shows the Overspending Alert positioned first/top, while this spec's locked KPI order (from DASH-01/DASH-02 research, see "Dashboard" under Interaction & State Contracts above) is (1) expense breakdown, (2) goal progress, (3) trend, (4) overspending alert, (5) balance. This is a direct conflict — do not silently reorder either the spec or the Figma layout; needs a team decision.
+
+2. **SAW default weights.** The Goal Prioritization Settings frame (`156:824`) shows Personal Importance 25%, Progress Gap 20%, Saving Capacity 20%, Urgency 15%, Target Amount 20% — versus the canonical CLAUDE.md/survey-n=62 weights (personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2%). The Figma numbers are rounder placeholder values in the mockup. `backend/services/saw_engine.py` default weights remain the canonical values unless the user explicitly overrides them — **do not adopt the Figma numbers as real defaults.**
+
+3. **"Create First Goal" full onboarding page vs. D-06's lightweight empty state.** `156:1438` is a full dedicated onboarding page (icon badge, H1, inline form, "Skip for now" link) — this conflicts with D-06 in `02-CONTEXT.md`, which specifies a lightweight, section-scoped empty state for "no goals yet." These may represent two different moments (first-ever app onboarding vs. a later empty Goals list) — flag for team confirmation; do not silently merge or pick one.
+
+4. **"Pending Suggestions" scope mismatch.** `156:1646` appears to be an AI Assistant proactive-nudge feed (F6 feature), not Smart Allocation's pending-confirmations queue implied by the original 4-area scope. Recommendation: narrow "Allocation modal" scope to `156:653` only and treat `156:1646` as out-of-scope-for-now — pending team confirmation, not decided here.
+
+5. **Transaction History bottom-nav tab labeling.** The Transaction History frame (`156:1526`) shows its bottom-nav tab labeled "History" rather than matching the standard 5-tab set (Home/Dashboard/Goals/AI Assistant/Profile) seen in other frames. Clarify whether Transaction History is its own nav destination or a pushed sub-page reached from Home — not resolved here.
+
+---
+
 ## Checker Sign-Off
+
+> **Addendum (2026-07-06, quick task 260706-jaq):** This spec was updated 2026-07-06 with real Figma-sourced visual detail. The sign-off below reflects the pre-Figma-detail approval (2026-07-05); the 5 discrepancies in "Open Questions / Flagged Discrepancies" above are pending team resolution before final execution of the affected areas.
 
 - [x] Dimension 1 Copywriting: PASS
 - [x] Dimension 2 Visuals: PASS (2 non-blocking recommendations applied: Dashboard focal point, icon-button aria-label rule)
