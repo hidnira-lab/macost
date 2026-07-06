@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: core-product-loop
 status: executing
-stopped_at: Completed 02-12-PLAN.md
-last_updated: "2026-07-06T23:11:49.796Z"
-last_activity: 2026-07-06
-last_activity_desc: Phase 02 execution started
+stopped_at: Completed 02-14-PLAN.md
+last_updated: "2026-07-06T23:32:55.201Z"
+last_activity: 2026-07-07
+last_activity_desc: Completed 02-14-PLAN.md (Dashboard aggregation + central router wiring)
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 14
-  percent: 40
+  completed_plans: 15
+  percent: 68
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 02 (core-product-loop) — EXECUTING
-Plan: 6 of 15
-Status: Ready to execute
-Last activity: 2026-07-06 -- Phase 02 execution started
+Plan: 8 of 15 (02-14 just completed; parallel-wave execution, remaining: 02-03, 02-06, 02-07, 02-08, 02-11, 02-13, 02-15)
+Status: Executing
+Last activity: 2026-07-07 -- Completed 02-14-PLAN.md (Dashboard aggregation + central router wiring)
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 68%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [██████████] 100%
 | Phase 02-core-product-loop P09 | 5min | 2 tasks | 4 files |
 | Phase 02 P10 | 25min | 2 tasks | 8 files |
 | Phase 02 P12 | 6min | 2 tasks | 5 files |
+| Phase 02-core-product-loop P14 | 15min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [02-10]: Widened PUT /api/goal-settings weight-sum tolerance from 0.001 to 0.002 -- CLAUDE.md's locked default weights (22.5/21.9/21.5/17.8/16.2%) sum to a real 0.999, not floating-point dust; 0.001 would reject the exact default weights re-sent via the D-05 strategy-toggle flow (Pitfall 7's own warning sign).
 - [Phase ?]: [02-12]: Pending allocation state derived implicitly (absence of alokasi row), not a new skipped_suggestion table -- keeps schema scope at exactly the 6 already-pushed migrations; skip is a pure read+compute echo with zero DB writes
 - [Phase ?]: [02-12]: GET /transactions/{id}/allocation-suggestion independently re-validates tipe_transaksi/source_label server-side rather than trusting allocation_suggestion_available from creation time
+- [Phase 02-core-product-loop]: 02-14: overspending_alert trailing-3-month baseline is defined relative to the selected period's start (not to 'today'), so a category is never compared against a baseline that includes its own current-period total
+- [Phase 02-core-product-loop]: 02-14: backend/main.py now registers all 6 Phase 2 routers (categories, transactions, goals, goal_settings, allocations, dashboard) alongside the unmodified Phase 1 auth/wallets routers -- backend is fully wired
+- [Phase 02-core-product-loop]: 02-14: backend pytest must be invoked via 'python -m pytest' from repo root, not bare 'pytest' -- backend/pytest.ini's presence anchors rootdir at backend/ under plain pytest, breaking 'from backend.routers import ...' imports
 
 ### Pending Todos
 
@@ -156,6 +160,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-06T23:11:49.790Z
-Stopped at: Completed 02-12-PLAN.md
+Last session: 2026-07-06T23:32:09.949Z
+Stopped at: Completed 02-14-PLAN.md
 Resume file: None

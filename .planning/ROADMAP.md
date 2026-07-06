@@ -96,7 +96,7 @@ Plans:
   4. User can create a savings goal, see goals ranked by the SAW algorithm, and toggle between Quick Win and Importance-First strategy — the ranking order visibly changes on toggle
   5. Dashboard displays the 5 KPIs in the research-validated sequence (expense breakdown → goal progress → monthly trend → overspending alert → total balance) and updates when the user changes the period filter
 
-**Plans**: 7/15 plans executed
+**Plans**: 8/15 plans executed
 
 Plans:
 **Wave 1**
@@ -126,7 +126,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 02-14-PLAN.md — Dashboard aggregation + central router wiring into main.py (Fertika, Wave 5)
+- [x] 02-14-PLAN.md — Dashboard aggregation + central router wiring into main.py (Fertika, Wave 5)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 7/15 | In Progress|  |
+| 2. Core Product Loop | 8/15 | In Progress|  |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

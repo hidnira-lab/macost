@@ -35,8 +35,8 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Dashboard
 
-- [ ] **DASH-01**: User dapat melihat dashboard dengan 5 KPI dalam urutan yang telah divalidasi riset: (1) breakdown pengeluaran per kategori, (2) progress goal aktif, (3) tren bulanan income vs expense, (4) alert overspending, (5) total saldo (FR-006)
-- [ ] **DASH-02**: Dashboard mendukung filter periode: bulan ini, bulan lalu, atau custom date range
+- [x] **DASH-01**: User dapat melihat dashboard dengan 5 KPI dalam urutan yang telah divalidasi riset: (1) breakdown pengeluaran per kategori, (2) progress goal aktif, (3) tren bulanan income vs expense, (4) alert overspending, (5) total saldo (FR-006)
+- [x] **DASH-02**: Dashboard mendukung filter periode: bulan ini, bulan lalu, atau custom date range
 
 ---
 
@@ -156,8 +156,8 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | TRAN-03 | Phase 2 | Complete |
 | TRAN-04 | Phase 2 | Complete |
 | TRAN-05 | Phase 2 | Complete |
-| DASH-01 | Phase 2 | Pending |
-| DASH-02 | Phase 2 | Pending |
+| DASH-01 | Phase 2 | Complete |
+| DASH-02 | Phase 2 | Complete |
 | GOAL-01 | Phase 2 | Complete |
 | GOAL-02 | Phase 2 | Complete |
 | GOAL-03 | Phase 2 | Complete |
