@@ -216,14 +216,59 @@ Beyond visual tokens, the following interaction sequences are locked by CONTEXT.
 
 ---
 
-## Figma Gap
+## Figma Reference — Frame Map & Visual Detail
 
-No Figma frame links for the 4 Phase 2 areas (Transactions, Goals, Dashboard, Allocation modal/Pending) were available to this research session. Per `CLAUDE.md`'s workflow, before building final layout for each area the executor/user should:
-1. Open the relevant frame/page in Figma, right-click → "Copy link to selection".
-2. Provide that link when implementing that specific page/component (one page or small group at a time — not all 4 areas in one prompt).
-3. Convert multi-screen flows (if any exist for Allocation modal + Pending page) one frame at a time, then compose.
+**Source (extracted 2026-07-06, quick task 260706-jaq):** Figma file `vKQLNfdx7yKSzWvxhmkhg5` ("ZEPHYRA"), page `156:2` ("MACOST") — https://www.figma.com/design/vKQLNfdx7yKSzWvxhmkhg5/ZEPHYRA?node-id=156-2
 
-Until those links are supplied, the executor should build against **this document's interaction/state/copy/token contract** and use a plain, token-consistent layout (matching the existing Wallets/Auth page visual language: dark card-on-dark-background, rounded-2xl cards, rounded-xl inputs/buttons) as a placeholder structure — expect this to be regenerated (not precision-edited) once real Figma frames are supplied, per CLAUDE.md's own note that Claude Code is stronger at generating new components from scratch than editing existing ones precisely.
+### Frame Node-ID Map (11 frames pulled, grouped by Phase 2 area)
+
+| Area | Frame | Node ID |
+|------|-------|---------|
+| Dashboard | Dashboard - MIS Overview | `156:198` |
+| Transactions | Home / Add Transaction entry | `156:65` |
+| Transactions | Choose Input Method (bottom sheet) | `156:3` |
+| Transactions | Manual Transaction Form | `156:366` |
+| Transactions | Transaction History | `156:1526` |
+| Goals | Goal List | `156:430` |
+| Goals | Goal Detail | `156:558` |
+| Goals | Create Goal Form | `156:713` |
+| Goals | Goal Prioritization Settings | `156:824` |
+| Goals | Create First Goal (empty state) | `156:1438` |
+| Allocation modal | Smart Allocation Suggestion | `156:653` |
+
+**Explicitly out of Allocation-modal scope (see Open Questions #4 below):** `156:1646` "Pending Suggestions" is recommended OUT of this scope — it is an AI Assistant proactive-nudge feed, not Smart Allocation's pending-confirmations queue, and belongs to the F6 AI Assistant feature instead.
+
+**Frames not yet pulled in detail (out of this phase's scope, noted for future reference only):** `156:939` AI Financial Assistant, `156:1040` Upload Statement, `156:1192` Scan Receipt Flow, `156:1740` Profile & Settings, `156:1837` Manage Wallets, auth/onboarding frames `156:1211`/`156:1273`/`156:1283`/`156:1322`/`156:1365`, `170:537` alternate Dashboard exploration.
+
+### Visual Layout — Dashboard (`156:198`)
+
+Header: avatar + "Dashboard" H1 (Bricolage Grotesque) + period filter pill ("This Month" dropdown) + bell icon. Overspending Alert banner (red/pink, dismissible) appears at the TOP of the content area in this frame — see Open Questions #1 for the conflict with this spec's locked KPI order. Expense Breakdown: donut chart + total in center ("Rp 2.4M / TOTAL") + legend rows (icon chip, label, %) per category. Goal Progress: stacked cards per active goal (icon chip, name, %, progress bar). Trend (Last 4 Mo): grouped bar chart (In/Out per month), legend at bottom. Available Balance: low-visual-weight centered text at the very bottom (muted color, not a card). Bottom nav present, Dashboard tab active. Node-ID `156:198` can be re-pulled for pixel-level detail (exact chart library/rendering approach is not specified — Figma shows a visual mock, not a real chart-lib output).
+
+### Visual Layout — Transactions (`156:65`, `156:3`, `156:366`, `156:1526`)
+
+**Home / Add Transaction entry (`156:65`):** Distinct "Home" tab (separate from the "Dashboard" tab) showing a "Remaining Budget" hero stat (Bricolage Grotesque, 32px), then a 2-up bento of quick actions — "Add Transaction" (dark gradient card) and "Scan Receipt" (light card) — which opens the `156:3` bottom sheet. Active Goals: horizontal-scroll goal cards (icon, name, %, progress bar, soft gradient corner accent). Recent: vertical list of last transactions (icon chip, merchant name, category, signed amount in Rupiah). Large circular FAB (blue gradient) bottom-right for quick-add, in addition to the bento "Add" tile.
+
+**Choose Input Method (`156:3`):** Bottom sheet modal over a dimmed/blurred Home background. Header: "Add Transaction" + close (X). Vertical stack of large tappable rows for input options (Manual Input first, plus Scan/Upload as parallel entry options in the same sheet) — matches FR-002/FR-003's dual-path requirement.
+
+**Manual Transaction Form (`156:366`):** Header: back arrow + "New Transaction" title (centered, blue). Expense/Income segmented toggle (pill, active = solid blue "Expense", inactive = grey "Income") is the only place `tipe_transaksi` is chosen visually (frontend still never sends it — this is purely a UI affordance the backend derives from `kategori_id`, per this spec's existing "Transaction quick-entry form" contract below). Amount: large card, "Rp" prefix + big placeholder "0" (numeric-keypad-style input). Category: select/dropdown row ("Select Category" + chevron). Date: text input pre-filled `06/29/2026` — **confirms D-01/D-02's today-default behavior still holds visually.** Note (Optional): multi-line textarea, placeholder "What was this for?". Primary CTA: full-width gradient blue "Save Transaction" button, sticky at bottom. This frame confirms the "3 required fields + pre-filled date" contract (nominal/kategori/dompet required, tanggal_transaksi pre-filled and non-competing) still holds visually — Category/Date/Note are the only other fields shown alongside the toggle and amount.
+
+**Transaction History (`156:1526`):** Header: avatar + "Macost" wordmark + bell. Search bar ("Search transactions...") + filter icon button (sliders icon). Grouped by relative date section headers in small-caps muted text ("TODAY", "YESTERDAY"). Each row: icon chip (category-tinted), merchant name (bold), category (muted, small), amount (colored: red/`-` for expense, blue/`+` for income) + time (muted, right-aligned under amount). Bottom nav shows a "History" tab active — see Open Questions #5 for the nav-labeling ambiguity.
+
+### Visual Layout — Goals (`156:430`, `156:558`, `156:713`, `156:824`, `156:1438`)
+
+**Goal List (`156:430`):** Header: "My Goals" H1 (Bricolage Grotesque, blue) + avatar (blue circle) + bell. Summary/hero row: "Total Savings Goal" (Rp 23.500.000) left, "On Track" + "3 Active" pill right, bottom-border divider. Goals grid: Priority #1 gets a distinct, larger "Goal Card 1: Top Priority" treatment (`rounded-3xl`/24px, soft orange gradient corner blob, "Priority #1" solid-orange pill badge, larger 20px name font) — this is the SAW-rank-differentiated card pattern, visually distinguishing SAW rank #1 from the rest. Goal Card 2+: standard `rounded-xl` cards, small `#2`/`#3` rank badge (grey pill, top-right), icon chip top-left, name + amount/target inline text, thin progress bar with gradient fill + % label. FAB: blue gradient rounded-square, bottom-right, "+" icon for "Add Goal". Bottom nav: Goals tab active.
+
+**Goal Detail (`156:558`):** Header: back arrow + goal name (e.g. "New Laptop") title. Large pixel-art hero image (orange plant-in-pot illustration) confirms CLAUDE.md's "minimal pixel-art visual style" for goal imagery. Stat card: "CURRENT PROGRESS" big % (blue, 32px+) + small circular target icon top-right, progress bar, then "COLLECTED" / "TARGET" two-column stat row, "DEADLINE" row with calendar icon. "Allocation History" section: list of past allocations (icon, "Manual saving"/"Auto-roundup" label + date, signed amount in orange). Footer actions: circular "Edit" (pencil) and "Delete" (trash, red) icon buttons, centered.
+
+**Create Goal Form (`156:713`):** Header: back arrow + "Create New Goal" + overflow menu (⋮). "Quick Start" row: horizontal template chips (Emergency Fund, Vacation, Health..., icon + label) pre-filling the form. Form fields: Goal Name (text), Target Amount (Rp-prefixed numeric), Deadline (date picker w/ calendar icon). "How important is this to you?" — slider 1–5, labels "Nice to have" (1) ↔ "Critical" (5), current value shown as a number (blue) top-right — this is the `personal_importance` SAW input (`skor_kepentingan`). CTA: full-width gradient blue "+ Create Goal" button.
+
+**Goal Prioritization Settings (`156:824`):** Header: back arrow + "Prioritization" + help (?) icon. Strategy toggle: segmented control "Quick Win" / "Importance First" (pill, active = solid blue), sitting directly below the header, above the weight sliders — **this resolves the FR-014 strategy-toggle question and confirms this spec's "Goals list + SAW strategy toggle" contract below: it's a top-level 2-option segmented control**, matching D-05. "Total Weight Distribution" — big "100%" readout + a single horizontal multi-segment bar (color-coded per criterion, segment width = weight %) directly below. 5 weight sliders, one per SAW criterion, each in its own card: colored dot + label + %, slider track. **The default % values shown in this frame (Personal Importance 25%, Progress Gap 20%, Saving Capacity 20%, Urgency 15%, Target Amount 20%) are mockup placeholders only — see Open Questions #2, do NOT adopt these as the real defaults.** CTA: full-width solid blue "Apply Weights" button. Bottom nav: Goals tab active.
+
+**Create First Goal / empty state (`156:1438`):** Full-page onboarding-style empty state — icon badge, "Set Your First Goal" H1 (blue, bold), subtitle "Let's build a habit of saving. What are you aiming for?". Inline form directly on this screen: Goal Name, Target Amount, Target Date, "Importance" slider (1–5, current selection shown as text e.g. "High Priority" in orange). Primary CTA: "Create Goal →", plus a secondary text-only "Skip for now" link below. See Open Questions #3 for the conflict with D-06's lightweight section-scoped empty-state contract.
+
+### Visual Layout — Allocation modal (`156:653`)
+
+Bottom-anchored card modal over a dimmed background, `rounded-3xl` top corners, sparkle icon badge in a blue gradient header band. Copy pattern: "Smart Allocation" H2, body text inline-composing the amounts — e.g. "Your side income of **Rp 500.000** just came in! We suggest allocating **Rp 175.000 (35%)** to your **New Laptop** goal — it's your top priority right now." Mini goal-progress preview: icon, goal name + "Priority 1" badge, progress bar (before/after allocation implied by the blue fill), current amount + delta ("+ Rp 175K"). 3 actions stacked: "Confirm Allocation" (solid blue, primary), "Change Amount" (outline/secondary), "Not Now" (text-only, tertiary) — confirms this spec's existing never-auto-execute, always-3-way-choice pattern in the "Allocation suggestion flow" contract below.
 
 ---
 
