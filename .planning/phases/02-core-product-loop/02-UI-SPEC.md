@@ -13,11 +13,13 @@ created: 2026-07-05
 
 **Scope:** Transaction quick-entry form + history/filter, Goals list (SAW-ranked) + detail + create/edit + strategy toggle, Dashboard (5 KPIs + period filter), Allocation suggestion modal + Pending Allocations page.
 
-**Design source of truth:** Per `CLAUDE.md` ("Sumber Desain UI"), Figma (Stitch → Figma refine) is canonical for exact layout/visuals — the Figma MCP server is connected but no frame links for these 4 areas were provided to this research session. **This is a known gap** (see "Figma Gap" section below) — this contract therefore focuses on interaction contracts, states, timing, and copy that CONTEXT.md/RESEARCH.md already lock, which are the parts most likely to cause execution drift if left ambiguous. The executor MUST request the relevant Figma frame link (per CLAUDE.md's workflow: copy link to selection → one page/group at a time) before building final pixel-level layout for each of the 4 areas; this document governs everything else (states, copy, timing, tokens) regardless of what the Figma frame shows.
+**Design source of truth:** Per `CLAUDE.md` ("Sumber Desain UI"), Figma (Stitch → Figma refine) is canonical for exact layout/visuals. As of 2026-07-06, the relevant Figma frames for all 4 Phase 2 areas have been pulled and reconciled into this document (see "Theme Resolution" callout below and the "Figma Reference — Frame Map & Visual Detail" section, which replaces the former "Figma Gap" placeholder). This contract still separately locks interaction contracts, states, timing, and copy from CONTEXT.md/RESEARCH.md, which remain the parts most likely to cause execution drift if left ambiguous.
 
 ---
 
 ## Design System
+
+> **Theme Resolution (2026-07-06):** Figma is confirmed as source of truth for visual design, per user decision on 2026-07-06 (quick task 260706-jaq). The Figma design (file `vKQLNfdx7yKSzWvxhmkhg5`, page `156:2`) is a **light theme** — this supersedes the dark theme previously assumed below from the existing hand-built pages. The currently-built `apps/web` pages (`wallets`, `goals`, `(auth)/login`, `(auth)/register`) still use the old dark theme (`bg-[#1e1e1e]`, Neulis/Helvetica local fonts) and are now **stale** relative to this spec. Retrofitting those pages to the new light theme is a **separate follow-up task, explicitly out of scope for this update** — flagged back to the team, not silently scheduled here.
 
 | Property | Value |
 |----------|-------|
@@ -25,7 +27,8 @@ created: 2026-07-05
 | Preset | not applicable |
 | Component library | none (raw Tailwind 4, CSS-first config via `apps/web/app/globals.css` `@theme` block — no `tailwind.config.*` file exists) |
 | Icon library | none installed (`apps/web/package.json` has no `lucide-react`, `heroicons`, or similar — Phase 2 introduces the first icon-needing UI, e.g. filter/edit/delete affordances; if icons are needed, use inline SVG or add `lucide-react` as a new dependency decision, not assumed here) |
-| Font | Neulis (headings/display, local `next/font/local`, weights 400/500/600/700/800 available as separate files) + Helvetica (body, local `next/font/local`, weights 400/700 + italics only — no 500/600 file exists) — both already wired in `apps/web/app/layout.tsx` as CSS vars `--font-display`/`--font-body`. **Known inconsistency in existing code:** components apply font family via inline `style={{ fontFamily: "'Neulis'"/'Helvetica' }}` rather than the `font-display`/`font-body` Tailwind theme classes — Phase 2 new components should use the `font-[family-name:var(--font-display)]` / `font-[family-name:var(--font-body)]` Tailwind arbitrary-value classes instead, to stay correct if the font files are ever swapped, but this is not a blocking requirement for this phase. |
+| Font (target, per Figma) | **Inter** (body/UI text — Regular for body copy, Medium for list item titles, Semi Bold for card titles/emphasis, Bold for labels/stat numbers/small-caps like "REMAINING BUDGET") for general UI, and **Bricolage Grotesque ExtraBold** (`font-variation-settings: "opsz" 14, "wdth" 100`) for the brand wordmark ("Macost") and large page H1s / hero stat numbers (e.g. "Dashboard", "My Goals", "Rp 250.000" balance). This is the new target per the Figma extraction (2026-07-06) and supersedes the "OLD/stale theme" row below. |
+| Font (OLD/stale theme — do not use for new work) | Neulis (headings/display, local `next/font/local`, weights 400/500/600/700/800 available as separate files) + Helvetica (body, local `next/font/local`, weights 400/700 + italics only — no 500/600 file exists) — both still wired in `apps/web/app/layout.tsx` as CSS vars `--font-display`/`--font-body`, describing the OLD dark-theme design used by the currently-built `wallets`/`login`/`register` pages, not the current Figma-confirmed target above. **Known inconsistency in existing code:** components apply font family via inline `style={{ fontFamily: "'Neulis'"/'Helvetica' }}` rather than the `font-display`/`font-body` Tailwind theme classes. Retrofitting these pages to Inter/Bricolage Grotesque is out of scope for this update (see Theme Resolution callout above). |
 
 ### shadcn Gate Decision
 
@@ -55,9 +58,30 @@ Exceptions:
 - `mt-0.5` (2px) already appears in `wallets/page.tsx` for the balance-line micro-offset under a wallet name — acceptable as a one-off text-baseline nudge, not a general-purpose token. Do not introduce new sub-4px values beyond this kind of micro-nudge.
 - 44px minimum touch target for icon-only buttons (filter icon, edit/delete icon buttons on Transaction history rows) — this phase introduces icon-only actions for the first time (existing pages use text-label buttons like "Edit"/"Hapus"); if icon-only buttons are used instead of text labels, they must meet 44×44px minimum hit area regardless of visual icon size. Every icon-only button must also carry an `aria-label` matching its text-equivalent action (e.g., `aria-label="Hapus transaksi"`) — icons alone are not an accessible label.
 
+**Component-level radii/heights (added 2026-07-06, per Figma extraction — supplements, does not replace, the spacing scale above):**
+- Standard cards: `rounded-xl` (12px)
+- Hero/priority cards (e.g. Priority #1 goal card, Smart Allocation modal top corners): `rounded-3xl` (24px)
+- Progress bar track: height 8–12px, `rounded-full`
+- Icon chips: circular or 8–16px rounded-square, tinted background at ~10–20% opacity of the icon's accent color
+
 ---
 
 ## Typography
+
+**Updated 2026-07-06 (Figma extraction, quick task 260706-jaq) — target type scale, supersedes the OLD/stale-theme table below:**
+
+| Role | Size | Font / Weight | Usage |
+|------|------|--------|-------------|
+| Hero stat / Display | 28–32px | Bricolage Grotesque ExtraBold | Hero stat numbers (e.g. "Rp 250.000" Remaining Budget), brand wordmark "Macost" |
+| Page H1 | 24px | Bricolage Grotesque ExtraBold | Page-level headings ("Dashboard", "My Goals") |
+| Section heading | 18–20px | Inter Semi Bold | Section headings within a page |
+| Body / card title | 16px | Inter Regular (body) / Inter Semi Bold (card title) | Primary row/card content (transaction description, goal name) |
+| Secondary | 14px | Inter Medium | List item titles, secondary text |
+| Label / badge | 12px | Inter Bold | Labels, badges, small-caps stat labels (e.g. "REMAINING BUDGET") |
+
+Weight set: Inter Regular / Medium / Semi Bold / Bold for general UI, plus Bricolage Grotesque ExtraBold reserved exclusively for the brand wordmark, page H1s, and hero stat numbers (with `font-variation-settings: "opsz" 14, "wdth" 100`).
+
+**OLD/stale-theme table (Neulis/Helvetica, dark-theme era — do not use for new work, retained for reference against currently-built pages only):**
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
@@ -66,17 +90,41 @@ Exceptions:
 | Body | 16px | 400 (Helvetica Regular) | 1.5 |
 | Label | 14px | 400 (Helvetica Regular) | 1.5 |
 
-**Weights declared (exactly 2, per contract discipline):** Regular 400 (Helvetica — body/label/input text) and Semibold 600 (Neulis — headings, primary CTA button labels).
+**Weights declared (exactly 2, per contract discipline) — OLD/stale theme:** Regular 400 (Helvetica — body/label/input text) and Semibold 600 (Neulis — headings, primary CTA button labels).
 
 Notes:
 - `Display` (28px) is new this phase — needed for large monetary figures (Dashboard total balance KPI, goal target/collected amounts on Goal detail) that didn't exist in Phase 1's wallet-name-only screens. Use only for hero numeric values, never for body copy.
 - `Heading` (24px/600) matches the existing `text-2xl font-bold` pattern used for `wallets/page.tsx`'s `<h1>` — this contract intentionally tightens the weight from 700→600 (Neulis SemiBold) going forward for new Phase 2 pages to enforce the "exactly 2 weights" rule; do not retrofit the existing Wallets page this phase (out of scope), but new Transaction/Goal/Dashboard/Allocation pages should follow 600 for headings.
 - `Body` (16px) is new this phase — existing pages used only 14px for all non-heading text. Phase 2 introduces denser, more numeric UI (transaction rows, goal cards, KPI labels) where 14px is too small for primary readable content; use 16px for primary row/card content (transaction description, goal name, KPI value context) and reserve 14px (`Label`) for secondary/meta text (timestamps, helper text, button labels, form labels) — matching the existing established use of `text-sm`.
-- Primary CTA buttons use Label size (14px) at weight 600, per existing `font-semibold` button convention (`Tambah Dompet`, `Login` buttons) — buttons are a Label-role component even though they're interactive, not a Heading.
+- Primary CTA buttons use Label size (14px) at weight 600, per existing `font-semibold` button convention (`Tambah Dompet`, `Login` buttons) — buttons are a Label-role component even though they're interactive, not a Heading. **Note:** this OLD-theme button convention is retained for the stale dark-theme pages; new Figma-sourced pages should follow the target type scale above.
 
 ---
 
 ## Color
+
+**Updated 2026-07-06 (Figma extraction, quick task 260706-jaq) — target light-theme roles, supersedes the OLD/stale dark-theme table below:**
+
+| Role | Value | Usage |
+|------|-------|-------|
+| Background | `#fcfcfc` / `#ffffff` (light, near-white) | Page background, top app bar (`rgba(252,252,252,0.8)` with backdrop-blur), bottom nav |
+| Primary text | `#1e1e1e` | Body copy, headings |
+| Muted/secondary text | `rgba(30,30,30,0.65)` | Secondary labels, meta text, timestamps |
+| Borders | `rgba(30,30,30,0.15)` | Card borders, dividers |
+| Subtle fills | `rgba(30,30,30,0.05)` – `rgba(30,30,30,0.08)` | Icon chip backgrounds, progress bar track backgrounds |
+| Accent orange | `#ff8929` (gradient to `#ffb787` on progress fills) | Goals / priority / positive emphasis (e.g. Priority #1 goal card badge, goal progress fills) |
+| Accent blue | `#298dff` (gradient to `#065fc5` on buttons/FABs, or `#a8c8ff` on progress fills) | Primary actions, links, active nav state |
+| Destructive/error | background `#ffdad6`, border `#ba1a1a`, text `#93000a` | Overspending alert banner, error states |
+| Category tint | varies per category, `rgba(<rgb>,0.1–0.2)` fill behind a solid-colored icon | Category icon chips (transaction rows, expense breakdown legend) |
+
+**Accent reserved for** (intent preserved from the OLD-theme rules below, hex values updated to the new roles above):
+- Primary CTA buttons: "Simpan Transaksi", "Buat Goal", "Konfirmasi Alokasi", "+ Tambah Transaksi", "+ Buat Goal" (mirrors existing "+ Tambah Dompet" pattern) — use accent blue (`#298dff` → `#065fc5` gradient) as the primary filled-button color per Figma (blue is the primary-action color in the new theme; orange is reserved for goals/priority/positive emphasis, not generic primary CTAs)
+- Input focus border — applies to all new form inputs (transaction amount, goal name/target/deadline fields)
+- Selected/active state of the SAW strategy toggle (Quick Win vs Importance-First) — only the currently-selected pill/segment, not both (Figma shows this as solid blue when active)
+- Loading overlay's spinner/progress indicator ("Menghitung saran alokasi...")
+
+**Secondary interactive/semantic color:** accent orange (`#ff8929`) — reserved for goal/priority/positive-emphasis surfaces (Priority #1 goal card corner accent, goal progress bar fills, "Priority #1" badge), distinct from the accent blue primary-action role. Inline text-link actions (Edit transaction, Edit goal, "Lewati"/Skip in the allocation modal, "Lihat semua" pagination/view-more links) use accent blue, matching its "links/active nav" role above.
+
+**OLD/stale dark-theme table (do not use for new work, retained for reference against currently-built pages only):**
 
 | Role | Value | Usage |
 |------|-------|-------|
@@ -85,15 +133,9 @@ Notes:
 | Accent (10%) | `#ff8929` (hover `#f77e2d`) | Primary CTA buttons only — see reserved-for list below |
 | Destructive | `#f87171` (Tailwind `red-400`) text on `rgba(239,68,68,0.10)` (`red-500/10`) background, `rgba(239,68,68,0.20)` border | Delete/Hapus actions, error banners/toasts, validation error text |
 
-**Accent reserved for** (explicit list — matches existing `#ff8929` usage in `wallets/page.tsx`/`login/page.tsx`, extended to Phase 2's new flows):
-- Primary CTA buttons: "Simpan Transaksi", "Buat Goal", "Konfirmasi Alokasi", "+ Tambah Transaksi", "+ Buat Goal" (mirrors existing "+ Tambah Dompet" pattern)
-- Input focus border (`focus:border-[#ff8929]`) — already established, applies to all new form inputs (transaction amount, goal name/target/deadline fields)
-- Selected/active state of the SAW strategy toggle (Quick Win vs Importance-First) — only the currently-selected pill/segment, not both
-- Loading overlay's spinner/progress indicator ("Menghitung saran alokasi...")
-
-**Secondary interactive color (not counted in the 10% accent budget):** `#298dff` (blue) — already established in `wallets/page.tsx` for the "Edit" action and `login/page.tsx` for the "Daftar" (register) link. Reserved for:
-- Inline text-link actions (Edit transaction, Edit goal, "Lewati"/Skip in the allocation modal, "Lihat semua" pagination/view-more links)
-- This is a distinct semantic role from the orange primary-action accent — never use `#298dff` for a filled/primary button, and never use `#ff8929` for a plain inline text link.
+OLD-theme reserved-for lists (superseded by the target roles above, retained for reference against the stale pages only):
+- Accent (`#ff8929`) was primary CTAs, input focus border, SAW toggle active state, loading overlay spinner
+- Secondary interactive (`#298dff`) was inline text-link actions ("Edit", "Daftar")
 
 ---
 
