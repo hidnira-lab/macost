@@ -40,10 +40,10 @@ def _client_as(user_id: str, app: FastAPI) -> TestClient:
 
 
 def _patch_supabase(monkeypatch, fake_supabase_client):
+    # allocation_service.py itself never imports get_supabase_admin directly
+    # — it only reuses goal_service.fetch_and_rank_goals(), so only the
+    # modules that actually hold Supabase clients need patching.
     monkeypatch.setattr(allocations, "get_supabase_admin", lambda: fake_supabase_client)
-    monkeypatch.setattr(
-        allocation_service, "get_supabase_admin", lambda: fake_supabase_client
-    )
     monkeypatch.setattr(goal_service, "get_supabase_admin", lambda: fake_supabase_client)
     monkeypatch.setattr(
         goal_settings_service, "get_supabase_admin", lambda: fake_supabase_client
@@ -170,4 +170,4 @@ def test_get_endpoint_rejects_non_side_income_transaction(
     response = client.get("/api/transactions/trx-1/allocation-suggestion")
 
     assert response.status_code == 400
-    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
