@@ -2,10 +2,15 @@ import uuid
 from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import Response
 
 from backend.core.supabase import get_supabase_admin
 from backend.dependencies.auth import get_current_user_id
-from backend.models.transaction import TransactionCreate, TransactionResponse
+from backend.models.transaction import (
+    TransactionCreate,
+    TransactionResponse,
+    TransactionUpdate,
+)
 
 router = APIRouter()
 
@@ -152,3 +157,101 @@ def list_transactions(
         "total": total,
         "page": page,
     }
+
+
+# ---------------------------------------------------------------------------
+# PUT /api/transactions/{id} — edit, re-derives labels, IDOR-safe (404)
+# ---------------------------------------------------------------------------
+
+@router.put("/transactions/{transaction_id}")
+def update_transaction(
+    transaction_id: str,
+    body: TransactionUpdate,
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Same server-derivation rule as create_transaction: tipe_transaksi/
+    source_label are ALWAYS re-derived from the (possibly new) kategori_id —
+    body.tipe_transaksi is never read (T-2-02). Double .eq() on both
+    id_transaksi and id_pengguna makes this IDOR-safe (T-2-01) — a
+    cross-user edit attempt returns 404 (never 403), matching wallets.py's
+    convention.
+    """
+    supabase = get_supabase_admin()
+
+    kategori_rows = (
+        supabase.table("kategori")
+        .select("*")
+        .eq("id_kategori", body.kategori_id)
+        .execute()
+    ).data
+    if not kategori_rows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": {
+                    "code": "NOT_FOUND",
+                    "message": "Kategori tidak ditemukan",
+                }
+            },
+        )
+    kategori = kategori_rows[0]
+
+    tipe_transaksi = kategori["tipe"]
+    source_label = (
+        kategori.get("flag_pemasukan") if tipe_transaksi == "Pemasukan" else None
+    )
+
+    update_payload = {
+        "tipe_transaksi": tipe_transaksi,
+        "nominal": body.nominal,
+        "tanggal_transaksi": body.tanggal_transaksi.isoformat(),
+        "metode_input": body.metode_input,
+        "dompet_id": body.dompet_id,
+        "kategori_id": body.kategori_id,
+        "source_label": source_label,
+        "catatan": body.catatan,
+    }
+
+    result = (
+        supabase.table("transaksi")
+        .update(update_payload)
+        .eq("id_transaksi", transaction_id)
+        .eq("id_pengguna", current_user_id)
+        .execute()
+    )
+
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": {
+                    "code": "NOT_FOUND",
+                    "message": "Transaksi tidak ditemukan",
+                }
+            },
+        )
+
+    return _row_to_response(result.data[0])
+
+
+# ---------------------------------------------------------------------------
+# DELETE /api/transactions/{id} — 204 regardless of ownership (IDOR-safe)
+# ---------------------------------------------------------------------------
+
+@router.delete("/transactions/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_transaction(
+    transaction_id: str,
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Double .eq() prevents cross-user deletion. Returns 204 regardless of
+    whether the transaction existed/was owned by the caller — matches
+    wallets.py's delete_wallet convention (avoids confirming row existence).
+    """
+    supabase = get_supabase_admin()
+    supabase.table("transaksi").delete().eq("id_transaksi", transaction_id).eq(
+        "id_pengguna", current_user_id
+    ).execute()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

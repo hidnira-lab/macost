@@ -285,7 +285,7 @@ def test_put_transaction_owned_by_another_user_returns_404(
     response = client.put("/api/transactions/tx-3", json=body)
 
     assert response.status_code == 404
-    assert response.json()["error"]["code"] == "NOT_FOUND"
+    assert response.json()["detail"]["error"]["code"] == "NOT_FOUND"
 
 
 # ---------------------------------------------------------------------------
