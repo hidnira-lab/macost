@@ -124,6 +124,16 @@ Notes:
 
 **Secondary interactive/semantic color:** accent orange (`#ff8929`) — reserved for goal/priority/positive-emphasis surfaces (Priority #1 goal card corner accent, goal progress bar fills, "Priority #1" badge), distinct from the accent blue primary-action role. Inline text-link actions (Edit transaction, Edit goal, "Lewati"/Skip in the allocation modal, "Lihat semua" pagination/view-more links) use accent blue, matching its "links/active nav" role above.
 
+**⚠ Palette A/B Discrepancy (flagged 2026-07-06, Round 2) — do not silently normalize:**
+
+Two distinct color-token sets exist across the 8 frames pulled in round 2, likely two different design-iteration passes within the same Figma file.
+
+Palette A (majority — 6 of 8 frames: Dashboard `156:198`, Home/Add-Transaction `156:65`, Goal List `156:430`, Goal Detail `156:558`, Create Goal Form `156:713`, Smart Allocation Modal `156:653`) matches the target color roles already documented above in this Color section: text `#1e1e1e` primary / `rgba(30,30,30,0.65)` muted, blue `#298dff`→`#065fc5`, orange `#ff8929`→`#ffb787`, background `#fcfcfc`, borders `rgba(30,30,30,0.15)`, Bricolage Grotesque ExtraBold headings.
+
+Palette B (minority — 2 of 8 frames: Transaction History `156:1526`, Pending Suggestions `156:1646`) uses different tokens: text `#1b1b1c` primary / `#414753` secondary / `#717785` tertiary / `#c0c6d6` placeholder; blue `#005bb0` (headings/amounts) and `#0074dc` (buttons/active nav); background `#fcf9f8` (warmer off-white vs Palette A's cooler `#fcfcfc`); borders `#e5e2e1`, card fill `#f6f3f2`; destructive red `#ba1a1a` (same value in both palettes); Bricolage Grotesque heading weight is inconsistent even within Palette B itself (ExtraBold on Transaction History, plain Regular on Pending Suggestions).
+
+**Recommendation:** treat Palette A as canonical (majority usage plus the two most structurally central screens, Dashboard and Goal List) and flag Palette B frames (Transaction History, Pending Suggestions) as needing normalization to Palette A tokens during implementation — e.g. build with `#1e1e1e`/`#298dff`/`#fcfcfc`/`rgba(30,30,30,0.15)` instead of the frame's literal `#1b1b1c`/`#005bb0`/`#fcf9f8`/`#e5e2e1`. This is an explicit flagged recommendation pending team confirmation, not a silent substitution — do not implement Palette B's literal hex values in production code without team sign-off.
+
 **OLD/stale dark-theme table (do not use for new work, retained for reference against currently-built pages only):**
 
 | Role | Value | Usage |
