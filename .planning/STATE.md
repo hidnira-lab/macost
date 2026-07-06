@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 Phase: 02 (core-product-loop) — EXECUTING
 Plan: 1 of 15
 Status: Executing Phase 02
-Last activity: 2026-07-06 - Completed quick task 260706-jaq: Update 02-UI-SPEC.md dengan detail visual asli dari Figma
+Last activity: 2026-07-06 - Completed quick task 260706-jaq round 2: resolved 4 open questions + full per-page visual detail in 02-UI-SPEC.md
 
 Progress: [██████████] 100%
 
@@ -123,6 +123,7 @@ Recent decisions affecting current work:
 | 260704-r45 | Reference Notion workspace for env var sourcing instead of asking Hidayat directly | 2026-07-04 | c98b096 | [260704-r45-update-sumber-env-var-di-panduan-teknika](./quick/260704-r45-update-sumber-env-var-di-panduan-teknika/) |
 | 260705-0mm | Tetapkan aturan platform ownership (Hidayat pegang akun Vercel/Railway/Supabase, Phase 2/3/4) di CLAUDE.md/PROJECT.md, tambah Section 2a di PANDUAN_TEKNIKAL_TIM.md | 2026-07-05 | b334c9d, 8ee48c0 | [260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku](./quick/260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku/) |
 | 260706-jaq | Update 02-UI-SPEC.md dengan detail visual asli dari Figma (11 frame, 4 area Phase 2) — resolusi konflik tema (Figma light theme menang atas dark theme lama) + 5 diskrepansi di-flag sebagai Open Questions | 2026-07-06 | b8ff368, f6f83d5, 0a30379 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
+| 260706-jaq (round 2) | Perdalam detail visual 8 frame Figma per user; resolusi 4 open question sesuai instruksi user (urutan KPI Dashboard tetap RESEARCH.md, bobot SAW tetap survey n=62, Pending Suggestions = antrian Smart Allocation bukan nudge AI, History = tab nav sendiri); temuan baru: diskrepansi Palette A/B warna di 2 frame | 2026-07-06 | 6f16855, b11b8ae, 39cb658 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
 
 ### Roadmap Evolution
 
