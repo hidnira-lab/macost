@@ -90,6 +90,7 @@ def test_post_allocations_inserts_one_row_and_returns_updated_goal_progress(
                 "tipe_transaksi": "Pemasukan",
                 "source_label": "Flexible Side Income",
                 "nominal": 500000,
+                "tanggal_transaksi": "2026-06-27",
                 "created_at": "2026-06-27T10:00:00+00:00",
             }
         ],
