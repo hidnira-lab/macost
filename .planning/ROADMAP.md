@@ -96,7 +96,7 @@ Plans:
   4. User can create a savings goal, see goals ranked by the SAW algorithm, and toggle between Quick Win and Importance-First strategy — the ranking order visibly changes on toggle
   5. Dashboard displays the 5 KPIs in the research-validated sequence (expense breakdown → goal progress → monthly trend → overspending alert → total balance) and updates when the user changes the period filter
 
-**Plans**: 3/15 plans executed
+**Plans**: 4/15 plans executed
 
 Plans:
 **Wave 1**
@@ -108,7 +108,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 02-04-PLAN.md — saw_engine.py: pure SAW ranking, edge-case guards, TC-01 strategy re-weighting (Fertika, TDD, Wave 2)
-- [ ] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
+- [x] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
 - [ ] 02-06-PLAN.md — [BLOCKING] Push Phase 2 Supabase migrations to live project (Hidayat-only, Wave 2)
 - [ ] 02-07-PLAN.md — Goal detail + create/edit form (Khayyira, Wave 2)
 - [ ] 02-08-PLAN.md — AllocationSuggestionModal + Pending Allocations page (Khayyira, Wave 2)
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 3/15 | In Progress|  |
+| 2. Core Product Loop | 4/15 | In Progress|  |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

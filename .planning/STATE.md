@@ -6,14 +6,14 @@ current_phase: 02
 current_phase_name: core-product-loop
 status: executing
 stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-07-06T21:42:19.009Z"
+last_updated: "2026-07-06T22:09:17.952Z"
 last_activity: 2026-07-06
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 10
+  completed_plans: 11
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 02 (core-product-loop) — EXECUTING
-Plan: 2 of 15
+Plan: 3 of 15
 Status: Ready to execute
 Last activity: 2026-07-06 -- Phase 02 execution started
 
@@ -59,6 +59,7 @@ Progress: [██████████] 100%
 | Phase 01-foundation P02 | 25m | 3 tasks | 8 files |
 | Phase 01-foundation P4 | 25m | 3 tasks | 7 files |
 | Phase 02-04 PSAW Ranking Engine | 25min | 2 tasks | 3 files |
+| Phase 02-core-product-loop P05 | 30min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [01.1-03]: `/health` route must use `@app.api_route(methods=["GET","HEAD"])`, not `@app.get` alone — UptimeRobot's HEAD-based checks return 405 on GET-only routes
 - [Phase ?]: [2026-07-05, quick-260705-0mm]: Hidayat is sole account holder for Vercel/Railway/Supabase — Phase 2/3/4 tasks needing new env vars or dashboard settings must be scoped as separate Hidayat-only tasks, never blocking Fertika/Khayyira/Zarra (placeholder/mock first, wire real value after). Rule locked in CLAUDE.md/.claude/CLAUDE.md/.planning/PROJECT.md; workflow detail in docs/PANDUAN_TEKNIKAL_TIM.md Section 2a.
 - [Phase ?]: TC-01/02/04 locked into saw_engine.py: strategy re-weighting via multiply-then-renormalize (internal-only, weights dict never mutated), skor_kepentingan/saving_capacity_raw expected pre-computed on goal dicts by the caller
+- [Phase ?]: tipe_transaksi/source_label always derived server-side from kategori row; TransactionCreate.tipe_transaksi accepted but never read (D-01/Pitfall 1, T-2-02)
+- [Phase ?]: GET /api/transactions unconditionally scopes by id_pengguna in addition to any optional filter (T-2-01 IDOR mitigation)
+- [Phase ?]: GET /api/categories intentionally has no id_pengguna scoping -- kategori is shared/unscoped read-only per kategori_select_all RLS policy
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-06T21:41:54.699Z
+Last session: 2026-07-06T22:08:01.011Z
 Stopped at: Phase 2 UI-SPEC approved
 Resume file: .planning/phases/02-core-product-loop/02-UI-SPEC.md

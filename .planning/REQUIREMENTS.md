@@ -27,9 +27,9 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Transactions
 
-- [ ] **TRAN-01**: User dapat mencatat transaksi manual (nominal, tipe Pemasukan/Pengeluaran, kategori, tanggal, dompet, catatan opsional) — maksimum 3 field wajib untuk mencegah friction (FR-001)
-- [ ] **TRAN-02**: Sistem secara otomatis melabeli pemasukan sebagai "Allowance" atau "Side Income" berdasarkan flag_pemasukan kategori yang dipilih — tidak pernah dikirim manual oleh frontend (FR-005)
-- [ ] **TRAN-03**: User dapat melihat riwayat transaksi dengan filter (tanggal, kategori, source, pagination)
+- [x] **TRAN-01**: User dapat mencatat transaksi manual (nominal, tipe Pemasukan/Pengeluaran, kategori, tanggal, dompet, catatan opsional) — maksimum 3 field wajib untuk mencegah friction (FR-001)
+- [x] **TRAN-02**: Sistem secara otomatis melabeli pemasukan sebagai "Allowance" atau "Side Income" berdasarkan flag_pemasukan kategori yang dipilih — tidak pernah dikirim manual oleh frontend (FR-005)
+- [x] **TRAN-03**: User dapat melihat riwayat transaksi dengan filter (tanggal, kategori, source, pagination)
 - [ ] **TRAN-04**: User dapat mengedit transaksi yang sudah tersimpan
 - [ ] **TRAN-05**: User dapat menghapus transaksi
 
@@ -151,9 +151,9 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | WALL-02 | Phase 1 | Complete |
 | WALL-03 | Phase 1 | Complete |
 | WALL-04 | Phase 1 | Complete |
-| TRAN-01 | Phase 2 | Pending |
-| TRAN-02 | Phase 2 | Pending |
-| TRAN-03 | Phase 2 | Pending |
+| TRAN-01 | Phase 2 | Complete |
+| TRAN-02 | Phase 2 | Complete |
+| TRAN-03 | Phase 2 | Complete |
 | TRAN-04 | Phase 2 | Pending |
 | TRAN-05 | Phase 2 | Pending |
 | DASH-01 | Phase 2 | Pending |
