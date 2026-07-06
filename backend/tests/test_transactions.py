@@ -19,6 +19,14 @@ FREELANCE_KATEGORI = {
     "flag_pengeluaran": None,
 }
 
+MAKAN_KATEGORI = {
+    "id_kategori": "kat-makan",
+    "nama_kategori": "Makan & Minum",
+    "tipe": "Pengeluaran",
+    "flag_pemasukan": None,
+    "flag_pengeluaran": "Kebutuhan",
+}
+
 
 def _build_app() -> FastAPI:
     app = FastAPI()
@@ -179,3 +187,180 @@ def test_get_transactions_filtered_by_category_never_leaks_other_users_rows(
     # Never leaks user-2's row (tx-3), even though it also matches kat-freelance
     ids = {t["id_transaksi"] for t in data["transactions"]}
     assert "tx-3" not in ids
+
+
+# ---------------------------------------------------------------------------
+# PUT /api/transactions/{id} — re-derives labels, IDOR-safe (02-09-PLAN.md)
+# ---------------------------------------------------------------------------
+
+def test_put_transaction_rederives_labels_from_new_kategori_and_ignores_body_tipe_transaksi(
+    monkeypatch, fake_supabase_client
+):
+    """Editing a transaction to point at a different (Pengeluaran) kategori
+    must re-derive tipe_transaksi/source_label from that NEW kategori — even
+    when the body explicitly (and incorrectly) sends tipe_transaksi='Pemasukan'
+    (T-2-02 mitigation, same rule as POST)."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI, MAKAN_KATEGORI])
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "tx-1",
+                "id_pengguna": "user-1",
+                "tipe_transaksi": "Pemasukan",
+                "nominal": 500000,
+                "tanggal_transaksi": "2026-06-27",
+                "metode_input": "Manual",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-freelance",
+                "source_label": "Flexible Side Income",
+                "catatan": None,
+                "created_at": "2026-06-27T10:00:00+00:00",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "nominal": 20000,
+        "tanggal_transaksi": "2026-06-28",
+        "dompet_id": "dompet-1",
+        "kategori_id": "kat-makan",
+        "catatan": "Makan siang",
+        "tipe_transaksi": "Pemasukan",  # mismatched — must be ignored
+    }
+    response = client.put("/api/transactions/tx-1", json=body)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["tipe_transaksi"] == "Pengeluaran"
+    assert data["source_label"] is None
+    assert data["kategori_id"] == "kat-makan"
+    assert data["nominal"] == 20000
+
+
+def test_put_transaction_owned_by_another_user_returns_404(
+    monkeypatch, fake_supabase_client
+):
+    """Editing a transaction id that belongs to another user must return 404
+    (never 403 — avoids confirming the row exists, matching wallets.py)."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "tx-3",
+                "id_pengguna": "user-2",
+                "tipe_transaksi": "Pemasukan",
+                "nominal": 999999,
+                "tanggal_transaksi": "2026-06-27",
+                "metode_input": "Manual",
+                "dompet_id": "dompet-2",
+                "kategori_id": "kat-freelance",
+                "source_label": "Flexible Side Income",
+                "catatan": None,
+                "created_at": "2026-06-27T11:00:00+00:00",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "nominal": 1,
+        "tanggal_transaksi": "2026-06-27",
+        "dompet_id": "dompet-2",
+        "kategori_id": "kat-freelance",
+        "catatan": None,
+    }
+    response = client.put("/api/transactions/tx-3", json=body)
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "NOT_FOUND"
+
+
+# ---------------------------------------------------------------------------
+# DELETE /api/transactions/{id} — 204 regardless, IDOR-safe (02-09-PLAN.md)
+# ---------------------------------------------------------------------------
+
+def test_delete_transaction_owned_by_caller_returns_204_and_removes_row(
+    monkeypatch, fake_supabase_client
+):
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "tx-1",
+                "id_pengguna": "user-1",
+                "tipe_transaksi": "Pengeluaran",
+                "nominal": 20000,
+                "tanggal_transaksi": "2026-06-20",
+                "metode_input": "Manual",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-makan",
+                "source_label": None,
+                "catatan": None,
+                "created_at": "2026-06-20T10:00:00+00:00",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    response = client.delete("/api/transactions/tx-1")
+
+    assert response.status_code == 204
+    remaining = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert remaining == []
+
+
+def test_delete_transaction_owned_by_another_user_returns_204_but_does_not_delete(
+    monkeypatch, fake_supabase_client
+):
+    """DELETE for another user's transaction is a no-op 204 (IDOR-safe,
+    matches wallets.py's delete_wallet convention) — the row must NOT
+    actually be removed."""
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "tx-3",
+                "id_pengguna": "user-2",
+                "tipe_transaksi": "Pemasukan",
+                "nominal": 999999,
+                "tanggal_transaksi": "2026-06-27",
+                "metode_input": "Manual",
+                "dompet_id": "dompet-2",
+                "kategori_id": "kat-freelance",
+                "source_label": "Flexible Side Income",
+                "catatan": None,
+                "created_at": "2026-06-27T11:00:00+00:00",
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    response = client.delete("/api/transactions/tx-3")
+
+    assert response.status_code == 204
+    remaining = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert len(remaining) == 1
+    assert remaining[0]["id_transaksi"] == "tx-3"
