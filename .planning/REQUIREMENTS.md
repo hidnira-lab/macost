@@ -52,9 +52,9 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### SAW Engine & Prioritization
 
-- [ ] **SAW-01**: Goal diranking otomatis oleh algoritma SAW dengan 5 kriteria berbobot dari riset (n=62): personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2% (FR-009)
-- [ ] **SAW-02**: SAW engine menangani edge case: 0 goal (return empty), 1 goal (return rank=1 tanpa normalisasi), goal dengan nilai identik (tidak crash)
-- [ ] **SAW-03**: User dapat toggle strategi ranking: Quick Win (default — prioritaskan goal hampir selesai) vs Importance-First (FR-013)
+- [x] **SAW-01**: Goal diranking otomatis oleh algoritma SAW dengan 5 kriteria berbobot dari riset (n=62): personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2% (FR-009)
+- [x] **SAW-02**: SAW engine menangani edge case: 0 goal (return empty), 1 goal (return rank=1 tanpa normalisasi), goal dengan nilai identik (tidak crash)
+- [x] **SAW-03**: User dapat toggle strategi ranking: Quick Win (default — prioritaskan goal hampir selesai) vs Importance-First (FR-013)
 
 #### Smart Allocation
 
@@ -163,9 +163,9 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | GOAL-03 | Phase 2 | Pending |
 | GOAL-04 | Phase 2 | Pending |
 | GOAL-05 | Phase 2 | Pending |
-| SAW-01 | Phase 2 | Pending |
-| SAW-02 | Phase 2 | Pending |
-| SAW-03 | Phase 2 | Pending |
+| SAW-01 | Phase 2 | Complete |
+| SAW-02 | Phase 2 | Complete |
+| SAW-03 | Phase 2 | Complete |
 | ALLOC-01 | Phase 2 | Pending |
 | ALLOC-02 | Phase 2 | Pending |
 | ALLOC-03 | Phase 2 | Pending |

@@ -2,18 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+current_phase: 02
+current_phase_name: core-product-loop
 status: executing
 stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-07-05T09:16:14.546Z"
-last_activity: 2026-07-05 -- Phase 02 execution started
+last_updated: "2026-07-06T21:42:19.009Z"
+last_activity: 2026-07-06
+last_activity_desc: Phase 02 execution started
 progress:
-  total_phases: 7
+  total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 7
-  percent: 29
-current_phase: 2
-current_phase_name: Core Product Loop
+  completed_plans: 10
+  percent: 40
 ---
 
 # Project State
@@ -28,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 02 (core-product-loop) — EXECUTING
-Plan: 1 of 15
-Status: Executing Phase 02
-Last activity: 2026-07-06 - Completed quick task 260706-jaq round 3 (final): all 6 Figma-vs-spec discrepancies resolved in 02-UI-SPEC.md
+Plan: 2 of 15
+Status: Ready to execute
+Last activity: 2026-07-06 -- Phase 02 execution started
 
 Progress: [██████████] 100%
 
@@ -57,6 +58,7 @@ Progress: [██████████] 100%
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 25m | 3 tasks | 8 files |
 | Phase 01-foundation P4 | 25m | 3 tasks | 7 files |
+| Phase 02-04 PSAW Ranking Engine | 25min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -81,6 +83,7 @@ Recent decisions affecting current work:
 - [01.1-03]: Railway requires manually generating a public domain per service (Settings -> Networking -> Generate Domain) — no auto-assigned URL like Render's
 - [01.1-03]: `/health` route must use `@app.api_route(methods=["GET","HEAD"])`, not `@app.get` alone — UptimeRobot's HEAD-based checks return 405 on GET-only routes
 - [Phase ?]: [2026-07-05, quick-260705-0mm]: Hidayat is sole account holder for Vercel/Railway/Supabase — Phase 2/3/4 tasks needing new env vars or dashboard settings must be scoped as separate Hidayat-only tasks, never blocking Fertika/Khayyira/Zarra (placeholder/mock first, wire real value after). Rule locked in CLAUDE.md/.claude/CLAUDE.md/.planning/PROJECT.md; workflow detail in docs/PANDUAN_TEKNIKAL_TIM.md Section 2a.
+- [Phase ?]: TC-01/02/04 locked into saw_engine.py: strategy re-weighting via multiply-then-renormalize (internal-only, weights dict never mutated), skor_kepentingan/saving_capacity_raw expected pre-computed on goal dicts by the caller
 
 ### Pending Todos
 
@@ -141,6 +144,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-05T03:53:45.191Z
+Last session: 2026-07-06T21:41:54.699Z
 Stopped at: Phase 2 UI-SPEC approved
 Resume file: .planning/phases/02-core-product-loop/02-UI-SPEC.md
