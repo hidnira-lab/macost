@@ -6,14 +6,14 @@ current_phase: 02
 current_phase_name: core-product-loop
 status: executing
 stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-07-06T22:09:17.952Z"
+last_updated: "2026-07-06T22:28:27.151Z"
 last_activity: 2026-07-06
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 22
-  completed_plans: 11
+  completed_plans: 12
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 ## Current Position
 
 Phase: 02 (core-product-loop) — EXECUTING
-Plan: 3 of 15
+Plan: 4 of 15
 Status: Ready to execute
 Last activity: 2026-07-06 -- Phase 02 execution started
 
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 01-foundation P4 | 25m | 3 tasks | 7 files |
 | Phase 02-04 PSAW Ranking Engine | 25min | 2 tasks | 3 files |
 | Phase 02-core-product-loop P05 | 30min | 2 tasks | 6 files |
+| Phase 02-core-product-loop P09 | 5min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Recent decisions affecting current work:
 - [Phase ?]: tipe_transaksi/source_label always derived server-side from kategori row; TransactionCreate.tipe_transaksi accepted but never read (D-01/Pitfall 1, T-2-02)
 - [Phase ?]: GET /api/transactions unconditionally scopes by id_pengguna in addition to any optional filter (T-2-01 IDOR mitigation)
 - [Phase ?]: GET /api/categories intentionally has no id_pengguna scoping -- kategori is shared/unscoped read-only per kategori_select_all RLS policy
+- [Phase ?]: dompet.saldo stored column left in schema/insert path (legacy, cosmetic) but no read path uses it anymore; GET /api/wallets computes saldo live as derived SUM over transaksi
+- [Phase ?]: PUT /api/transactions/{id} re-derives tipe_transaksi/source_label from kategori exactly like POST, never trusting body.tipe_transaksi (T-2-02)
 
 ### Pending Todos
 
@@ -148,6 +151,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-06T22:08:01.011Z
+Last session: 2026-07-06T22:27:21.669Z
 Stopped at: Phase 2 UI-SPEC approved
 Resume file: .planning/phases/02-core-product-loop/02-UI-SPEC.md
