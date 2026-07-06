@@ -133,7 +133,7 @@ def test_put_goal_settings_weight_sum_0_95_returns_400_validation_error(
     response = client.put("/api/goal-settings", json=body)
 
     assert response.status_code == 400
-    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
 
     rows = fake_supabase_client.table("goal_settings").select("*").execute().data
     assert rows[0]["weights"] == DEFAULT_WEIGHTS  # unchanged
