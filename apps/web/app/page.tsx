@@ -10,7 +10,7 @@ export default function Home() {
   useEffect(() => {
     async function init() {
       const token = await getToken()
-      router.push(token ? '/wallets' : '/login')
+      router.push(token ? '/dashboard' : '/login')
     }
     init()
   }, [router])
