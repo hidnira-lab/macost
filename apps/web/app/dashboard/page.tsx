@@ -13,9 +13,9 @@ const USE_MOCK = typeof window !== 'undefined'
 type Period = 'this_month' | 'last_month' | 'custom'
 
 const PERIOD_LABELS: Record<Period, string> = {
-  this_month: 'This Month',
-  last_month: 'Last Month',
-  custom: 'Custom Range',
+  this_month: 'Bulan Ini',
+  last_month: 'Bulan Lalu',
+  custom: 'Pilih Rentang',
 }
 
 // ─── Bottom nav items ────────────────────────────────────────────────
@@ -167,7 +167,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#fcfcfc] flex flex-col">
-      <div className="flex-1 px-4 md:px-6 lg:mx-auto lg:max-w-2xl lg:px-8 pb-24 md:pb-28 lg:pb-28">
+      <div className="flex-1 container mx-auto px-4 md:max-w-2xl md:px-6 lg:max-w-5xl lg:px-8 pb-24 md:pb-28 lg:pb-28">
         {/* ── Top App Bar ──────────────────────────────────────────── */}
         <header className="flex items-center justify-between h-16 sticky top-0 z-10 bg-[rgba(252,252,252,0.8)] backdrop-blur-[6px] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 border-b border-[rgba(30,30,30,0.08)]">
           <div className="flex items-center gap-2">
@@ -241,9 +241,9 @@ export default function DashboardPage() {
         )}
 
         {data && !loading && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
             {/* ─── 1. Expense Breakdown ──────────────────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 md:p-6 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 md:p-6 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-start-1 lg:row-start-2">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
                 Expense Breakdown
               </h3>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
             </section>
 
             {/* ─── 2. Active Goal Progress ───────────────────────── */}
-            <section>
+            <section className="lg:col-start-2 lg:row-start-2 lg:row-span-3">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
                 Goal Progress
               </h3>
@@ -379,9 +379,9 @@ export default function DashboardPage() {
             </section>
 
             {/* ─── 3. Monthly Trend ─────────────────────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-start-1 lg:row-start-3">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
-                Trend (Last 4 Mo)
+                Tren Bulanan
               </h3>
               {data.monthly_trend && data.monthly_trend.length > 0 ? (
                 <>
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                       const inH = (m.income / maxVal) * 100
                       const outH = (m.expense / maxVal) * 100
                       const monthLabel = new Date(m.month + '-01').toLocaleString(
-                        'en-US',
+                        'id-ID',
                         { month: 'short' }
                       )
                       return (
@@ -431,13 +431,13 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[rgba(41,141,255,0.35)]" />
                       <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
-                        In
+                        Masuk
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#298dff]" />
                       <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
-                        Out
+                        Keluar
                       </span>
                     </div>
                   </div>
@@ -451,7 +451,7 @@ export default function DashboardPage() {
 
             {/* ─── 4. Overspending Alert ────────────────────────── */}
             {showAlert && (
-              <section className="bg-[#ffdad6] border border-[#ba1a1a] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+              <section className="bg-[#ffdad6] border border-[#ba1a1a] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-span-2 lg:row-start-1">
                 <div className="flex gap-3">
                   <div className="shrink-0 pt-0.5">
                     <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -460,7 +460,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#93000a] font-body">
-                      Overspending Alert
+                      Peringatan Pengeluaran
                     </p>
                     <p className="text-base text-[rgba(147,0,10,0.8)] mt-0.5 font-body">
                       {data.overspending_alert.message}
@@ -480,9 +480,9 @@ export default function DashboardPage() {
             )}
 
             {/* ─── 5. Total Balance (most prominent) ────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-6 md:p-8 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-center">
+            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-6 md:p-8 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-center lg:col-start-1 lg:row-start-4">
               <p className="text-sm font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
-                Available Balance
+                Total Saldo
               </p>
               <p
                 className="text-[32px] md:text-[40px] font-extrabold text-[#1e1e1e] mt-2 leading-tight font-display"
