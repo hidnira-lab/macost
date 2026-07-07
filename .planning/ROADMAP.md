@@ -96,37 +96,37 @@ Plans:
   4. User can create a savings goal, see goals ranked by the SAW algorithm, and toggle between Quick Win and Importance-First strategy — the ranking order visibly changes on toggle
   5. Dashboard displays the 5 KPIs in the research-validated sequence (expense breakdown → goal progress → monthly trend → overspending alert → total balance) and updates when the user changes the period filter
 
-**Plans**: 15 plans across 6 waves
+**Plans**: 8/15 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
-- [ ] 02-02-PLAN.md — Goals list (SAW-ranked) + strategy toggle + mock plumbing (Khayyira, Wave 1)
+- [x] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
+- [x] 02-02-PLAN.md — Goals list (SAW-ranked) + strategy toggle + mock plumbing (Khayyira, Wave 1)
 - [ ] 02-03-PLAN.md — Dashboard page: 5 KPIs fixed order + period filter (Zarra, Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-04-PLAN.md — saw_engine.py: pure SAW ranking, edge-case guards, TC-01 strategy re-weighting (Fertika, TDD, Wave 2)
-- [ ] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
+- [x] 02-04-PLAN.md — saw_engine.py: pure SAW ranking, edge-case guards, TC-01 strategy re-weighting (Fertika, TDD, Wave 2)
+- [x] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
 - [ ] 02-06-PLAN.md — [BLOCKING] Push Phase 2 Supabase migrations to live project (Hidayat-only, Wave 2)
 - [ ] 02-07-PLAN.md — Goal detail + create/edit form (Khayyira, Wave 2)
 - [ ] 02-08-PLAN.md — AllocationSuggestionModal + Pending Allocations page (Khayyira, Wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-09-PLAN.md — Transactions edit/delete + wallet balance derived-SUM (Fertika, Wave 3)
-- [ ] 02-10-PLAN.md — Goal Settings + Goals CRUD with real-time SAW ranking (Fertika, Wave 3)
+- [x] 02-09-PLAN.md — Transactions edit/delete + wallet balance derived-SUM (Fertika, Wave 3)
+- [x] 02-10-PLAN.md — Goal Settings + Goals CRUD with real-time SAW ranking (Fertika, Wave 3)
 - [ ] 02-11-PLAN.md — Transaction quick-entry form + allocation-suggestion save sequencing (Zarra, Wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-12-PLAN.md — Smart Allocation service + suggest/confirm/skip/pending endpoints (Fertika, Wave 4)
+- [x] 02-12-PLAN.md — Smart Allocation service + suggest/confirm/skip/pending endpoints (Fertika, Wave 4)
 - [ ] 02-13-PLAN.md — Transaction history/filter/edit/delete + wallet balance refresh (Zarra, Wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 02-14-PLAN.md — Dashboard aggregation + central router wiring into main.py (Fertika, Wave 5)
+- [x] 02-14-PLAN.md — Dashboard aggregation + central router wiring into main.py (Fertika, Wave 5)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -209,7 +209,7 @@ Plans:
 **Full diagnostic trail:** `.planning/todos/pending/2026-07-02-verify-android-ndk-toolchain-and-build-test-apk.md`
 **Plans:**
 
-- [x] 01-01: Track A — Tasks 1-2 (Next.js static export, Tauri scaffold) done and committed; Task 3 (NDK verify + working Android APK) blocked on the blank-screen bug above — descoped from MVP, not a blocker for Phase 2+
+1/15 plans executed
 
 ### Phase 999.2: Follow-up — AI Agent Chatbot (Could Have, post-MVP stretch goal) (BACKLOG)
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 0/15 | Planned | - |
+| 2. Core Product Loop | 8/15 | In Progress|  |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |

@@ -2,18 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 2 planned (15 plans, 6 waves), ready to execute
-last_updated: "2026-07-05T08:01:09.000Z"
-last_activity: 2026-07-05 — Phase 2 planned (15 plans across 6 waves), plan-checker verification passed, ready to execute
+current_phase: 02
+current_phase_name: core-product-loop
+status: executing
+stopped_at: Completed 02-14-PLAN.md
+last_updated: "2026-07-06T23:32:55.201Z"
+last_activity: 2026-07-07
+last_activity_desc: Completed 02-14-PLAN.md (Dashboard aggregation + central router wiring)
 progress:
-  total_phases: 7
+  total_phases: 5
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 29
-current_phase: 2
-current_phase_name: Core Product Loop
+  total_plans: 22
+  completed_plans: 15
+  percent: 68
 ---
 
 # Project State
@@ -23,16 +24,16 @@ current_phase_name: Core Product Loop
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 2 — Core Product Loop
+**Current focus:** Phase 02 — core-product-loop
 
 ## Current Position
 
-Phase: 2 — Core Product Loop
-Plan: 15 plans created (6 waves)
-Status: Ready to execute
-Last activity: 2026-07-05 — Phase 2 planned (15 plans across 6 waves), plan-checker verification passed, ready to execute
+Phase: 02 (core-product-loop) — EXECUTING
+Plan: 8 of 15 (02-14 just completed; parallel-wave execution, remaining: 02-03, 02-06, 02-07, 02-08, 02-11, 02-13, 02-15)
+Status: Executing
+Last activity: 2026-07-07 -- Completed 02-14-PLAN.md (Dashboard aggregation + central router wiring)
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 68%
 
 ## Performance Metrics
 
@@ -57,6 +58,12 @@ Progress: [██████████] 100%
 *Updated after each plan completion*
 | Phase 01-foundation P02 | 25m | 3 tasks | 8 files |
 | Phase 01-foundation P4 | 25m | 3 tasks | 7 files |
+| Phase 02-04 PSAW Ranking Engine | 25min | 2 tasks | 3 files |
+| Phase 02-core-product-loop P05 | 30min | 2 tasks | 6 files |
+| Phase 02-core-product-loop P09 | 5min | 2 tasks | 4 files |
+| Phase 02 P10 | 25min | 2 tasks | 8 files |
+| Phase 02 P12 | 6min | 2 tasks | 5 files |
+| Phase 02-core-product-loop P14 | 15min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -81,6 +88,18 @@ Recent decisions affecting current work:
 - [01.1-03]: Railway requires manually generating a public domain per service (Settings -> Networking -> Generate Domain) — no auto-assigned URL like Render's
 - [01.1-03]: `/health` route must use `@app.api_route(methods=["GET","HEAD"])`, not `@app.get` alone — UptimeRobot's HEAD-based checks return 405 on GET-only routes
 - [Phase ?]: [2026-07-05, quick-260705-0mm]: Hidayat is sole account holder for Vercel/Railway/Supabase — Phase 2/3/4 tasks needing new env vars or dashboard settings must be scoped as separate Hidayat-only tasks, never blocking Fertika/Khayyira/Zarra (placeholder/mock first, wire real value after). Rule locked in CLAUDE.md/.claude/CLAUDE.md/.planning/PROJECT.md; workflow detail in docs/PANDUAN_TEKNIKAL_TIM.md Section 2a.
+- [Phase ?]: TC-01/02/04 locked into saw_engine.py: strategy re-weighting via multiply-then-renormalize (internal-only, weights dict never mutated), skor_kepentingan/saving_capacity_raw expected pre-computed on goal dicts by the caller
+- [Phase ?]: tipe_transaksi/source_label always derived server-side from kategori row; TransactionCreate.tipe_transaksi accepted but never read (D-01/Pitfall 1, T-2-02)
+- [Phase ?]: GET /api/transactions unconditionally scopes by id_pengguna in addition to any optional filter (T-2-01 IDOR mitigation)
+- [Phase ?]: GET /api/categories intentionally has no id_pengguna scoping -- kategori is shared/unscoped read-only per kategori_select_all RLS policy
+- [Phase ?]: dompet.saldo stored column left in schema/insert path (legacy, cosmetic) but no read path uses it anymore; GET /api/wallets computes saldo live as derived SUM over transaksi
+- [Phase ?]: PUT /api/transactions/{id} re-derives tipe_transaksi/source_label from kategori exactly like POST, never trusting body.tipe_transaksi (T-2-02)
+- [Phase ?]: [02-10]: Widened PUT /api/goal-settings weight-sum tolerance from 0.001 to 0.002 -- CLAUDE.md's locked default weights (22.5/21.9/21.5/17.8/16.2%) sum to a real 0.999, not floating-point dust; 0.001 would reject the exact default weights re-sent via the D-05 strategy-toggle flow (Pitfall 7's own warning sign).
+- [Phase ?]: [02-12]: Pending allocation state derived implicitly (absence of alokasi row), not a new skipped_suggestion table -- keeps schema scope at exactly the 6 already-pushed migrations; skip is a pure read+compute echo with zero DB writes
+- [Phase ?]: [02-12]: GET /transactions/{id}/allocation-suggestion independently re-validates tipe_transaksi/source_label server-side rather than trusting allocation_suggestion_available from creation time
+- [Phase 02-core-product-loop]: 02-14: overspending_alert trailing-3-month baseline is defined relative to the selected period's start (not to 'today'), so a category is never compared against a baseline that includes its own current-period total
+- [Phase 02-core-product-loop]: 02-14: backend/main.py now registers all 6 Phase 2 routers (categories, transactions, goals, goal_settings, allocations, dashboard) alongside the unmodified Phase 1 auth/wallets routers -- backend is fully wired
+- [Phase 02-core-product-loop]: 02-14: backend pytest must be invoked via 'python -m pytest' from repo root, not bare 'pytest' -- backend/pytest.ini's presence anchors rootdir at backend/ under plain pytest, breaking 'from backend.routers import ...' imports
 
 ### Pending Todos
 
@@ -122,6 +141,9 @@ Recent decisions affecting current work:
 | 260704-quj | Add gh CLI setup and PR/merge flow explanation to docs/PANDUAN_TEKNIKAL_TIM.md | 2026-07-04 | 9c91bd5 | [260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-](./quick/260704-quj-tambah-penjelasan-setup-gh-cli-dan-alur-/) |
 | 260704-r45 | Reference Notion workspace for env var sourcing instead of asking Hidayat directly | 2026-07-04 | c98b096 | [260704-r45-update-sumber-env-var-di-panduan-teknika](./quick/260704-r45-update-sumber-env-var-di-panduan-teknika/) |
 | 260705-0mm | Tetapkan aturan platform ownership (Hidayat pegang akun Vercel/Railway/Supabase, Phase 2/3/4) di CLAUDE.md/PROJECT.md, tambah Section 2a di PANDUAN_TEKNIKAL_TIM.md | 2026-07-05 | b334c9d, 8ee48c0 | [260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku](./quick/260705-0mm-tetapkan-aturan-hidayat-pegang-penuh-aku/) |
+| 260706-jaq | Update 02-UI-SPEC.md dengan detail visual asli dari Figma (11 frame, 4 area Phase 2) — resolusi konflik tema (Figma light theme menang atas dark theme lama) + 5 diskrepansi di-flag sebagai Open Questions | 2026-07-06 | b8ff368, f6f83d5, 0a30379 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
+| 260706-jaq (round 2) | Perdalam detail visual 8 frame Figma per user; resolusi 4 open question sesuai instruksi user (urutan KPI Dashboard tetap RESEARCH.md, bobot SAW tetap survey n=62, Pending Suggestions = antrian Smart Allocation bukan nudge AI, History = tab nav sendiri); temuan baru: diskrepansi Palette A/B warna di 2 frame | 2026-07-06 | 6f16855, b11b8ae, 39cb658 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
+| 260706-jaq (round 3, final) | Resolusi final 2 keputusan tersisa: Create First Goal diimplementasi sebagai halaman onboarding penuh (bukan empty-state ringan D-06); Palette A/B distandarkan ke Palette A (bg #fcfcfc, teks #1e1e1e, blue #298dff, orange #ff8929) — Transaction History & Pending Suggestions diupdate ke token Palette A. Semua 6 Open Questions kini RESOLVED | 2026-07-06 | 617baa1 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
 
 ### Roadmap Evolution
 
@@ -138,6 +160,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-05T03:53:45.191Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-core-product-loop/02-UI-SPEC.md
+Last session: 2026-07-06T23:32:09.949Z
+Stopped at: Completed 02-14-PLAN.md
+Resume file: None

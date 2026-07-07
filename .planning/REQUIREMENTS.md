@@ -27,16 +27,16 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Transactions
 
-- [ ] **TRAN-01**: User dapat mencatat transaksi manual (nominal, tipe Pemasukan/Pengeluaran, kategori, tanggal, dompet, catatan opsional) — maksimum 3 field wajib untuk mencegah friction (FR-001)
-- [ ] **TRAN-02**: Sistem secara otomatis melabeli pemasukan sebagai "Allowance" atau "Side Income" berdasarkan flag_pemasukan kategori yang dipilih — tidak pernah dikirim manual oleh frontend (FR-005)
-- [ ] **TRAN-03**: User dapat melihat riwayat transaksi dengan filter (tanggal, kategori, source, pagination)
-- [ ] **TRAN-04**: User dapat mengedit transaksi yang sudah tersimpan
-- [ ] **TRAN-05**: User dapat menghapus transaksi
+- [x] **TRAN-01**: User dapat mencatat transaksi manual (nominal, tipe Pemasukan/Pengeluaran, kategori, tanggal, dompet, catatan opsional) — maksimum 3 field wajib untuk mencegah friction (FR-001)
+- [x] **TRAN-02**: Sistem secara otomatis melabeli pemasukan sebagai "Allowance" atau "Side Income" berdasarkan flag_pemasukan kategori yang dipilih — tidak pernah dikirim manual oleh frontend (FR-005)
+- [x] **TRAN-03**: User dapat melihat riwayat transaksi dengan filter (tanggal, kategori, source, pagination)
+- [x] **TRAN-04**: User dapat mengedit transaksi yang sudah tersimpan
+- [x] **TRAN-05**: User dapat menghapus transaksi
 
 #### Dashboard
 
-- [ ] **DASH-01**: User dapat melihat dashboard dengan 5 KPI dalam urutan yang telah divalidasi riset: (1) breakdown pengeluaran per kategori, (2) progress goal aktif, (3) tren bulanan income vs expense, (4) alert overspending, (5) total saldo (FR-006)
-- [ ] **DASH-02**: Dashboard mendukung filter periode: bulan ini, bulan lalu, atau custom date range
+- [x] **DASH-01**: User dapat melihat dashboard dengan 5 KPI dalam urutan yang telah divalidasi riset: (1) breakdown pengeluaran per kategori, (2) progress goal aktif, (3) tren bulanan income vs expense, (4) alert overspending, (5) total saldo (FR-006)
+- [x] **DASH-02**: Dashboard mendukung filter periode: bulan ini, bulan lalu, atau custom date range
 
 ---
 
@@ -44,25 +44,25 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Goals
 
-- [ ] **GOAL-01**: User dapat membuat goal baru (nama, nominal target, deadline, skor keinginan 1-5) (FR-007)
-- [ ] **GOAL-02**: User dapat melihat daftar goal dengan nominal terkumpul dan progress percentage (dihitung dari SUM Alokasi) (FR-008)
-- [ ] **GOAL-03**: User dapat melihat detail goal termasuk riwayat alokasi
-- [ ] **GOAL-04**: User dapat mengedit goal yang sudah ada
-- [ ] **GOAL-05**: User dapat menghapus goal
+- [x] **GOAL-01**: User dapat membuat goal baru (nama, nominal target, deadline, skor keinginan 1-5) (FR-007)
+- [x] **GOAL-02**: User dapat melihat daftar goal dengan nominal terkumpul dan progress percentage (dihitung dari SUM Alokasi) (FR-008)
+- [x] **GOAL-03**: User dapat melihat detail goal termasuk riwayat alokasi
+- [x] **GOAL-04**: User dapat mengedit goal yang sudah ada
+- [x] **GOAL-05**: User dapat menghapus goal
 
 #### SAW Engine & Prioritization
 
-- [ ] **SAW-01**: Goal diranking otomatis oleh algoritma SAW dengan 5 kriteria berbobot dari riset (n=62): personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2% (FR-009)
-- [ ] **SAW-02**: SAW engine menangani edge case: 0 goal (return empty), 1 goal (return rank=1 tanpa normalisasi), goal dengan nilai identik (tidak crash)
-- [ ] **SAW-03**: User dapat toggle strategi ranking: Quick Win (default — prioritaskan goal hampir selesai) vs Importance-First (FR-013)
+- [x] **SAW-01**: Goal diranking otomatis oleh algoritma SAW dengan 5 kriteria berbobot dari riset (n=62): personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2% (FR-009)
+- [x] **SAW-02**: SAW engine menangani edge case: 0 goal (return empty), 1 goal (return rank=1 tanpa normalisasi), goal dengan nilai identik (tidak crash)
+- [x] **SAW-03**: User dapat toggle strategi ranking: Quick Win (default — prioritaskan goal hampir selesai) vs Importance-First (FR-013)
 
 #### Smart Allocation
 
-- [ ] **ALLOC-01**: Saat transaksi Side Income tersimpan, sistem menampilkan modal saran alokasi ke goal prioritas tertinggi dalam ≤2 detik (FR-010)
-- [ ] **ALLOC-02**: Saran alokasi menganjurkan ≈30-40% dari nominal transaksi side income, dengan goal alternatif tersedia
-- [ ] **ALLOC-03**: User wajib mengkonfirmasi alokasi melalui modal — sistem tidak pernah auto-execute alokasi tanpa persetujuan eksplisit (FR-011)
-- [ ] **ALLOC-04**: User dapat melewati (skip) saran alokasi; suggestion tersimpan sebagai pending
-- [ ] **ALLOC-05**: User dapat melihat daftar pending allocation suggestion yang belum direspons
+- [x] **ALLOC-01**: Saat transaksi Side Income tersimpan, sistem menampilkan modal saran alokasi ke goal prioritas tertinggi dalam ≤2 detik (FR-010)
+- [x] **ALLOC-02**: Saran alokasi menganjurkan ≈30-40% dari nominal transaksi side income, dengan goal alternatif tersedia
+- [x] **ALLOC-03**: User wajib mengkonfirmasi alokasi melalui modal — sistem tidak pernah auto-execute alokasi tanpa persetujuan eksplisit (FR-011)
+- [x] **ALLOC-04**: User dapat melewati (skip) saran alokasi; suggestion tersimpan sebagai pending
+- [x] **ALLOC-05**: User dapat melihat daftar pending allocation suggestion yang belum direspons
 
 ---
 
@@ -151,26 +151,26 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | WALL-02 | Phase 1 | Complete |
 | WALL-03 | Phase 1 | Complete |
 | WALL-04 | Phase 1 | Complete |
-| TRAN-01 | Phase 2 | Pending |
-| TRAN-02 | Phase 2 | Pending |
-| TRAN-03 | Phase 2 | Pending |
-| TRAN-04 | Phase 2 | Pending |
-| TRAN-05 | Phase 2 | Pending |
-| DASH-01 | Phase 2 | Pending |
-| DASH-02 | Phase 2 | Pending |
-| GOAL-01 | Phase 2 | Pending |
-| GOAL-02 | Phase 2 | Pending |
-| GOAL-03 | Phase 2 | Pending |
-| GOAL-04 | Phase 2 | Pending |
-| GOAL-05 | Phase 2 | Pending |
-| SAW-01 | Phase 2 | Pending |
-| SAW-02 | Phase 2 | Pending |
-| SAW-03 | Phase 2 | Pending |
-| ALLOC-01 | Phase 2 | Pending |
-| ALLOC-02 | Phase 2 | Pending |
-| ALLOC-03 | Phase 2 | Pending |
-| ALLOC-04 | Phase 2 | Pending |
-| ALLOC-05 | Phase 2 | Pending |
+| TRAN-01 | Phase 2 | Complete |
+| TRAN-02 | Phase 2 | Complete |
+| TRAN-03 | Phase 2 | Complete |
+| TRAN-04 | Phase 2 | Complete |
+| TRAN-05 | Phase 2 | Complete |
+| DASH-01 | Phase 2 | Complete |
+| DASH-02 | Phase 2 | Complete |
+| GOAL-01 | Phase 2 | Complete |
+| GOAL-02 | Phase 2 | Complete |
+| GOAL-03 | Phase 2 | Complete |
+| GOAL-04 | Phase 2 | Complete |
+| GOAL-05 | Phase 2 | Complete |
+| SAW-01 | Phase 2 | Complete |
+| SAW-02 | Phase 2 | Complete |
+| SAW-03 | Phase 2 | Complete |
+| ALLOC-01 | Phase 2 | Complete |
+| ALLOC-02 | Phase 2 | Complete |
+| ALLOC-03 | Phase 2 | Complete |
+| ALLOC-04 | Phase 2 | Complete |
+| ALLOC-05 | Phase 2 | Complete |
 | SCAN-01 | Phase 3 | Pending |
 | SCAN-02 | Phase 3 | Pending |
 | SCAN-03 | Phase 3 | Pending |

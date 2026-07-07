@@ -15,8 +15,13 @@ router = APIRouter()
 @router.get("/wallets", response_model=dict)
 def list_wallets(current_user_id: str = Depends(get_current_user_id)):
     """
-    Returns all wallets belonging to the authenticated user.
-    Filters by id_pengguna so users can never see other users' wallets.
+    Returns all wallets belonging to the authenticated user. `saldo` is
+    computed live as a derived SUM over that wallet's transaksi rows
+    (Pemasukan minus Pengeluaran) — NOT read from the stale/legacy stored
+    `dompet.saldo` column (02-RESEARCH.md Pitfall 9 / Assumption A7), using
+    the same batched-aggregation pattern as goal progress (Pattern 2):
+    exactly 2 Supabase queries total (dompet, then transaksi via `.in_()`),
+    never one query per wallet.
     """
     supabase = get_supabase_admin()
     result = (
@@ -25,14 +30,31 @@ def list_wallets(current_user_id: str = Depends(get_current_user_id)):
         .eq("id_pengguna", current_user_id)
         .execute()
     )
+    dompet_rows = result.data
+    dompet_ids = [row["id_dompet"] for row in dompet_rows]
+
+    transaksi_rows = (
+        supabase.table("transaksi")
+        .select("dompet_id, tipe_transaksi, nominal")
+        .in_("dompet_id", dompet_ids)
+        .execute()
+        .data
+        if dompet_ids
+        else []
+    )
+
+    saldo_by_dompet: dict[str, int] = {}
+    for row in transaksi_rows:
+        delta = row["nominal"] if row["tipe_transaksi"] == "Pemasukan" else -row["nominal"]
+        saldo_by_dompet[row["dompet_id"]] = saldo_by_dompet.get(row["dompet_id"], 0) + delta
 
     wallets = [
         WalletResponse(
             id_dompet=str(row["id_dompet"]),
             nama_dompet=row["nama_dompet"],
-            saldo=row["saldo"],
+            saldo=saldo_by_dompet.get(row["id_dompet"], 0),
         )
-        for row in result.data
+        for row in dompet_rows
     ]
 
     return {"wallets": [w.model_dump() for w in wallets]}

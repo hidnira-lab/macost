@@ -13,11 +13,13 @@ created: 2026-07-05
 
 **Scope:** Transaction quick-entry form + history/filter, Goals list (SAW-ranked) + detail + create/edit + strategy toggle, Dashboard (5 KPIs + period filter), Allocation suggestion modal + Pending Allocations page.
 
-**Design source of truth:** Per `CLAUDE.md` ("Sumber Desain UI"), Figma (Stitch → Figma refine) is canonical for exact layout/visuals — the Figma MCP server is connected but no frame links for these 4 areas were provided to this research session. **This is a known gap** (see "Figma Gap" section below) — this contract therefore focuses on interaction contracts, states, timing, and copy that CONTEXT.md/RESEARCH.md already lock, which are the parts most likely to cause execution drift if left ambiguous. The executor MUST request the relevant Figma frame link (per CLAUDE.md's workflow: copy link to selection → one page/group at a time) before building final pixel-level layout for each of the 4 areas; this document governs everything else (states, copy, timing, tokens) regardless of what the Figma frame shows.
+**Design source of truth:** Per `CLAUDE.md` ("Sumber Desain UI"), Figma (Stitch → Figma refine) is canonical for exact layout/visuals. As of 2026-07-06, the relevant Figma frames for all 4 Phase 2 areas have been pulled and reconciled into this document (see "Theme Resolution" callout below and the "Figma Reference — Frame Map & Visual Detail" section, which replaces the former "Figma Gap" placeholder). This contract still separately locks interaction contracts, states, timing, and copy from CONTEXT.md/RESEARCH.md, which remain the parts most likely to cause execution drift if left ambiguous.
 
 ---
 
 ## Design System
+
+> **Theme Resolution (2026-07-06):** Figma is confirmed as source of truth for visual design, per user decision on 2026-07-06 (quick task 260706-jaq). The Figma design (file `vKQLNfdx7yKSzWvxhmkhg5`, page `156:2`) is a **light theme** — this supersedes the dark theme previously assumed below from the existing hand-built pages. The currently-built `apps/web` pages (`wallets`, `goals`, `(auth)/login`, `(auth)/register`) still use the old dark theme (`bg-[#1e1e1e]`, Neulis/Helvetica local fonts) and are now **stale** relative to this spec. Retrofitting those pages to the new light theme is a **separate follow-up task, explicitly out of scope for this update** — flagged back to the team, not silently scheduled here.
 
 | Property | Value |
 |----------|-------|
@@ -25,7 +27,8 @@ created: 2026-07-05
 | Preset | not applicable |
 | Component library | none (raw Tailwind 4, CSS-first config via `apps/web/app/globals.css` `@theme` block — no `tailwind.config.*` file exists) |
 | Icon library | none installed (`apps/web/package.json` has no `lucide-react`, `heroicons`, or similar — Phase 2 introduces the first icon-needing UI, e.g. filter/edit/delete affordances; if icons are needed, use inline SVG or add `lucide-react` as a new dependency decision, not assumed here) |
-| Font | Neulis (headings/display, local `next/font/local`, weights 400/500/600/700/800 available as separate files) + Helvetica (body, local `next/font/local`, weights 400/700 + italics only — no 500/600 file exists) — both already wired in `apps/web/app/layout.tsx` as CSS vars `--font-display`/`--font-body`. **Known inconsistency in existing code:** components apply font family via inline `style={{ fontFamily: "'Neulis'"/'Helvetica' }}` rather than the `font-display`/`font-body` Tailwind theme classes — Phase 2 new components should use the `font-[family-name:var(--font-display)]` / `font-[family-name:var(--font-body)]` Tailwind arbitrary-value classes instead, to stay correct if the font files are ever swapped, but this is not a blocking requirement for this phase. |
+| Font (target, per Figma) | **Inter** (body/UI text — Regular for body copy, Medium for list item titles, Semi Bold for card titles/emphasis, Bold for labels/stat numbers/small-caps like "REMAINING BUDGET") for general UI, and **Bricolage Grotesque ExtraBold** (`font-variation-settings: "opsz" 14, "wdth" 100`) for the brand wordmark ("Macost") and large page H1s / hero stat numbers (e.g. "Dashboard", "My Goals", "Rp 250.000" balance). This is the new target per the Figma extraction (2026-07-06) and supersedes the "OLD/stale theme" row below. |
+| Font (OLD/stale theme — do not use for new work) | Neulis (headings/display, local `next/font/local`, weights 400/500/600/700/800 available as separate files) + Helvetica (body, local `next/font/local`, weights 400/700 + italics only — no 500/600 file exists) — both still wired in `apps/web/app/layout.tsx` as CSS vars `--font-display`/`--font-body`, describing the OLD dark-theme design used by the currently-built `wallets`/`login`/`register` pages, not the current Figma-confirmed target above. **Known inconsistency in existing code:** components apply font family via inline `style={{ fontFamily: "'Neulis'"/'Helvetica' }}` rather than the `font-display`/`font-body` Tailwind theme classes. Retrofitting these pages to Inter/Bricolage Grotesque is out of scope for this update (see Theme Resolution callout above). |
 
 ### shadcn Gate Decision
 
@@ -55,9 +58,30 @@ Exceptions:
 - `mt-0.5` (2px) already appears in `wallets/page.tsx` for the balance-line micro-offset under a wallet name — acceptable as a one-off text-baseline nudge, not a general-purpose token. Do not introduce new sub-4px values beyond this kind of micro-nudge.
 - 44px minimum touch target for icon-only buttons (filter icon, edit/delete icon buttons on Transaction history rows) — this phase introduces icon-only actions for the first time (existing pages use text-label buttons like "Edit"/"Hapus"); if icon-only buttons are used instead of text labels, they must meet 44×44px minimum hit area regardless of visual icon size. Every icon-only button must also carry an `aria-label` matching its text-equivalent action (e.g., `aria-label="Hapus transaksi"`) — icons alone are not an accessible label.
 
+**Component-level radii/heights (added 2026-07-06, per Figma extraction — supplements, does not replace, the spacing scale above):**
+- Standard cards: `rounded-xl` (12px)
+- Hero/priority cards (e.g. Priority #1 goal card, Smart Allocation modal top corners): `rounded-3xl` (24px)
+- Progress bar track: height 8–12px, `rounded-full`
+- Icon chips: circular or 8–16px rounded-square, tinted background at ~10–20% opacity of the icon's accent color
+
 ---
 
 ## Typography
+
+**Updated 2026-07-06 (Figma extraction, quick task 260706-jaq) — target type scale, supersedes the OLD/stale-theme table below:**
+
+| Role | Size | Font / Weight | Usage |
+|------|------|--------|-------------|
+| Hero stat / Display | 28–32px | Bricolage Grotesque ExtraBold | Hero stat numbers (e.g. "Rp 250.000" Remaining Budget), brand wordmark "Macost" |
+| Page H1 | 24px | Bricolage Grotesque ExtraBold | Page-level headings ("Dashboard", "My Goals") |
+| Section heading | 18–20px | Inter Semi Bold | Section headings within a page |
+| Body / card title | 16px | Inter Regular (body) / Inter Semi Bold (card title) | Primary row/card content (transaction description, goal name) |
+| Secondary | 14px | Inter Medium | List item titles, secondary text |
+| Label / badge | 12px | Inter Bold | Labels, badges, small-caps stat labels (e.g. "REMAINING BUDGET") |
+
+Weight set: Inter Regular / Medium / Semi Bold / Bold for general UI, plus Bricolage Grotesque ExtraBold reserved exclusively for the brand wordmark, page H1s, and hero stat numbers (with `font-variation-settings: "opsz" 14, "wdth" 100`).
+
+**OLD/stale-theme table (Neulis/Helvetica, dark-theme era — do not use for new work, retained for reference against currently-built pages only):**
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
@@ -66,17 +90,49 @@ Exceptions:
 | Body | 16px | 400 (Helvetica Regular) | 1.5 |
 | Label | 14px | 400 (Helvetica Regular) | 1.5 |
 
-**Weights declared (exactly 2, per contract discipline):** Regular 400 (Helvetica — body/label/input text) and Semibold 600 (Neulis — headings, primary CTA button labels).
+**Weights declared (exactly 2, per contract discipline) — OLD/stale theme:** Regular 400 (Helvetica — body/label/input text) and Semibold 600 (Neulis — headings, primary CTA button labels).
 
 Notes:
 - `Display` (28px) is new this phase — needed for large monetary figures (Dashboard total balance KPI, goal target/collected amounts on Goal detail) that didn't exist in Phase 1's wallet-name-only screens. Use only for hero numeric values, never for body copy.
 - `Heading` (24px/600) matches the existing `text-2xl font-bold` pattern used for `wallets/page.tsx`'s `<h1>` — this contract intentionally tightens the weight from 700→600 (Neulis SemiBold) going forward for new Phase 2 pages to enforce the "exactly 2 weights" rule; do not retrofit the existing Wallets page this phase (out of scope), but new Transaction/Goal/Dashboard/Allocation pages should follow 600 for headings.
 - `Body` (16px) is new this phase — existing pages used only 14px for all non-heading text. Phase 2 introduces denser, more numeric UI (transaction rows, goal cards, KPI labels) where 14px is too small for primary readable content; use 16px for primary row/card content (transaction description, goal name, KPI value context) and reserve 14px (`Label`) for secondary/meta text (timestamps, helper text, button labels, form labels) — matching the existing established use of `text-sm`.
-- Primary CTA buttons use Label size (14px) at weight 600, per existing `font-semibold` button convention (`Tambah Dompet`, `Login` buttons) — buttons are a Label-role component even though they're interactive, not a Heading.
+- Primary CTA buttons use Label size (14px) at weight 600, per existing `font-semibold` button convention (`Tambah Dompet`, `Login` buttons) — buttons are a Label-role component even though they're interactive, not a Heading. **Note:** this OLD-theme button convention is retained for the stale dark-theme pages; new Figma-sourced pages should follow the target type scale above.
 
 ---
 
 ## Color
+
+**Updated 2026-07-06 (Figma extraction, quick task 260706-jaq) — target light-theme roles, supersedes the OLD/stale dark-theme table below:**
+
+| Role | Value | Usage |
+|------|-------|-------|
+| Background | `#fcfcfc` / `#ffffff` (light, near-white) | Page background, top app bar (`rgba(252,252,252,0.8)` with backdrop-blur), bottom nav |
+| Primary text | `#1e1e1e` | Body copy, headings |
+| Muted/secondary text | `rgba(30,30,30,0.65)` | Secondary labels, meta text, timestamps |
+| Borders | `rgba(30,30,30,0.15)` | Card borders, dividers |
+| Subtle fills | `rgba(30,30,30,0.05)` – `rgba(30,30,30,0.08)` | Icon chip backgrounds, progress bar track backgrounds |
+| Accent orange | `#ff8929` (gradient to `#ffb787` on progress fills) | Goals / priority / positive emphasis (e.g. Priority #1 goal card badge, goal progress fills) |
+| Accent blue | `#298dff` (gradient to `#065fc5` on buttons/FABs, or `#a8c8ff` on progress fills) | Primary actions, links, active nav state |
+| Destructive/error | background `#ffdad6`, border `#ba1a1a`, text `#93000a` | Overspending alert banner, error states |
+| Category tint | varies per category, `rgba(<rgb>,0.1–0.2)` fill behind a solid-colored icon | Category icon chips (transaction rows, expense breakdown legend) |
+
+**Accent reserved for** (intent preserved from the OLD-theme rules below, hex values updated to the new roles above):
+- Primary CTA buttons: "Simpan Transaksi", "Buat Goal", "Konfirmasi Alokasi", "+ Tambah Transaksi", "+ Buat Goal" (mirrors existing "+ Tambah Dompet" pattern) — use accent blue (`#298dff` → `#065fc5` gradient) as the primary filled-button color per Figma (blue is the primary-action color in the new theme; orange is reserved for goals/priority/positive emphasis, not generic primary CTAs)
+- Input focus border — applies to all new form inputs (transaction amount, goal name/target/deadline fields)
+- Selected/active state of the SAW strategy toggle (Quick Win vs Importance-First) — only the currently-selected pill/segment, not both (Figma shows this as solid blue when active)
+- Loading overlay's spinner/progress indicator ("Menghitung saran alokasi...")
+
+**Secondary interactive/semantic color:** accent orange (`#ff8929`) — reserved for goal/priority/positive-emphasis surfaces (Priority #1 goal card corner accent, goal progress bar fills, "Priority #1" badge), distinct from the accent blue primary-action role. Inline text-link actions (Edit transaction, Edit goal, "Lewati"/Skip in the allocation modal, "Lihat semua" pagination/view-more links) use accent blue, matching its "links/active nav" role above.
+
+**✅ Palette A/B Discrepancy — RESOLVED (2026-07-06, final decision):**
+
+Two distinct color-token sets existed across the 8 frames pulled in round 2, likely two different design-iteration passes within the same Figma file. **The user has now made a final call: standardize on the majority palette ("Palette A") project-wide.** This is no longer a flagged recommendation pending confirmation — it is the locked design-token decision for Phase 2.
+
+**Canonical palette (Palette A — final):** background `#fcfcfc`, primary text `#1e1e1e` / `rgba(30,30,30,0.65)` muted, primary blue `#298dff`→`#065fc5` gradient, primary orange `#ff8929`→`#ffb787` gradient, borders `rgba(30,30,30,0.15)`, destructive `#ba1a1a`, Bricolage Grotesque ExtraBold headings. This was already the majority (6 of 8 frames: Dashboard `156:198`, Home/Add-Transaction `156:65`, Goal List `156:430`, Goal Detail `156:558`, Create Goal Form `156:713`, Smart Allocation Modal `156:653`) and the two most structurally central screens (Dashboard, Goal List).
+
+**Superseded ("Palette B", no longer valid for new work):** Transaction History (`156:1526`) and Pending Suggestions (`156:1646`) originally used a different token set — text `#1b1b1c`/`#414753`/`#717785`/`#c0c6d6`, blue `#005bb0`/`#0074dc`, background `#fcf9f8`, borders `#e5e2e1`, card fill `#f6f3f2`. **These two pages' visual-layout descriptions below have been updated to use Palette A tokens instead of their frame's literal Palette B hex values** — implement with Palette A throughout; do not use Palette B's literal values in production code.
+
+**OLD/stale dark-theme table (do not use for new work, retained for reference against currently-built pages only):**
 
 | Role | Value | Usage |
 |------|-------|-------|
@@ -85,15 +141,9 @@ Notes:
 | Accent (10%) | `#ff8929` (hover `#f77e2d`) | Primary CTA buttons only — see reserved-for list below |
 | Destructive | `#f87171` (Tailwind `red-400`) text on `rgba(239,68,68,0.10)` (`red-500/10`) background, `rgba(239,68,68,0.20)` border | Delete/Hapus actions, error banners/toasts, validation error text |
 
-**Accent reserved for** (explicit list — matches existing `#ff8929` usage in `wallets/page.tsx`/`login/page.tsx`, extended to Phase 2's new flows):
-- Primary CTA buttons: "Simpan Transaksi", "Buat Goal", "Konfirmasi Alokasi", "+ Tambah Transaksi", "+ Buat Goal" (mirrors existing "+ Tambah Dompet" pattern)
-- Input focus border (`focus:border-[#ff8929]`) — already established, applies to all new form inputs (transaction amount, goal name/target/deadline fields)
-- Selected/active state of the SAW strategy toggle (Quick Win vs Importance-First) — only the currently-selected pill/segment, not both
-- Loading overlay's spinner/progress indicator ("Menghitung saran alokasi...")
-
-**Secondary interactive color (not counted in the 10% accent budget):** `#298dff` (blue) — already established in `wallets/page.tsx` for the "Edit" action and `login/page.tsx` for the "Daftar" (register) link. Reserved for:
-- Inline text-link actions (Edit transaction, Edit goal, "Lewati"/Skip in the allocation modal, "Lihat semua" pagination/view-more links)
-- This is a distinct semantic role from the orange primary-action accent — never use `#298dff` for a filled/primary button, and never use `#ff8929` for a plain inline text link.
+OLD-theme reserved-for lists (superseded by the target roles above, retained for reference against the stale pages only):
+- Accent (`#ff8929`) was primary CTAs, input focus border, SAW toggle active state, loading overlay spinner
+- Secondary interactive (`#298dff`) was inline text-link actions ("Edit", "Daftar")
 
 ---
 
@@ -174,18 +224,94 @@ Beyond visual tokens, the following interaction sequences are locked by CONTEXT.
 
 ---
 
-## Figma Gap
+## Figma Reference — Frame Map & Visual Detail
 
-No Figma frame links for the 4 Phase 2 areas (Transactions, Goals, Dashboard, Allocation modal/Pending) were available to this research session. Per `CLAUDE.md`'s workflow, before building final layout for each area the executor/user should:
-1. Open the relevant frame/page in Figma, right-click → "Copy link to selection".
-2. Provide that link when implementing that specific page/component (one page or small group at a time — not all 4 areas in one prompt).
-3. Convert multi-screen flows (if any exist for Allocation modal + Pending page) one frame at a time, then compose.
+**Source (extracted 2026-07-06, quick task 260706-jaq):** Figma file `vKQLNfdx7yKSzWvxhmkhg5` ("ZEPHYRA"), page `156:2` ("MACOST") — https://www.figma.com/design/vKQLNfdx7yKSzWvxhmkhg5/ZEPHYRA?node-id=156-2
 
-Until those links are supplied, the executor should build against **this document's interaction/state/copy/token contract** and use a plain, token-consistent layout (matching the existing Wallets/Auth page visual language: dark card-on-dark-background, rounded-2xl cards, rounded-xl inputs/buttons) as a placeholder structure — expect this to be regenerated (not precision-edited) once real Figma frames are supplied, per CLAUDE.md's own note that Claude Code is stronger at generating new components from scratch than editing existing ones precisely.
+### Frame Node-ID Map (11 frames pulled, grouped by Phase 2 area)
+
+| Area | Frame | Node ID |
+|------|-------|---------|
+| Dashboard | Dashboard - MIS Overview | `156:198` |
+| Transactions | Home / Add Transaction entry | `156:65` |
+| Transactions | Choose Input Method (bottom sheet) | `156:3` |
+| Transactions | Manual Transaction Form | `156:366` |
+| Transactions | Transaction History | `156:1526` |
+| Goals | Goal List | `156:430` |
+| Goals | Goal Detail | `156:558` |
+| Goals | Create Goal Form | `156:713` |
+| Goals | Goal Prioritization Settings | `156:824` |
+| Goals | Create First Goal (empty state) | `156:1438` |
+| Allocation modal | Smart Allocation Suggestion | `156:653` |
+| Allocation modal | Pending Suggestions (Smart Allocation confirmation queue) | `156:1646` |
+
+`156:1646` is now IN scope as the Smart Allocation confirmation queue page (resolved 2026-07-06, Round 2 — see "Resolved Decisions" section above); its literal AI-Assistant-nudge copy/content does not apply — only its card/list visual layout pattern is reused.
+
+**Frames not yet pulled in detail (out of this phase's scope, noted for future reference only):** `156:939` AI Financial Assistant, `156:1040` Upload Statement, `156:1192` Scan Receipt Flow, `156:1740` Profile & Settings, `156:1837` Manage Wallets, auth/onboarding frames `156:1211`/`156:1273`/`156:1283`/`156:1322`/`156:1365`, `170:537` alternate Dashboard exploration.
+
+### Visual Layout — Dashboard (`156:198`)
+
+Header: avatar + "Dashboard" H1 (Bricolage Grotesque) + period filter pill ("This Month" dropdown) + bell icon. Overspending Alert banner (red/pink, dismissible) appears at the TOP of the content area in this frame — resolved 2026-07-06 Round 2 — see "Resolved Decisions" section above; the page-level KPI order still follows RESEARCH.md, not this frame's literal layout. Expense Breakdown: donut chart + total in center ("Rp 2.4M / TOTAL") + legend rows (icon chip, label, %) per category. Goal Progress: stacked cards per active goal (icon chip, name, %, progress bar). Trend (Last 4 Mo): grouped bar chart (In/Out per month), legend at bottom. Available Balance: low-visual-weight centered text at the very bottom (muted color, not a card). Bottom nav present, Dashboard tab active. Node-ID `156:198` can be re-pulled for pixel-level detail (exact chart library/rendering approach is not specified — Figma shows a visual mock, not a real chart-lib output).
+
+### Visual Layout — Transactions (`156:65`, `156:3`, `156:366`, `156:1526`)
+
+**Home / Add Transaction entry (`156:65`):** Distinct "Home" tab (separate from the "Dashboard" tab) showing a "Remaining Budget" hero stat (Bricolage Grotesque, 32px), then a 2-up bento of quick actions — "Add Transaction" (dark gradient card) and "Scan Receipt" (light card) — which opens the `156:3` bottom sheet. Active Goals: horizontal-scroll goal cards (icon, name, %, progress bar, soft gradient corner accent). Recent: vertical list of last transactions (icon chip, merchant name, category, signed amount in Rupiah). Large circular FAB (blue gradient) bottom-right for quick-add, in addition to the bento "Add" tile.
+
+**Choose Input Method (`156:3`):** Bottom sheet modal over a dimmed/blurred Home background. Header: "Add Transaction" + close (X). Vertical stack of large tappable rows for input options (Manual Input first, plus Scan/Upload as parallel entry options in the same sheet) — matches FR-002/FR-003's dual-path requirement.
+
+**Manual Transaction Form (`156:366`):** Header: back arrow + "New Transaction" title (centered, blue). Expense/Income segmented toggle (pill, active = solid blue "Expense", inactive = grey "Income") is the only place `tipe_transaksi` is chosen visually (frontend still never sends it — this is purely a UI affordance the backend derives from `kategori_id`, per this spec's existing "Transaction quick-entry form" contract below). Amount: large card, "Rp" prefix + big placeholder "0" (numeric-keypad-style input). Category: select/dropdown row ("Select Category" + chevron). Date: text input pre-filled `06/29/2026` — **confirms D-01/D-02's today-default behavior still holds visually.** Note (Optional): multi-line textarea, placeholder "What was this for?". Primary CTA: full-width gradient blue "Save Transaction" button, sticky at bottom. This frame confirms the "3 required fields + pre-filled date" contract (nominal/kategori/dompet required, tanggal_transaksi pre-filled and non-competing) still holds visually — Category/Date/Note are the only other fields shown alongside the toggle and amount.
+
+**Transaction History (`156:1526`):** **Uses Palette A (normalized — final, 2026-07-06)** — the frame's original literal tokens were Palette B; this description has been converted to the canonical palette. Header: avatar + "Macost" wordmark + bell. Search bar: white input, `border-[rgba(30,30,30,0.15)]`, rounded-8px, search icon left-inset, placeholder "Search transactions..." in `rgba(30,30,30,0.35)`. Filter button: 48x48 square, `bg-[rgba(30,30,30,0.05)]`, rounded-8px, sliders icon. Date-group headers: small-caps bold `rgba(30,30,30,0.35)`, 12px, tracked — "TODAY", "YESTERDAY". Transaction rows are grouped inside ONE bordered container per date (`border-[rgba(30,30,30,0.15)]`, rounded-12px) with thin `border-b border-[rgba(30,30,30,0.15)]` row dividers — not individually-boxed cards like other lists. Row anatomy: circular category-tinted icon chip + merchant/title (semibold 16px `#1e1e1e`) + category (14px `rgba(30,30,30,0.65)`) on the left; amount (semibold 16px, `#ba1a1a` "- Rp X" for expense / `#298dff` "+ Rp X" for income) + time (14px `rgba(30,30,30,0.65)`) right-aligned. The bottom-nav "History" tab is its own destination (resolved — see "Resolved Decisions" above); active-pill color is `#298dff` (Palette A).
+
+### Visual Layout — Goals (`156:430`, `156:558`, `156:713`, `156:824`, `156:1438`)
+
+**Goal List (`156:430`):** Header: "My Goals" H1 (Bricolage Grotesque, blue) + avatar (blue circle) + bell. Summary/hero row: "Total Savings Goal" (Rp 23.500.000) left, "On Track" + "3 Active" pill right, bottom-border divider. Goals grid: Priority #1 gets a distinct, larger "Goal Card 1: Top Priority" treatment (`rounded-3xl`/24px, soft orange gradient corner blob, "Priority #1" solid-orange pill badge, larger 20px name font) — this is the SAW-rank-differentiated card pattern, visually distinguishing SAW rank #1 from the rest. Goal Card 2+: standard `rounded-xl` cards, small `#2`/`#3` rank badge (grey pill, top-right), icon chip top-left, name + amount/target inline text, thin progress bar with gradient fill + % label. FAB: blue gradient rounded-square, bottom-right, "+" icon for "Add Goal". Bottom nav: Goals tab active.
+
+**Goal Detail (`156:558`):** Palette A confirmed here (`#1e1e1e`, `#298dff`, `#ff8929`, `#fcfcfc`, `rgba(30,30,30,0.15)` borders), consistent with Dashboard/Goals. Header: back arrow + goal name as page title (Bricolage Grotesque ExtraBold, `#298dff`, centered). Hero graphic: 256px tall, rounded-12px, orange gradient (`#ffb787` → `#ff8929`) at 80% opacity with a `mix-blend-overlay` pixel-art image on top (confirms CLAUDE.md's "minimal pixel-art visual style" for goal imagery), large drop shadow. Progress Card: "CURRENT PROGRESS" label (12px bold uppercase muted) + big stat in Bricolage Grotesque ExtraBold 32px `#298dff` + circular icon badge top-right on `rgba(255,137,41,0.2)` background; progress bar orange gradient `#ffb787`→`#ff8929`, 12px height, rounded-full; below a `border-t` divider, a 2-column COLLECTED/TARGET stats row (16px semibold `#1e1e1e`), then a full-width DEADLINE row with a calendar icon. Allocation History section: 20px semibold heading + individually-boxed rounded-8px cards (not grouped like Transaction History) — each with an icon chip tinted orange `rgba(250,179,135,0.2)` for manual saving or blue `rgba(41,141,255,0.1)` for auto-roundup, a date (16px medium) + type label (14px muted) on the left, and a signed amount in `#ff8929` ("+Rp X") on the right. Footer actions: centered row of icon-with-caption buttons (not plain text buttons) — circular grey `rgba(30,30,30,0.05)` "Edit" icon-button with pencil icon + 12px bold caption below, and circular red-tinted `rgba(255,218,214,0.5)` "Delete" icon-button with trash icon + `#ba1a1a` 12px bold caption below.
+
+**Create Goal Form (`156:713`):** Palette A confirmed. Header: back arrow + "Create New Goal" (Bricolage Grotesque ExtraBold `#298dff`) + right-aligned overflow-menu "⋮" button. Quick Start section: 20px semibold label + horizontal-scroll row of 128px-wide rounded-12px template chip cards (white background, `rgba(30,30,30,0.15)` border), each with a circular icon badge tinted per template — Emergency Fund `#ffdad6`, Vacation `rgba(41,141,255,0.2)`, Health `rgba(255,137,41,0.14)`, Laptop/Gadget `rgba(41,141,255,0.14)` — plus a centered up-to-2-line 14px semibold label. Form section: single bordered rounded-12px card, 25px padding, containing: Goal Name text input; Target Amount input with a fixed "Rp" prefix at 16px semibold and placeholder "10,000,000"; Deadline input styled as a 3-segment "mm / dd / yyyy" placeholder with a calendar-icon button right-inset; an Importance slider labeled "How important is this to you?" with a bold blue `#298dff` current-value readout right-aligned, an `rgba(30,30,30,0.08)` 8px-height rounded track, tick numbers 1-5 below, and endpoint labels "Nice to have"/"Critical" — this is the `personal_importance` SAW input (`skor_kepentingan`). CTA: full-width gradient `#298dff`→`#065fc5` button, rounded-12px, "+" icon + "Create Goal" 20px semibold white label, drop shadow. This frame suppresses the bottom nav bar, confirming Create/Edit Goal is a pushed full-screen flow, not a tab-nav destination.
+
+**Goal Prioritization Settings (`156:824`):** Header: back arrow + "Prioritization" + help (?) icon. Strategy toggle: segmented control "Quick Win" / "Importance First" (pill, active = solid blue), sitting directly below the header, above the weight sliders — **this resolves the FR-014 strategy-toggle question and confirms this spec's "Goals list + SAW strategy toggle" contract below: it's a top-level 2-option segmented control**, matching D-05. "Total Weight Distribution" — big "100%" readout + a single horizontal multi-segment bar (color-coded per criterion, segment width = weight %) directly below. 5 weight sliders, one per SAW criterion, each in its own card: colored dot + label + %, slider track. **The default % values shown in this frame (Personal Importance 25%, Progress Gap 20%, Saving Capacity 20%, Urgency 15%, Target Amount 20%) are mockup placeholders only — see "Resolved Decisions" > "SAW default weights" above, do NOT adopt these as the real defaults.** CTA: full-width solid blue "Apply Weights" button. Bottom nav: Goals tab active.
+
+**Create First Goal / onboarding page (`156:1438`) — RESOLVED (2026-07-06, final decision):** implement as the full-page onboarding experience shown in Figma, not D-06's lightweight section-scoped empty state — see "Resolved Decisions" below. Layout: icon badge, "Set Your First Goal" H1 (blue, bold), subtitle "Let's build a habit of saving. What are you aiming for?". Inline form directly on this screen: Goal Name, Target Amount, Target Date, "Importance" slider (1–5, current selection shown as text e.g. "High Priority" in orange). Primary CTA: "Create Goal →", plus a secondary text-only "Skip for now" link below.
+
+### Visual Layout — Allocation modal (`156:653`)
+
+**Full structural detail (supersedes round 1's screenshot-only description).** Palette A confirmed. Structure: dimmed+blurred simulated background (`rgba(30,30,30,0.2)` overlay, `backdrop-blur-[1px]`) behind a centered modal card. Modal card: `max-w-[384px]`, `rounded-24px` top corners, `bg-[rgba(252,252,252,0.85)]` with `backdrop-blur-[12px]` frosted-glass effect, large shadow. Header illustration band: 128px tall, `bg-[rgba(41,141,255,0.2)]`, two blurred decorative circle shapes, centered white circular badge with a sparkle/stars icon. Content: "Smart Allocation" heading (Bricolage Grotesque ExtraBold, 24px, centered) + body copy composing mixed-weight inline spans — muted regular text with bold/semibold emphasis on the amounts and goal name, e.g. "Your side income of **Rp 500.000** just came in! We suggest allocating **Rp 175.000 (35%)** to your **New Laptop** goal — it's your top priority right now." Mini progress-bar context card: bordered white rounded-12px card showing goal name + "Priority 1" 12px bold blue badge on the top row, then a progress bar split into a "Current Progress" segment `rgba(30,30,30,0.22)` dark grey followed by a "Suggested Addition" segment `#298dff` solid, then a bottom row with the current amount on the left and the delta "+ Rp 175K" in blue on the right. Actions (exactly 3, stacked, confirms this spec's existing never-auto-execute, always-3-way-choice pattern in the "Allocation suggestion flow" contract below): "Confirm Allocation" (solid `#298dff` pill, white text, primary), "Change Amount" (outlined pill, `#1e1e1e` text, secondary), "Not Now" (plain text link, muted, tertiary, no border/background).
+
+## Visual Layout — Pending Suggestions (`156:1646`)
+
+Documents the resolved-scope Smart Allocation confirmation queue (per the "Resolved Decisions" section above). **Uses Palette A (normalized — final, 2026-07-06)** — text `rgba(30,30,30,0.65)` muted / `#1e1e1e` primary, blue `#298dff` (the frame's original literal Palette B tokens, `#414753`/`#717785` text and `#0074dc` blue, are superseded). The greeting-style header ("Hey there! 👋") is NOT reused (that belongs to the AI Assistant feed, out of scope), but the list-of-cards pattern IS reused: a high-priority first card with a decorative orange corner-blob overlay (`rgba(255,137,41,0.2)`, top-right, rounded-bl-full) versus standard plain bordered cards for subsequent items, each card containing a circular icon chip (goal icon, not an activity icon), a title (20px semibold — the goal name), a short one-line description (14px muted, e.g. "Rp 175.000 (35%) dari side income baru" instead of the frame's spending-nudge description), a bottom row with the amount (16px semibold, `#298dff`) on the left and a solid `#298dff` pill CTA on the right labeled "Review"/"Konfirmasi", which opens the Smart Allocation modal (`156:653`) for that specific queued item. Footer is a centered "Dismiss all" text link (14px muted, border-bottom underline style). Each card = one queued side-income allocation suggestion (goal name, suggested amount + %, Review/Confirm action) — not a spending-pattern nudge.
+
+---
+
+## Resolved Decisions (2026-07-06, User-Directed)
+
+The following 6 items were flagged open across round 1 and round 2 of the Figma extraction (2026-07-06, quick task 260706-jaq) and are now all resolved by explicit user instruction:
+
+**Dashboard KPI order — RESOLVED (2026-07-06, Round 2):** RESEARCH.md's locked order wins over Figma's visual placement — the page-level SECTION ORDER of the 5 KPIs stays (1) expense breakdown, (2) goal progress, (3) monthly trend, (4) overspending alert, (5) total balance. Figma's `156:198` frame visually places the Overspending Alert directly below the header/period filter, above Expense Breakdown, but this placement is explicitly overridden by the user. Only the Overspending Alert component's own visual card styling is taken from Figma: `#ffdad6` background, `#ba1a1a` border, `#93000a` text, dismissible via an "X" button.
+
+**SAW default weights — RESOLVED (2026-07-06, Round 2, reconfirmed):** the canonical survey n=62 values are final: personal_importance 22.5%, progress_gap 21.9%, saving_capacity 21.5%, urgency 17.8%, target_amount 16.2%. The Goal Prioritization Settings frame (`156:824`) shows illustrative-only placeholder values (25/20/20/15/20) that must never be adopted as `saw_engine.py` defaults.
+
+**Pending Suggestions scope — RESOLVED (2026-07-06, Round 2):** the Pending Suggestions page is the Smart Allocation confirmation queue (per PRD/CONTEXT.md), not the AI Assistant nudge feed shown in Figma frame `156:1646`. The page reuses `156:1646`'s visual card/list pattern (icon chip + title + description + amount + pill-shaped CTA + "Dismiss all" text link at the bottom) but with different content semantics: each card represents one queued side-income allocation suggestion — goal name, suggested amount + percentage, and a "Review"/"Confirm" action that opens the Smart Allocation modal (`156:653`) for that specific item, not a spending-pattern nudge. Full visual detail is added in the new "Visual Layout — Pending Suggestions (`156:1646`)" subsection below.
+
+**Transaction History nav tab — RESOLVED (2026-07-06, Round 2):** "History" IS its own bottom-nav destination (confirmed by the 5th-tab-position variant in frame `156:1526`), not a pushed sub-page reached from Home.
+
+**Create First Goal vs. D-06 empty state — RESOLVED (2026-07-06, final decision):** implement `156:1438` as the full-page onboarding experience shown in Figma (icon badge, H1, inline form, "Skip for now" link) for the first-ever "create your first goal" moment. This supersedes D-06's lightweight section-scoped empty-state contract for this specific screen — D-06 still governs the *other* section-scoped empty states (Dashboard per-KPI, Transaction history list, Pending Allocations list) which are unaffected by this decision; only the Goals-list-with-zero-goals moment now uses this full onboarding page instead of a lightweight inline message.
+
+**Palette A/B color-token discrepancy — RESOLVED (2026-07-06, final decision):** standardize on Palette A project-wide (background `#fcfcfc`, primary text `#1e1e1e`, primary blue `#298dff`, primary orange `#ff8929`). Transaction History (`156:1526`) and Pending Suggestions (`156:1646`), which originally used Palette B tokens (`#1b1b1c`/`#005bb0`/`#0074dc`/`#fcf9f8`), have had their visual-layout descriptions above updated to Palette A — see the Design System > Color "Palette A/B Discrepancy" note above (now marked RESOLVED) and the updated Transaction History / Pending Suggestions descriptions in the Figma Reference section.
+
+---
+
+## Open Questions / Flagged Discrepancies
+
+**None remaining — all 6 items (5 from the original round-1 extraction plus the Palette A/B finding from round 2) are now resolved by explicit user instruction.** See "Resolved Decisions" section above for the full record.
 
 ---
 
 ## Checker Sign-Off
+
+> **Addendum (2026-07-06, quick task 260706-jaq, final):** This spec was updated 2026-07-06 with real Figma-sourced visual detail (Round 1), further updated Round 2 with user-directed resolutions and full per-page visual detail, and finalized with 2 remaining decisions (Create First Goal as full onboarding page; Palette A/B standardized on Palette A). The sign-off below reflects the pre-Figma-detail approval (2026-07-05); all 6 discrepancies surfaced during Figma extraction are now resolved by explicit user instruction — see "Resolved Decisions (2026-07-06, User-Directed)" above. No open items remain blocking execution of this spec's affected areas.
 
 - [x] Dimension 1 Copywriting: PASS
 - [x] Dimension 2 Visuals: PASS (2 non-blocking recommendations applied: Dashboard focal point, icon-button aria-label rule)
