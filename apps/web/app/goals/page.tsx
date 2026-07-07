@@ -317,13 +317,13 @@ export default function GoalsPage() {
 
         {/* ── Goal list ── */}
         <div
-          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-opacity ${
+          className={`grid grid-cols-1 gap-4 transition-opacity ${
             toggleLoading ? 'opacity-50' : ''
           }`}
         >
           {/* Empty state */}
           {goals.length === 0 && !loading && (
-            <div className="text-center py-12 md:col-span-2 lg:col-span-3">
+            <div className="text-center py-12">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(255,137,41,0.14)' }}>
                 <Target className="w-8 h-8" style={{ color: '#ff8929' }} />
               </div>
@@ -362,7 +362,7 @@ export default function GoalsPage() {
               /* ── Priority #1 Card (larger, orange accent) ── */
               <div
                 key={goal.id_goal}
-                className="relative overflow-hidden rounded-3xl px-5 pt-5 pb-4 md:col-span-2 lg:col-span-3"
+                className="relative overflow-hidden rounded-3xl px-5 pt-5 pb-4"
                 style={{
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(30,30,30,0.15)',
