@@ -29,7 +29,7 @@ const NAV_ITEMS = [
       </svg>
     ),
     active: false,
-    href: '/dashboard',
+    href: '/home',
   },
   {
     label: 'Dashboard',
@@ -170,15 +170,13 @@ export default function DashboardPage() {
       <div className="flex-1 container mx-auto px-4 md:max-w-2xl md:px-6 lg:max-w-5xl lg:px-8 pb-24 md:pb-28 lg:pb-28">
         {/* ── Top App Bar ──────────────────────────────────────────── */}
         <header className="flex items-center justify-between h-16 sticky top-0 z-10 bg-[rgba(252,252,252,0.8)] backdrop-blur-[6px] -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 border-b border-[rgba(30,30,30,0.08)]">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[rgba(41,141,255,0.2)] flex items-center justify-center overflow-hidden shrink-0" />
-            <h1
-              className="text-2xl font-extrabold text-[#298dff] tracking-tight font-display"
-              style={{ fontVariationSettings: '"opsz" 14, "wdth" 100' }}
-            >
-              Macost
-            </h1>
-          </div>
+          <div className="w-8 h-8 rounded-full bg-[rgba(41,141,255,0.2)] flex items-center justify-center overflow-hidden shrink-0" />
+          <h1
+            className="text-2xl font-extrabold text-[#298dff] tracking-tight font-display"
+            style={{ fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+          >
+            Macost
+          </h1>
           {/* Bell icon */}
           <button
             className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-[rgba(30,30,30,0.05)] transition-colors"

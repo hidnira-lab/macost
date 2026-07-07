@@ -1,16 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch, apiMutate } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
 import type {
   Transaction,
+  TransactionsResponse,
   TransactionCreateRequest,
   AllocationSuggestionResponse,
+  Category,
+  CategoriesResponse,
+  Wallet,
+  WalletsResponse,
 } from '@/lib/api/types'
 import TransactionForm from '@/components/TransactionForm'
 import AllocationSuggestionModal from '@/components/AllocationSuggestionModal'
+
+const LIMIT = 20
 
 // ─── Bottom nav items ────────────────────────────────────────────────
 // Transaksi is a sub-destination reached from Home/FAB, not one of the 5
@@ -80,8 +87,51 @@ interface ModalState {
   transaksiId: string
 }
 
+function formatRp(value: number) {
+  return value.toLocaleString('id-ID')
+}
+
+function formatTime(isoDatetime: string) {
+  return new Date(isoDatetime).toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function dateGroupLabel(tanggal: string) {
+  const today = new Date().toISOString().slice(0, 10)
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  if (tanggal === today) return 'Hari Ini'
+  if (tanggal === yesterday) return 'Kemarin'
+  return new Date(tanggal + 'T00:00:00').toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+/** Icon + tint pair for a transaction row, matched by category name */
+function categoryVisual(namaKategori: string | undefined, tipe: string) {
+  const fallback =
+    tipe === 'Pemasukan'
+      ? { bg: 'bg-[rgba(41,141,255,0.2)]', fg: '#298dff' }
+      : { bg: 'bg-[rgba(255,137,41,0.2)]', fg: '#ff8929' }
+  const map: Record<string, { bg: string; fg: string }> = {
+    'Makan & Minum': { bg: 'bg-[rgba(255,137,41,0.2)]', fg: '#ff8929' },
+    Transportasi: { bg: 'bg-[rgba(41,141,255,0.2)]', fg: '#298dff' },
+    Hiburan: { bg: 'bg-[rgba(168,85,247,0.15)]', fg: '#9333ea' },
+    'Keperluan Kuliah': { bg: 'bg-[rgba(16,185,129,0.15)]', fg: '#059669' },
+    'Tempat Tinggal': { bg: 'bg-[rgba(30,30,30,0.08)]', fg: '#1e1e1e' },
+    'Uang Saku / Kiriman Orang Tua': { bg: 'bg-[rgba(41,141,255,0.2)]', fg: '#298dff' },
+    'Freelance / Kerja Sampingan': { bg: 'bg-[rgba(255,137,41,0.2)]', fg: '#ff8929' },
+  }
+  return (namaKategori && map[namaKategori]) || fallback
+}
+
 export default function TransactionsPage() {
   const router = useRouter()
+  const formSectionRef = useRef<HTMLDivElement>(null)
+
   const [checkingAuth, setCheckingAuth] = useState(true)
 
   // D-03: full-overlay blocking loading state, no client-side timeout
@@ -90,17 +140,76 @@ export default function TransactionsPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [savedBanner, setSavedBanner] = useState(false)
 
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [wallets, setWallets] = useState<Wallet[]>([])
+
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [totalTransactions, setTotalTransactions] = useState(0)
+  const [listLoading, setListLoading] = useState(true)
+  const [listError, setListError] = useState<string | null>(null)
+
+  const [page, setPage] = useState(1)
+  const [showFilters, setShowFilters] = useState(false)
+  const [search, setSearch] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [sourceFilter, setSourceFilter] = useState('')
+
+  const refreshWallets = useCallback(async () => {
+    try {
+      const res = await apiFetch<WalletsResponse>('/api/wallets')
+      setWallets(res.wallets)
+    } catch {
+      // Non-critical — wallet strip just won't refresh this cycle
+    }
+  }, [])
+
+  const refreshList = useCallback(async () => {
+    setListLoading(true)
+    setListError(null)
+    try {
+      const params = new URLSearchParams()
+      if (startDate) params.set('start_date', startDate)
+      if (endDate) params.set('end_date', endDate)
+      if (categoryFilter) params.set('category_id', categoryFilter)
+      if (sourceFilter) params.set('source', sourceFilter)
+      params.set('page', String(page))
+      params.set('limit', String(LIMIT))
+      const res = await apiFetch<TransactionsResponse>(`/api/transactions?${params.toString()}`)
+      setTransactions(res.transactions)
+      setTotalTransactions(res.total)
+    } catch {
+      setListError('Gagal memuat riwayat transaksi')
+    } finally {
+      setListLoading(false)
+    }
+  }, [startDate, endDate, categoryFilter, sourceFilter, page])
+
   useEffect(() => {
-    async function checkAuth() {
+    async function init() {
       const token = await getToken()
       if (!token) {
         router.push('/login')
         return
       }
       setCheckingAuth(false)
+      const [categoriesRes] = await Promise.all([
+        apiFetch<CategoriesResponse>('/api/categories').catch(() => ({ categories: [] })),
+        refreshWallets(),
+      ])
+      setCategories(categoriesRes.categories)
     }
-    checkAuth()
-  }, [router])
+    init()
+  }, [router, refreshWallets])
+
+  useEffect(() => {
+    if (checkingAuth) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch on filter/page change is the intended sync-with-API use case for this effect
+    refreshList()
+  }, [checkingAuth, refreshList])
 
   useEffect(() => {
     if (!toastMessage) return
@@ -114,10 +223,69 @@ export default function TransactionsPage() {
     return () => clearTimeout(timer)
   }, [savedBanner])
 
-  async function handleSaveTransaction(payload: TransactionCreateRequest) {
-    const created = await apiMutate<Transaction>('/api/transactions', 'POST', payload)
+  function categoryName(kategoriId: string) {
+    return categories.find((c) => c.id_kategori === kategoriId)?.nama_kategori
+  }
 
-    if (!created.allocation_suggestion_available) {
+  function handleFilterChange(setter: (v: string) => void) {
+    return (value: string) => {
+      setter(value)
+      setPage(1)
+    }
+  }
+
+  // Client-side re-filter on top of whatever page is currently loaded — makes
+  // filters visibly work under mock data too (the mock ignores query params).
+  const visibleTransactions = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return transactions.filter((trx) => {
+      if (categoryFilter && trx.kategori_id !== categoryFilter) return false
+      if (sourceFilter && trx.source_label !== sourceFilter) return false
+      if (startDate && trx.tanggal_transaksi < startDate) return false
+      if (endDate && trx.tanggal_transaksi > endDate) return false
+      if (q) {
+        const nama = (categoryName(trx.kategori_id) ?? '').toLowerCase()
+        const catatan = (trx.catatan ?? '').toLowerCase()
+        if (!nama.includes(q) && !catatan.includes(q)) return false
+      }
+      return true
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transactions, search, categoryFilter, sourceFilter, startDate, endDate, categories])
+
+  const groupedTransactions = useMemo(() => {
+    const groups = new Map<string, Transaction[]>()
+    for (const trx of visibleTransactions) {
+      const label = dateGroupLabel(trx.tanggal_transaksi)
+      const bucket = groups.get(label) ?? []
+      bucket.push(trx)
+      groups.set(label, bucket)
+    }
+    return Array.from(groups.entries())
+  }, [visibleTransactions])
+
+  const totalPages = Math.max(1, Math.ceil(totalTransactions / LIMIT))
+
+  async function handleSaveTransaction(payload: TransactionCreateRequest) {
+    const isEdit = Boolean(editingTransaction)
+    const saved = isEdit
+      ? await apiMutate<Transaction>(
+          `/api/transactions/${editingTransaction!.id_transaksi}`,
+          'PUT',
+          payload
+        )
+      : await apiMutate<Transaction>('/api/transactions', 'POST', payload)
+
+    await refreshWallets()
+    await refreshList()
+
+    if (isEdit) {
+      setEditingTransaction(null)
+      setSavedBanner(true)
+      return
+    }
+
+    if (!saved.allocation_suggestion_available) {
       setSavedBanner(true)
       return
     }
@@ -125,10 +293,10 @@ export default function TransactionsPage() {
     setCalculating(true)
     try {
       const suggestion = await apiFetch<AllocationSuggestionResponse>(
-        `/api/transactions/${created.id_transaksi}/allocation-suggestion`
+        `/api/transactions/${saved.id_transaksi}/allocation-suggestion`
       )
       setCalculating(false)
-      setModalState({ suggestion, transaksiId: created.id_transaksi })
+      setModalState({ suggestion, transaksiId: saved.id_transaksi })
     } catch {
       setCalculating(false)
       setToastMessage('Gagal memuat saran alokasi. Cek nanti di halaman Pending.')
@@ -138,7 +306,23 @@ export default function TransactionsPage() {
   function handleModalResolved() {
     setModalState(null)
     setSavedBanner(true)
-    // Transaction list refresh is wired up in 02-13-PLAN.md
+    refreshList()
+    refreshWallets()
+  }
+
+  async function handleDeleteTransaction(id: string) {
+    if (!window.confirm('Hapus transaksi ini? Tindakan ini tidak dapat dibatalkan.')) return
+    try {
+      await apiMutate<Record<string, never>>(`/api/transactions/${id}`, 'DELETE', null)
+      await refreshList()
+      await refreshWallets()
+    } catch {
+      setListError('Gagal menghapus transaksi')
+    }
+  }
+
+  function scrollToForm() {
+    formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   if (checkingAuth) {
@@ -154,12 +338,10 @@ export default function TransactionsPage() {
       <div className="mx-auto w-full px-4 pb-28 md:max-w-2xl md:px-6 md:pb-32 lg:max-w-5xl lg:px-8 lg:pb-32">
         {/* ── Top App Bar ── */}
         <header className="sticky top-0 z-10 -mx-4 flex h-16 items-center justify-between border-b border-[rgba(30,30,30,0.08)] bg-[rgba(252,252,252,0.8)] px-4 backdrop-blur-[6px] md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 shrink-0 rounded-full bg-[rgba(41,141,255,0.2)]" />
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#298dff]">
-              Macost
-            </h1>
-          </div>
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[rgba(41,141,255,0.2)]" />
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#298dff]">
+            Macost
+          </h1>
           <button
             className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[rgba(30,30,30,0.05)]"
             aria-label="Notifikasi"
@@ -184,26 +366,279 @@ export default function TransactionsPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
           {/* ── Left / Form ── */}
-          <section>
+          <section ref={formSectionRef}>
             <h3 className="font-display mb-3 text-xl font-semibold text-[#1e1e1e]">
-              Tambah Transaksi
+              {editingTransaction ? 'Edit Transaksi' : 'Tambah Transaksi'}
             </h3>
-            <TransactionForm onSubmit={handleSaveTransaction} />
+            <TransactionForm
+              key={editingTransaction?.id_transaksi ?? 'create'}
+              transactionId={editingTransaction?.id_transaksi}
+              initialValues={
+                editingTransaction
+                  ? {
+                      nominal: editingTransaction.nominal,
+                      tanggal_transaksi: editingTransaction.tanggal_transaksi,
+                      dompet_id: editingTransaction.dompet_id,
+                      kategori_id: editingTransaction.kategori_id,
+                      catatan: editingTransaction.catatan,
+                    }
+                  : undefined
+              }
+              onSubmit={handleSaveTransaction}
+              onCancel={() => setEditingTransaction(null)}
+            />
           </section>
 
-          {/* ── Right / Recent list placeholder ── */}
+          {/* ── Right / History ── */}
           <section>
             <h3 className="font-display mb-3 text-xl font-semibold text-[#1e1e1e]">
-              Transaksi Terbaru
+              Riwayat Transaksi
             </h3>
-            <div className="rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-6 text-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
-              <p className="font-body text-sm font-semibold text-[#1e1e1e]">
-                Belum ada transaksi
-              </p>
-              <p className="font-body mt-1 text-sm text-[rgba(30,30,30,0.65)]">
-                Catat transaksi pertamamu untuk mulai melacak keuanganmu.
-              </p>
+
+            {/* Wallet balances — refreshes after every create/edit/delete */}
+            {wallets.length > 0 && (
+              <div className="mb-4 flex gap-3 overflow-x-auto pb-1">
+                {wallets.map((w) => (
+                  <div
+                    key={w.id_dompet}
+                    className="shrink-0 rounded-xl border border-[rgba(30,30,30,0.15)] bg-white px-4 py-3 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+                  >
+                    <p className="font-body text-xs text-[rgba(30,30,30,0.65)]">{w.nama_dompet}</p>
+                    <p className="font-body text-base font-semibold text-[#1e1e1e]">
+                      Rp {formatRp(w.saldo)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Search + filter toggle */}
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
+                >
+                  <circle cx="11" cy="11" r="7" stroke="rgba(30,30,30,0.35)" strokeWidth="2" fill="none" />
+                  <path d="M21 21L17 17" stroke="rgba(30,30,30,0.35)" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari transaksi..."
+                  className="font-body w-full rounded-lg border border-[rgba(30,30,30,0.15)] bg-white py-3 pl-11 pr-4 text-sm text-[#1e1e1e] outline-none placeholder:text-[rgba(30,30,30,0.35)]"
+                />
+              </div>
+              <button
+                onClick={() => setShowFilters((v) => !v)}
+                aria-label="Filter transaksi"
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+                  showFilters
+                    ? 'border-[#298dff] bg-[rgba(41,141,255,0.1)]'
+                    : 'border-[rgba(30,30,30,0.15)] bg-[rgba(30,30,30,0.05)]'
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6H20M8 12H16M11 18H13" stroke="#1e1e1e" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
             </div>
+
+            {showFilters && (
+              <div className="mt-3 grid grid-cols-2 gap-3 rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-4">
+                <div>
+                  <label className="font-body block text-xs text-[rgba(30,30,30,0.65)]">
+                    Dari Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => handleFilterChange(setStartDate)(e.target.value)}
+                    className="font-body mt-1 w-full rounded-lg border border-[rgba(30,30,30,0.15)] px-3 py-2 text-sm text-[#1e1e1e] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-body block text-xs text-[rgba(30,30,30,0.65)]">
+                    Sampai Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => handleFilterChange(setEndDate)(e.target.value)}
+                    className="font-body mt-1 w-full rounded-lg border border-[rgba(30,30,30,0.15)] px-3 py-2 text-sm text-[#1e1e1e] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-body block text-xs text-[rgba(30,30,30,0.65)]">
+                    Kategori
+                  </label>
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => handleFilterChange(setCategoryFilter)(e.target.value)}
+                    className="font-body mt-1 w-full rounded-lg border border-[rgba(30,30,30,0.15)] px-3 py-2 text-sm text-[#1e1e1e] outline-none"
+                  >
+                    <option value="">Semua Kategori</option>
+                    {categories.map((c) => (
+                      <option key={c.id_kategori} value={c.id_kategori}>
+                        {c.nama_kategori}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="font-body block text-xs text-[rgba(30,30,30,0.65)]">
+                    Sumber
+                  </label>
+                  <select
+                    value={sourceFilter}
+                    onChange={(e) => handleFilterChange(setSourceFilter)(e.target.value)}
+                    className="font-body mt-1 w-full rounded-lg border border-[rgba(30,30,30,0.15)] px-3 py-2 text-sm text-[#1e1e1e] outline-none"
+                  >
+                    <option value="">Semua Sumber</option>
+                    <option value="Fixed Routine">Rutin (Fixed Routine)</option>
+                    <option value="Flexible Side Income">Sampingan (Side Income)</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {listError && (
+              <div className="mt-4 rounded-xl border border-[#ba1a1a] bg-[#ffdad6] px-4 py-3">
+                <p className="font-body text-sm text-[#93000a]" role="alert">
+                  {listError}
+                </p>
+              </div>
+            )}
+
+            {/* Date-grouped list */}
+            <div className="mt-4 flex flex-col gap-6">
+              {listLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-[rgba(41,141,255,0.3)] border-t-[#298dff]" />
+                </div>
+              ) : groupedTransactions.length === 0 ? (
+                <div className="rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-6 text-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                  <p className="font-body text-sm font-semibold text-[#1e1e1e]">
+                    Belum ada transaksi
+                  </p>
+                  <p className="font-body mt-1 text-sm text-[rgba(30,30,30,0.65)]">
+                    Catat transaksi pertamamu untuk mulai melacak keuanganmu.
+                  </p>
+                  <button
+                    onClick={scrollToForm}
+                    className="font-body mt-3 rounded-xl bg-[#298dff] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    + Tambah Transaksi
+                  </button>
+                </div>
+              ) : (
+                groupedTransactions.map(([label, items]) => (
+                  <div key={label}>
+                    <p className="font-body pl-1 text-xs font-bold uppercase tracking-wide text-[rgba(30,30,30,0.35)]">
+                      {label}
+                    </p>
+                    <div className="mt-2 overflow-hidden rounded-xl border border-[rgba(30,30,30,0.15)] bg-white">
+                      {items.map((trx, i) => {
+                        const nama = categoryName(trx.kategori_id)
+                        const { bg, fg } = categoryVisual(nama, trx.tipe_transaksi)
+                        const isIncome = trx.tipe_transaksi === 'Pemasukan'
+                        return (
+                          <div
+                            key={trx.id_transaksi}
+                            className={`flex items-center justify-between gap-3 px-4 py-4 ${
+                              i < items.length - 1 ? 'border-b border-[rgba(30,30,30,0.15)]' : ''
+                            }`}
+                          >
+                            <div className="flex min-w-0 items-center gap-3">
+                              <span
+                                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${bg}`}
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <circle cx="12" cy="12" r="9" stroke={fg} strokeWidth="1.5" fill="none" />
+                                  <circle cx="12" cy="12" r="3" fill={fg} />
+                                </svg>
+                              </span>
+                              <div className="min-w-0">
+                                <p className="font-body truncate text-base font-semibold text-[#1e1e1e]">
+                                  {nama ?? 'Transaksi'}
+                                </p>
+                                <p className="font-body truncate text-sm text-[rgba(30,30,30,0.65)]">
+                                  {trx.catatan || trx.source_label || (isIncome ? 'Pemasukan' : 'Pengeluaran')}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <div className="mr-1 text-right">
+                                <p
+                                  className="font-body text-base font-semibold"
+                                  style={{ color: isIncome ? '#298dff' : '#ba1a1a' }}
+                                >
+                                  {isIncome ? '+' : '-'} Rp {formatRp(trx.nominal)}
+                                </p>
+                                <p className="font-body text-sm text-[rgba(30,30,30,0.65)]">
+                                  {formatTime(trx.created_at)}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  setEditingTransaction(trx)
+                                  formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                }}
+                                aria-label="Edit transaksi"
+                                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors hover:bg-[rgba(30,30,30,0.05)]"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 20H21" stroke="rgba(30,30,30,0.65)" strokeWidth="1.5" strokeLinecap="round" />
+                                  <path d="M16.5 3.5C16.8978 3.10218 17.4374 2.87868 18 2.87868C18.5626 2.87868 19.1022 3.10218 19.5 3.5C19.8978 3.89782 20.1213 4.43739 20.1213 5C20.1213 5.56261 19.8978 6.10218 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z" stroke="rgba(30,30,30,0.65)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTransaction(trx.id_transaksi)}
+                                aria-label="Hapus transaksi"
+                                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors hover:bg-[rgba(186,26,26,0.08)]"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M3 6H21" stroke="#ba1a1a" strokeWidth="1.5" strokeLinecap="round" />
+                                  <path d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6M19 6L18.2 20.2C18.15 20.9 17.5 21.5 16.8 21.5H7.2C6.5 21.5 5.85 20.9 5.8 20.2L5 6" stroke="#ba1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalTransactions > LIMIT && (
+              <div className="mt-4 flex items-center justify-between">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="font-body rounded-lg border border-[rgba(30,30,30,0.15)] px-4 py-2 text-sm font-semibold text-[#1e1e1e] disabled:opacity-40"
+                >
+                  Sebelumnya
+                </button>
+                <span className="font-body text-sm text-[rgba(30,30,30,0.65)]">
+                  Halaman {page} dari {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="font-body rounded-lg border border-[rgba(30,30,30,0.15)] px-4 py-2 text-sm font-semibold text-[#1e1e1e] disabled:opacity-40"
+                >
+                  Berikutnya
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </div>
