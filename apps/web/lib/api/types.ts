@@ -252,6 +252,13 @@ export interface AllocationSuggestionResponse {
   /** Suggested allocation as percentage of side income */
   suggested_pct?: number;
   alternative_goals?: AlternativeGoal[];
+  /**
+   * "side_income" — modal says "Pemasukan sampingan..."
+   * "spending_nudge" — modal says "Kamu bisa hemat..."
+   */
+  suggestion_type?: string;
+  /** Human-readable description of the suggestion */
+  description?: string;
 }
 
 /** POST /api/allocations — request body (FR-011) */
@@ -282,12 +289,20 @@ export interface AllocationSkipResponse {
   pending_until: string;
 }
 
-/** A single pending allocation suggestion */
+/**
+ * A single pending allocation suggestion.
+ * suggestion_type discriminates between side_income (pemasukan sampingan)
+ * and spending_nudge (penghematan/uang tidak terpakai).
+ */
 export interface AllocationPending {
   transaksi_id: string;
   nominal: number;
   suggested_goal_name: string;
   expires_at: string;
+  /** "side_income" | "spending_nudge" */
+  suggestion_type: string;
+  /** Short description of the suggestion (e.g. "Skip the afternoon Boba?") */
+  description: string;
 }
 
 /** GET /api/allocations/pending — response (200) */

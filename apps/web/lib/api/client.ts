@@ -40,8 +40,14 @@ import allocationsPendingData from "@/mocks/allocations-pending.json";
  */
 function resolveMock(path: string): unknown {
   // /api/goals/{id} — single goal detail (must be checked BEFORE /api/goals)
-  if (/^\/api\/goals\/[^/]+$/.test(path)) {
-    return goalDetailData;
+  const goalDetailMatch = path.match(/^\/api\/goals\/([^/]+)$/);
+  if (goalDetailMatch) {
+    const goalId = goalDetailMatch[1];
+    const data = (goalDetailData as Record<string, unknown>)[goalId];
+    if (data) return data;
+    // fallback: return first goal if ID not found
+    const firstKey = Object.keys(goalDetailData)[0];
+    return (goalDetailData as Record<string, unknown>)[firstKey];
   }
 
   // /api/goals

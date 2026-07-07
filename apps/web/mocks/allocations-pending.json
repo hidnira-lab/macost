@@ -2,9 +2,21 @@
   "pending": [
     {
       "transaksi_id": "txn_003",
-      "nominal": 250000,
+      "nominal": 500000,
       "suggested_goal_name": "Beli Laptop",
       "expires_at": "2026-07-12T00:00:00Z"
+    },
+    {
+      "transaksi_id": "txn_005",
+      "nominal": 150000,
+      "suggested_goal_name": "Dana Darurat",
+      "expires_at": "2026-07-15T00:00:00Z"
+    },
+    {
+      "transaksi_id": "txn_007",
+      "nominal": 85000,
+      "suggested_goal_name": "Liburan ke Bali",
+      "expires_at": "2026-07-18T00:00:00Z"
     }
   ]
 }

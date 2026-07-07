@@ -12,6 +12,7 @@ import {
   Trash2,
   PiggyBank,
   Target,
+  RotateCcw,
 } from 'lucide-react'
 
 function formatRp(value: number) {
@@ -55,7 +56,6 @@ export default function GoalDetailPage() {
     if (!goal) return
     const confirmed = window.confirm('Hapus goal ini? Tindakan ini tidak dapat dibatalkan.')
     if (!confirmed) return
-    // If backend returns validation error about allocation history, show inline error
     try {
       const { apiMutate } = await import('@/lib/api/client')
       await apiMutate(`/api/goals/${id}`, 'DELETE', null)
@@ -94,7 +94,7 @@ export default function GoalDetailPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fcfcfc' }}>
-      <div className="max-w-md mx-auto px-6">
+      <div className="mx-auto w-full px-4 md:max-w-2xl md:px-6 lg:max-w-5xl lg:px-8">
         {/* ── Header ── */}
         <div className="flex items-center justify-center pt-8 pb-5 relative">
           <button
@@ -162,7 +162,7 @@ export default function GoalDetailPage() {
               className="text-xs font-bold uppercase tracking-wider"
               style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
             >
-              Current Progress
+              Progress Saat Ini
             </p>
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center"
@@ -206,7 +206,7 @@ export default function GoalDetailPage() {
                   className="text-xs font-bold uppercase tracking-wider mb-0.5"
                   style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
                 >
-                  Collected
+                  Terkumpul
                 </p>
                 <p
                   className="text-base font-semibold"
@@ -250,7 +250,7 @@ export default function GoalDetailPage() {
             className="text-lg font-semibold mb-3"
             style={{ fontFamily: "'Neulis', sans-serif", color: '#1e1e1e' }}
           >
-            Allocation History
+            Riwayat Alokasi
           </h2>
 
           {goal.allocation_history.length === 0 ? (
@@ -262,7 +262,7 @@ export default function GoalDetailPage() {
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {goal.allocation_history.map((entry) => (
+              {goal.allocation_history.map((entry, index) => (
                 <div
                   key={entry.id_alokasi}
                   className="rounded-lg px-4 py-3 flex items-center gap-3"
@@ -273,9 +273,17 @@ export default function GoalDetailPage() {
                 >
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: 'rgba(255,137,41,0.2)' }}
+                    style={{
+                      backgroundColor: index % 2 === 0
+                        ? 'rgba(255,137,41,0.2)'
+                        : 'rgba(41,141,255,0.1)',
+                    }}
                   >
-                    <PiggyBank className="w-4 h-4" style={{ color: '#ff8929' }} />
+                    {index % 2 === 0 ? (
+                      <PiggyBank className="w-4 h-4" style={{ color: '#ff8929' }} />
+                    ) : (
+                      <RotateCcw className="w-4 h-4" style={{ color: '#298dff' }} />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
@@ -288,7 +296,7 @@ export default function GoalDetailPage() {
                       className="text-xs"
                       style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
                     >
-                      Manual saving
+                      {index % 2 === 0 ? 'Tabungan Manual' : 'Auto-roundup'}
                     </p>
                   </div>
                   <p
@@ -307,7 +315,7 @@ export default function GoalDetailPage() {
         <div className="flex items-center justify-center gap-6 pb-8">
           {/* Edit */}
           <button
-            onClick={() => router.push(`/goals/${id}/edit`)}
+            onClick={() => router.push(`/goals/new?edit=${id}`)}
             className="flex flex-col items-center gap-1"
             aria-label="Edit goal"
           >
@@ -319,7 +327,7 @@ export default function GoalDetailPage() {
             </div>
             <span
               className="text-xs font-bold"
-              style={{ fontFamily: 'Helvetica, sans-serif', color: '#1e1e1e' }}
+              style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
             >
               Edit
             </span>
@@ -341,7 +349,7 @@ export default function GoalDetailPage() {
               className="text-xs font-bold"
               style={{ fontFamily: 'Helvetica, sans-serif', color: '#ba1a1a' }}
             >
-              Delete
+              Hapus
             </span>
           </button>
         </div>
