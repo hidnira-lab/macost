@@ -38,6 +38,75 @@ function formatRp(value: number) {
   return `Rp ${value.toLocaleString('id-ID')}`
 }
 
+function formatDeadline(value: string) {
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+// ─── Bottom nav items ────────────────────────────────────────────────
+const NAV_ITEMS = [
+  {
+    label: 'Home',
+    icon: (active: boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <path d="M9 22V12H15V22" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    active: false,
+    href: '/dashboard',
+  },
+  {
+    label: 'Dashboard',
+    icon: (active: boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="8" height="8" rx="2" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <rect x="13" y="3" width="8" height="4" rx="2" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <rect x="13" y="9" width="8" height="12" rx="2" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <rect x="3" y="13" width="8" height="8" rx="2" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    active: false,
+    href: '/dashboard',
+  },
+  {
+    label: 'Goals',
+    icon: (active: boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" fill="none"/>
+        <circle cx="12" cy="12" r="6" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" fill="none"/>
+        <circle cx="12" cy="12" r="2" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" fill="none"/>
+      </svg>
+    ),
+    active: true,
+    href: '#',
+  },
+  {
+    label: 'AI Assistant',
+    icon: (active: boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    active: false,
+    href: '/ai',
+  },
+  {
+    label: 'Profile',
+    icon: (active: boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="8" r="4" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    active: false,
+    href: '/profile',
+  },
+]
+
 export default function GoalsPage() {
   const router = useRouter()
   const [goals, setGoals] = useState<Goal[]>([])
@@ -129,7 +198,7 @@ export default function GoalsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#fcfcfc' }}>
-      <div className="px-4 md:px-6 lg:px-8 mx-auto w-full max-w-md lg:max-w-2xl">
+      <div className="mx-auto w-full px-4 pb-28 md:max-w-2xl md:px-6 md:pb-32 lg:max-w-5xl lg:px-8 lg:pb-32">
         {/* ── Top Header ── */}
         <div className="flex items-center justify-between pt-8 pb-4">
           <h1
@@ -139,7 +208,7 @@ export default function GoalsPage() {
               color: '#298dff',
             }}
           >
-            My Goals
+            Goal Saya
           </h1>
           <div className="flex items-center gap-3">
             <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(30,30,30,0.05)' }} aria-label="Notifikasi">
@@ -152,12 +221,12 @@ export default function GoalsPage() {
         </div>
 
         {/* ── Strategy Toggle ── */}
-        <div className="mb-4">
-          <div className="flex rounded-xl p-0.5" style={{ backgroundColor: 'rgba(30,30,30,0.05)', border: '1px solid rgba(30,30,30,0.08)' }}>
+        <div className="mb-4 lg:flex">
+          <div className="flex rounded-xl p-0.5 lg:inline-flex" style={{ backgroundColor: 'rgba(30,30,30,0.05)', border: '1px solid rgba(30,30,30,0.08)' }}>
             <button
               onClick={() => handleStrategyToggle('quick_win')}
               disabled={toggleLoading}
-              className={`flex-1 text-sm font-semibold rounded-[10px] px-4 py-2 transition-colors ${
+              className={`flex-1 lg:flex-none text-sm font-semibold rounded-[10px] px-4 py-2 lg:px-6 transition-colors ${
                 strategy === 'quick_win'
                   ? 'text-white'
                   : 'text-[#1e1e1e] hover:text-[#1e1e1e]'
@@ -172,7 +241,7 @@ export default function GoalsPage() {
             <button
               onClick={() => handleStrategyToggle('importance_first')}
               disabled={toggleLoading}
-              className={`flex-1 text-sm font-semibold rounded-[10px] px-4 py-2 transition-colors ${
+              className={`flex-1 lg:flex-none text-sm font-semibold rounded-[10px] px-4 py-2 lg:px-6 transition-colors ${
                 strategy === 'importance_first'
                   ? 'text-white'
                   : 'text-[#1e1e1e] hover:text-[#1e1e1e]'
@@ -189,7 +258,7 @@ export default function GoalsPage() {
 
         {/* ── Summary/Hero Row ── */}
         <div
-          className="flex items-center justify-between mb-5 pb-4 flex-wrap gap-2"
+          className="flex items-center justify-between mb-5 pb-4 flex-wrap gap-2 lg:flex-nowrap"
           style={{ borderBottom: '1px solid rgba(30,30,30,0.15)' }}
         >
           <div>
@@ -197,7 +266,7 @@ export default function GoalsPage() {
               className="text-xs font-bold uppercase tracking-wider mb-1"
               style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
             >
-              Total Savings Goal
+              Total Target Tabungan
             </p>
             <p
               className="text-2xl font-bold"
@@ -248,13 +317,13 @@ export default function GoalsPage() {
 
         {/* ── Goal list ── */}
         <div
-          className={`grid grid-cols-1 lg:grid-cols-2 gap-4 mb-24 transition-opacity ${
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-opacity ${
             toggleLoading ? 'opacity-50' : ''
           }`}
         >
           {/* Empty state */}
           {goals.length === 0 && !loading && (
-            <div className="text-center py-12 lg:col-span-2">
+            <div className="text-center py-12 md:col-span-2 lg:col-span-3">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(255,137,41,0.14)' }}>
                 <Target className="w-8 h-8" style={{ color: '#ff8929' }} />
               </div>
@@ -293,7 +362,7 @@ export default function GoalsPage() {
               /* ── Priority #1 Card (larger, orange accent) ── */
               <div
                 key={goal.id_goal}
-                className="relative overflow-hidden rounded-3xl px-5 pt-5 pb-4 lg:col-span-2"
+                className="relative overflow-hidden rounded-3xl px-5 pt-5 pb-4 md:col-span-2 lg:col-span-3"
                 style={{
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(30,30,30,0.15)',
@@ -333,6 +402,12 @@ export default function GoalsPage() {
                         >
                           {formatRp(goal.nominal_terkumpul)} / {formatRp(goal.nominal_target)}
                         </p>
+                        <p
+                          className="text-xs mt-0.5"
+                          style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
+                        >
+                          Deadline: {formatDeadline(goal.deadline)}
+                        </p>
                       </div>
                     </div>
                     <span
@@ -343,7 +418,7 @@ export default function GoalsPage() {
                       }}
                     >
                       <Sparkles className="w-3 h-3" />
-                      Priority #1
+                      Prioritas #1
                     </span>
                   </div>
 
@@ -393,6 +468,12 @@ export default function GoalsPage() {
                     >
                       {formatRp(goal.nominal_terkumpul)} / {formatRp(goal.nominal_target)}
                     </p>
+                    <p
+                      className="text-xs mt-0.5"
+                      style={{ fontFamily: 'Helvetica, sans-serif', color: 'rgba(30,30,30,0.65)' }}
+                    >
+                      Deadline: {formatDeadline(goal.deadline)}
+                    </p>
                   </div>
 
                   {/* Rank badge */}
@@ -433,7 +514,7 @@ export default function GoalsPage() {
         {goals.length > 0 && (
           <button
             onClick={() => router.push('/goals/new')}
-            className="fixed bottom-8 right-4 md:right-6 lg:right-[calc(50%-512px+2rem)] w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+            className="fixed bottom-24 right-4 md:right-6 lg:right-[calc(50%-512px+2rem)] w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #298dff, #065fc5)',
             }}
@@ -443,6 +524,39 @@ export default function GoalsPage() {
           </button>
         )}
       </div>
+
+      {/* ─── Bottom Navigation Bar ────────────────────────────────── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[rgba(30,30,30,0.08)] shadow-[0_-4px_12px_0_rgba(0,0,0,0.05)]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex items-center justify-around px-2 py-1.5 max-w-2xl mx-auto">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => router.push(item.href)}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 min-w-[56px] min-h-[44px] justify-center rounded-full transition-colors ${
+                item.active
+                  ? 'bg-[#298dff]'
+                  : 'bg-transparent'
+              }`}
+            >
+              <span className="w-6 h-6 flex items-center justify-center">
+                {item.icon(item.active)}
+              </span>
+              <span
+                className={`text-[10px] font-semibold leading-tight whitespace-nowrap ${
+                  item.active
+                    ? 'text-white'
+                    : 'text-[rgba(30,30,30,0.45)]'
+                }`}
+              >
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   )
 }
