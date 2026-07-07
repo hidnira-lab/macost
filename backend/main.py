@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import auth, wallets
+from backend.routers import (
+    allocations,
+    auth,
+    categories,
+    dashboard,
+    goal_settings,
+    goals,
+    transactions,
+    wallets,
+)
 
 app = FastAPI(title="Macost API")
 
@@ -24,6 +33,12 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth")
 app.include_router(wallets.router, prefix="/api")
+app.include_router(categories.router, prefix="/api")
+app.include_router(transactions.router, prefix="/api")
+app.include_router(goals.router, prefix="/api")
+app.include_router(goal_settings.router, prefix="/api")
+app.include_router(allocations.router, prefix="/api")
+app.include_router(dashboard.router, prefix="/api")
 
 
 @app.get("/")
