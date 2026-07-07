@@ -29,6 +29,7 @@ import transactionsData from "@/mocks/transactions.json";
 import walletsData from "@/mocks/wallets.json";
 import dashboardData from "@/mocks/dashboard.json";
 import allocationsPendingData from "@/mocks/allocations-pending.json";
+import categoriesData from "@/mocks/categories.json";
 
 // ---------------------------------------------------------------------------
 // Mock resolver
@@ -65,6 +66,9 @@ function resolveMock(path: string): unknown {
 
   // /api/wallets
   if (path === "/api/wallets") return walletsData;
+
+  // /api/categories
+  if (path === "/api/categories") return categoriesData;
 
   // /api/dashboard (with optional query params)
   if (path === "/api/dashboard" || path.startsWith("/api/dashboard?")) {

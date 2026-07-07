@@ -1,0 +1,11 @@
+{
+  "categories": [
+    { "id_kategori": "cat_001", "nama_kategori": "Makan & Minum", "tipe": "Pengeluaran", "flag_pemasukan": null, "flag_pengeluaran": "Kebutuhan" },
+    { "id_kategori": "cat_002", "nama_kategori": "Transportasi", "tipe": "Pengeluaran", "flag_pemasukan": null, "flag_pengeluaran": "Kebutuhan" },
+    { "id_kategori": "cat_003", "nama_kategori": "Hiburan", "tipe": "Pengeluaran", "flag_pemasukan": null, "flag_pengeluaran": "Keinginan" },
+    { "id_kategori": "cat_004", "nama_kategori": "Keperluan Kuliah", "tipe": "Pengeluaran", "flag_pemasukan": null, "flag_pengeluaran": "Kebutuhan" },
+    { "id_kategori": "cat_005", "nama_kategori": "Tempat Tinggal", "tipe": "Pengeluaran", "flag_pemasukan": null, "flag_pengeluaran": "Kebutuhan" },
+    { "id_kategori": "cat_006", "nama_kategori": "Uang Saku / Kiriman Orang Tua", "tipe": "Pemasukan", "flag_pemasukan": "Fixed Routine", "flag_pengeluaran": null },
+    { "id_kategori": "cat_007", "nama_kategori": "Freelance / Kerja Sampingan", "tipe": "Pemasukan", "flag_pemasukan": "Flexible Side Income", "flag_pengeluaran": null }
+  ]
+}
