@@ -7,6 +7,7 @@ dashboard_service.py in 02-14-PLAN.md) — do not duplicate this logic
 elsewhere (see this plan's `key_links`).
 """
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
 
 from backend.core.supabase import get_supabase_admin
@@ -98,8 +99,11 @@ def fetch_and_rank_goals(user_id: str) -> list[dict]:
     for row in alokasi_rows:
         sums[row["goal_id"]] = sums.get(row["goal_id"], 0) + row["nominal_alokasi"]
 
-    avg_monthly_side_income = get_avg_monthly_side_income(user_id)
-    settings = get_or_create_goal_settings(user_id)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        income_future = executor.submit(get_avg_monthly_side_income, user_id)
+        settings_future = executor.submit(get_or_create_goal_settings, user_id)
+        avg_monthly_side_income = income_future.result()
+        settings = settings_future.result()
     today = datetime.now(timezone.utc).date()
 
     enriched_goals = []
