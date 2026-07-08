@@ -242,6 +242,7 @@ export default function PendingAllocationsPage() {
         transaksiId={reviewingId ?? ''}
         suggestion={reviewSuggestion}
         sideIncomeAmount={reviewSideIncome}
+        context="pending"
         onClose={handleModalClose}
         onConfirmed={handleConfirmed}
         onSkipped={handleSkipped}

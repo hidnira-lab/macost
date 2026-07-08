@@ -16,6 +16,8 @@ interface SmartAllocationModalProps {
   suggestion: AllocationSuggestionResponse | null
   /** Side income amount for dynamic body text — derived from suggestion if not provided */
   sideIncomeAmount?: number
+  /** Context for body copy: "fresh" = new transaction flow, "pending" = from pending suggestions page */
+  context?: 'fresh' | 'pending'
   onClose: () => void
   onConfirmed: () => void
   onSkipped: () => void
@@ -40,6 +42,7 @@ export default function SmartAllocationModal({
   transaksiId,
   suggestion,
   sideIncomeAmount,
+  context = 'fresh',
   onClose,
   onConfirmed,
   onSkipped,
@@ -254,17 +257,35 @@ export default function SmartAllocationModal({
             className="text-sm text-center leading-relaxed mb-4"
             style={{ fontFamily: 'Helvetica, sans-serif', color: '#1e1e1e' }}
           >
-            Pemasukan sampingan sebesar{' '}
-            <span className="font-bold" style={{ color: '#1e1e1e' }}>
-              {formatRp(incomeAmount)}
-            </span>{' '}
-            masuk! Kami sarankan alokasikan{' '}
-            <span className="font-bold" style={{ color: '#298dff' }}>
-              {formatRp(suggestedAmount)} ({suggestedPct}%)
-            </span>{' '}
-            ke goal{' '}
-            <span className="font-semibold">{suggestedGoalName}</span> — ini
-            prioritas utama kamu saat ini.
+            {context === 'pending' ? (
+              <>
+                Kamu memiliki saran alokasi dari pemasukan sampingan sebesar{' '}
+                <span className="font-bold" style={{ color: '#1e1e1e' }}>
+                  {formatRp(incomeAmount)}
+                </span>
+                . Alokasikan{' '}
+                <span className="font-bold" style={{ color: '#298dff' }}>
+                  {formatRp(suggestedAmount)} ({suggestedPct}%)
+                </span>{' '}
+                ke goal{' '}
+                <span className="font-semibold">{suggestedGoalName}</span> —
+                ini prioritas utama kamu saat ini.
+              </>
+            ) : (
+              <>
+                Pemasukan sampingan sebesar{' '}
+                <span className="font-bold" style={{ color: '#1e1e1e' }}>
+                  {formatRp(incomeAmount)}
+                </span>{' '}
+                masuk! Kami sarankan alokasikan{' '}
+                <span className="font-bold" style={{ color: '#298dff' }}>
+                  {formatRp(suggestedAmount)} ({suggestedPct}%)
+                </span>{' '}
+                ke goal{' '}
+                <span className="font-semibold">{suggestedGoalName}</span> —
+                ini prioritas utama kamu saat ini.
+              </>
+            )}
           </p>
 
           {/* ── Edit amount input ── */}
