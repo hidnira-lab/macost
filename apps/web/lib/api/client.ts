@@ -64,6 +64,9 @@ function resolveMock(path: string): unknown {
     return allocationSuggestionData;
   }
 
+  // /api/categories
+  if (path === "/api/categories") return categoriesData;
+
   // /api/wallets
   if (path === "/api/wallets") return walletsData;
 
