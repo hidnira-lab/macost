@@ -22,3 +22,10 @@ services:
       - ./apps/web:/app
       - /app/node_modules
     command: npm run dev -- -H 0.0.0.0
+    # Required: `next dev`'s CLI wrapper forks the real dev-server process with
+    # stdio: 'inherit'. Without an allocated pseudo-TTY and open stdin, that
+    # forked child can exit cleanly right after "Ready", and the wrapper
+    # silently mirrors that as a plain `process.exit(0)` — no error printed,
+    # container just stops. See .planning/debug/resolved/docker-frontend-exits-code-0.md
+    stdin_open: true
+    tty: true
