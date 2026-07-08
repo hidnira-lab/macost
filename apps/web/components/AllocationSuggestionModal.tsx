@@ -36,8 +36,14 @@ export default function AllocationSuggestionModal({
 
   if (!open) return null
 
+  const isSuggestionValid =
+    Boolean(suggestion.suggested_goal_id) && (suggestion.suggested_amount ?? 0) > 0
+
   async function handleConfirm() {
-    if (!suggestion.suggested_goal_id || !suggestion.suggested_amount) return
+    if (!suggestion.suggested_goal_id || !suggestion.suggested_amount || suggestion.suggested_amount <= 0) {
+      setError('Saran alokasi tidak valid. Coba tutup dan buka kembali.')
+      return
+    }
     setBusy(true)
     setError(null)
     try {
@@ -138,7 +144,7 @@ export default function AllocationSuggestionModal({
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   onClick={handleConfirm}
-                  disabled={busy}
+                  disabled={busy || !isSuggestionValid}
                   className="font-body w-full rounded-full px-6 py-3 text-sm font-bold text-white transition-opacity disabled:opacity-60"
                   style={{ background: 'linear-gradient(135deg, #298dff, #065fc5)' }}
                 >
