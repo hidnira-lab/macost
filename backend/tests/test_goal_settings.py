@@ -165,3 +165,104 @@ def test_put_goal_settings_weight_sum_within_tolerance_succeeds_and_persists_ver
     rows = fake_supabase_client.table("goal_settings").select("*").execute().data
     assert rows[0]["strategy"] == "importance_first"
     assert rows[0]["weights"] == DEFAULT_WEIGHTS
+
+
+def test_put_goal_settings_missing_required_key_returns_400_validation_error(
+    monkeypatch, fake_supabase_client
+):
+    """A weights dict missing one of the 5 real keys (here: target_amount)
+    must return a structured 400 VALIDATION_ERROR, not silently pass just
+    because the remaining 4 values happen to sum to ~1.0. Row not updated."""
+    fake_supabase_client.seed(
+        "goal_settings",
+        [{"id_pengguna": "user-1", "strategy": "quick_win", "weights": DEFAULT_WEIGHTS}],
+    )
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "strategy": "quick_win",
+        "weights": {
+            "personal_importance": 0.3,
+            "progress_gap": 0.25,
+            "saving_capacity": 0.25,
+            "urgency": 0.2,
+            # target_amount missing
+        },
+    }
+    response = client.put("/api/goal-settings", json=body)
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+
+    rows = fake_supabase_client.table("goal_settings").select("*").execute().data
+    assert rows[0]["weights"] == DEFAULT_WEIGHTS  # unchanged
+
+
+def test_put_goal_settings_typo_key_returns_400_validation_error(
+    monkeypatch, fake_supabase_client
+):
+    """The exact regression scenario from the bug report: a typo'd key
+    (`progress_gp` instead of `progress_gap`) that still sums to ~1.0 across
+    5 keys used to pass validation silently and corrupt stored weights --
+    later blowing up saw_engine.rank_goals with a KeyError on every
+    subsequent GET /api/goals. Must now return 400 VALIDATION_ERROR."""
+    fake_supabase_client.seed(
+        "goal_settings",
+        [{"id_pengguna": "user-1", "strategy": "quick_win", "weights": DEFAULT_WEIGHTS}],
+    )
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "strategy": "quick_win",
+        "weights": {
+            "personal_importance": 0.225,
+            "progress_gp": 0.219,  # typo: should be progress_gap
+            "saving_capacity": 0.215,
+            "urgency": 0.178,
+            "target_amount": 0.163,
+        },
+    }
+    response = client.put("/api/goal-settings", json=body)
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+
+    rows = fake_supabase_client.table("goal_settings").select("*").execute().data
+    assert rows[0]["weights"] == DEFAULT_WEIGHTS  # unchanged
+
+
+def test_put_goal_settings_extra_key_returns_400_validation_error(
+    monkeypatch, fake_supabase_client
+):
+    """A weights dict with all 5 real keys plus a genuinely extra key must
+    also be rejected -- `extra="forbid"` on GoalSettingsWeights covers both
+    the missing-key and extra-key shape-mismatch cases. Row not updated."""
+    fake_supabase_client.seed(
+        "goal_settings",
+        [{"id_pengguna": "user-1", "strategy": "quick_win", "weights": DEFAULT_WEIGHTS}],
+    )
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "strategy": "quick_win",
+        "weights": {
+            **DEFAULT_WEIGHTS,
+            "extra_criterion": 0.0,
+        },
+    }
+    response = client.put("/api/goal-settings", json=body)
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+
+    rows = fake_supabase_client.table("goal_settings").select("*").execute().data
+    assert rows[0]["weights"] == DEFAULT_WEIGHTS  # unchanged

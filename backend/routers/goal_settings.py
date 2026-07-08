@@ -58,7 +58,7 @@ def update_goal_settings(
     supabase = get_supabase_admin()
     result = (
         supabase.table("goal_settings")
-        .update({"strategy": validated.strategy, "weights": validated.weights})
+        .update({"strategy": validated.strategy, "weights": validated.weights.model_dump()})
         .eq("id_pengguna", current_user_id)
         .execute()
     )

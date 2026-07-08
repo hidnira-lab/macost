@@ -1,11 +1,18 @@
 from typing import Literal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class GoalSettingsWeights(BaseModel):
     """5 SAW criteria weights — must sum to 1.0 (validated at the
-    `GoalSettingsUpdate.weights` level, see below, per D-05/Pitfall 7)."""
+    `GoalSettingsUpdate.weights` level, see below, per D-05/Pitfall 7).
+
+    `extra="forbid"` + all 5 fields required means Pydantic rejects any
+    incoming dict that is missing a real key, has a typo'd key standing in
+    for a real one, or has a genuinely extra key — since exactly these 5
+    keys are the only ones `saw_engine.rank_goals` ever reads."""
+
+    model_config = ConfigDict(extra="forbid")
 
     personal_importance: float
     progress_gap: float
@@ -16,11 +23,11 @@ class GoalSettingsWeights(BaseModel):
 
 class GoalSettingsUpdate(BaseModel):
     strategy: Literal["quick_win", "importance_first"]
-    weights: dict[str, float]
+    weights: GoalSettingsWeights
 
     @field_validator("weights")
     @classmethod
-    def validate_weight_sum(cls, v: dict[str, float]) -> dict[str, float]:
+    def validate_weight_sum(cls, v: GoalSettingsWeights) -> GoalSettingsWeights:
         """Pitfall 7: floating-point weight-sum validation — never a bare
         `== 1.0` equality check.
 
@@ -36,7 +43,7 @@ class GoalSettingsUpdate(BaseModel):
         materially wrong weight set (e.g. summing to 0.95) while accepting
         this known 0.1% rounding artifact.
         """
-        if abs(sum(v.values()) - 1.0) >= 0.002:
+        if abs(sum(v.model_dump().values()) - 1.0) >= 0.002:
             raise ValueError("weights must sum to 1.0")
         return v
 
