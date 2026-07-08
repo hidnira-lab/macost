@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: core-product-loop
 status: executing
-stopped_at: Verified and documented 02-03, 02-07, 02-08, 02-11, 02-13 (externally implemented by Khayyira/Zarra via Cline, PR #12/#13)
-last_updated: "2026-07-09T00:00:00.000Z"
+stopped_at: Fixed allocation-suggestion latency (quick task 260709-0pc) found during 02-15 live verification; re-measuring against production next
+last_updated: "2026-07-09T00:35:00.000Z"
 last_activity: 2026-07-09
-last_activity_desc: Retroactively verified and wrote SUMMARY.md for 02-03, 02-07, 02-08, 02-11, 02-13 — all PASS against their PLAN.md must-haves (minor documented deviations, no blocking gaps)
+last_activity_desc: Executed plan 02-15 Task 1 (live latency measurement) against Railway+Supabase production — found 2622ms avg (FAIL vs <=2000ms), root-caused to sequential Supabase queries, fixed via quick task 260709-0pc (commit d53b417, 75/75 tests passing), merged to main
 progress:
   total_phases: 5
   completed_phases: 2
@@ -145,6 +145,7 @@ Recent decisions affecting current work:
 | 260706-jaq | Update 02-UI-SPEC.md dengan detail visual asli dari Figma (11 frame, 4 area Phase 2) — resolusi konflik tema (Figma light theme menang atas dark theme lama) + 5 diskrepansi di-flag sebagai Open Questions | 2026-07-06 | b8ff368, f6f83d5, 0a30379 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
 | 260706-jaq (round 2) | Perdalam detail visual 8 frame Figma per user; resolusi 4 open question sesuai instruksi user (urutan KPI Dashboard tetap RESEARCH.md, bobot SAW tetap survey n=62, Pending Suggestions = antrian Smart Allocation bukan nudge AI, History = tab nav sendiri); temuan baru: diskrepansi Palette A/B warna di 2 frame | 2026-07-06 | 6f16855, b11b8ae, 39cb658 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
 | 260706-jaq (round 3, final) | Resolusi final 2 keputusan tersisa: Create First Goal diimplementasi sebagai halaman onboarding penuh (bukan empty-state ringan D-06); Palette A/B distandarkan ke Palette A (bg #fcfcfc, teks #1e1e1e, blue #298dff, orange #ff8929) — Transaction History & Pending Suggestions diupdate ke token Palette A. Semua 6 Open Questions kini RESOLVED | 2026-07-06 | 617baa1 | [260706-jaq-update-02-ui-spec-md-dengan-detail-visua](./quick/260706-jaq-update-02-ui-spec-md-dengan-detail-visua/) |
+| 260709-0pc | Fix allocation-suggestion latency: parallelize independent Supabase queries in goal_service.fetch_and_rank_goals() (found during 02-15 live latency measurement: 2622ms avg, FAIL vs <=2000ms target) | 2026-07-09 | d53b417 | [260709-0pc-fix-allocation-suggestion-latency-parall](./quick/260709-0pc-fix-allocation-suggestion-latency-parall/) |
 
 ### Roadmap Evolution
 
