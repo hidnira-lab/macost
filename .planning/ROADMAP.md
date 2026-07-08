@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 9/15 | In Progress|  |
+| 2. Core Product Loop | 14/15 | In Progress|  |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
