@@ -111,7 +111,6 @@ export default function NewTransactionPage() {
         '/api/transactions',
         'POST',
         {
-          tipe_transaksi: 'pengeluaran',
           nominal: amountNum,
           tanggal_transaksi: toISODate(dateValue),
           dompet_id: selectedWallet,

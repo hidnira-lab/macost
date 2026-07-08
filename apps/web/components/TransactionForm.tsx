@@ -92,15 +92,12 @@ export default function TransactionForm({
       return
     }
 
-    // tipe_transaksi is auto-derived from the selected category's own `tipe` —
-    // never a manual Pemasukan/Pengeluaran toggle the user can set independently.
-    const selectedCategory = categories.find((c) => c.id_kategori === kategoriId)
-
+    // tipe_transaksi/source_label are never sent by the frontend — the backend
+    // derives both server-side from kategori_id's flag_pemasukan (CLAUDE.md).
     setError(null)
     setSubmitting(true)
     try {
       const payload: TransactionCreateRequest = {
-        tipe_transaksi: selectedCategory?.tipe ?? 'Pengeluaran',
         nominal,
         tanggal_transaksi: tanggalTransaksi,
         metode_input: 'Manual',

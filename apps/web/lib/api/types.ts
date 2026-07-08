@@ -103,7 +103,6 @@ export interface CategoriesResponse {
  * Frontend only sends kategori_id.
  */
 export interface TransactionCreateRequest {
-  tipe_transaksi: string;
   nominal: number;
   tanggal_transaksi: string;
   metode_input: string;
