@@ -183,6 +183,77 @@ def test_post_allocations_rejects_cross_user_transaction(
     assert fake_supabase_client._tables["alokasi"] == []
 
 
+def test_post_allocations_rejects_when_transaction_already_allocated(
+    monkeypatch, fake_supabase_client
+):
+    """A transaction that already has a matching `alokasi` row must be
+    rejected with 400 VALIDATION_ERROR — prevents double-allocation
+    (phantom savings) and keeps GET /api/allocations/pending's implicit
+    pending-derivation logic correct (a duplicate row would silently make
+    the transaction vanish from that list for the wrong reason)."""
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    far_deadline = (datetime.now(timezone.utc).date() + timedelta(days=400)).isoformat()
+    fake_supabase_client.seed(
+        "goal",
+        [
+            {
+                "id_goal": "goal-1",
+                "id_pengguna": "user-1",
+                "nama_goal": "Beli Laptop",
+                "nominal_target": 1000000,
+                "deadline": far_deadline,
+                "skor_keinginan": 5,
+                "created_at": "2026-06-01T00:00:00+00:00",
+            }
+        ],
+    )
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "trx-1",
+                "id_pengguna": "user-1",
+                "tipe_transaksi": "Pemasukan",
+                "source_label": "Flexible Side Income",
+                "nominal": 500000,
+                "tanggal_transaksi": "2026-06-27",
+                "created_at": "2026-06-27T10:00:00+00:00",
+            }
+        ],
+    )
+    fake_supabase_client.seed(
+        "alokasi",
+        [
+            {
+                "id_alokasi": "alokasi-existing",
+                "id_pengguna": "user-1",
+                "goal_id": "goal-1",
+                "transaksi_id": "trx-1",
+                "nominal_alokasi": 300000,
+                "tanggal_alokasi": "2026-06-27T11:00:00+00:00",
+            }
+        ],
+    )
+    fake_supabase_client.seed("goal_settings", [])
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    response = client.post(
+        "/api/allocations",
+        json={
+            "transaksi_id": "trx-1",
+            "goal_id": "goal-1",
+            "nominal_alokasi": 200000,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    assert len(fake_supabase_client._tables["alokasi"]) == 1
+
+
 # ---------------------------------------------------------------------------
 # POST /api/allocations/{transaction_id}/skip — zero DB writes
 # ---------------------------------------------------------------------------

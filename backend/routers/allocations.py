@@ -37,6 +37,18 @@ def _not_side_income() -> HTTPException:
     )
 
 
+def _already_allocated() -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail={
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Transaksi ini sudah dialokasikan sebelumnya",
+            }
+        },
+    )
+
+
 # ---------------------------------------------------------------------------
 # GET /api/transactions/{id}/allocation-suggestion
 # ---------------------------------------------------------------------------
@@ -124,6 +136,17 @@ def confirm_allocation(
     )
     if not goal_rows:
         raise _goal_not_found()
+
+    existing_alokasi = (
+        supabase.table("alokasi")
+        .select("id_alokasi")
+        .eq("transaksi_id", body.transaksi_id)
+        .eq("id_pengguna", current_user_id)
+        .execute()
+        .data
+    )
+    if existing_alokasi:
+        raise _already_allocated()
 
     new_id = str(uuid.uuid4())
     tanggal_alokasi = datetime.now(timezone.utc).isoformat()
