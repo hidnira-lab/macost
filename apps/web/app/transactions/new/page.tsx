@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch, apiMutate } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
-import type { Category, Wallet } from '@/lib/api/types'
+import type { Category, Wallet, Transaction, AllocationSuggestionResponse } from '@/lib/api/types'
+import SmartAllocationModal from '@/components/SmartAllocationModal'
 
 const USE_MOCK = typeof window !== 'undefined'
   ? process.env.NEXT_PUBLIC_USE_MOCK === 'true'
@@ -48,6 +49,15 @@ export default function NewTransactionPage() {
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Smart Allocation modal state
+  const [savingSuccess, setSavingSuccess] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
+  const [savedTransactionId, setSavedTransactionId] = useState<string | null>(null)
+  const [suggestion, setSuggestion] = useState<AllocationSuggestionResponse | null>(null)
+  const [sideIncomeAmount, setSideIncomeAmount] = useState<number | undefined>(undefined)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -97,7 +107,7 @@ export default function NewTransactionPage() {
     setSaving(true)
     setError(null)
     try {
-      await apiMutate(
+      const saved = await apiMutate<Transaction>(
         '/api/transactions',
         'POST',
         {
@@ -110,12 +120,57 @@ export default function NewTransactionPage() {
           catatan: note || null,
         }
       )
-      router.back()
+
+      setSavingSuccess(true)
+      setSavedTransactionId(saved.id_transaksi)
+
+      // If allocation suggestion is available, fetch it
+      if (saved.allocation_suggestion_available) {
+        setModalLoading(true)
+        try {
+          const data = await apiFetch<AllocationSuggestionResponse>(
+            `/api/transactions/${saved.id_transaksi}/allocation-suggestion`
+          )
+          setSuggestion(data)
+          setSideIncomeAmount(amountNum)
+          setModalOpen(true)
+        } catch {
+          // Error fetching suggestion — show error toast, transaction is already saved
+          setFetchError('Gagal memuat saran alokasi. Cek nanti di halaman Pending.')
+        } finally {
+          setModalLoading(false)
+        }
+      }
     } catch {
       setError('Gagal menyimpan transaksi. Coba lagi.')
     } finally {
       setSaving(false)
     }
+  }
+
+  function handleModalClose() {
+    // Close/skip — save as pending suggestion via /skip endpoint
+    if (savedTransactionId) {
+      apiMutate(`/api/allocations/${savedTransactionId}/skip`, 'POST', null).catch(() => {})
+    }
+    setModalOpen(false)
+    setSuggestion(null)
+    setSideIncomeAmount(undefined)
+    setSavedTransactionId(null)
+  }
+
+  function handleSkipped() {
+    setModalOpen(false)
+    setSuggestion(null)
+    setSideIncomeAmount(undefined)
+    setSavedTransactionId(null)
+  }
+
+  function handleConfirmed() {
+    setModalOpen(false)
+    setSuggestion(null)
+    setSideIncomeAmount(undefined)
+    setSavedTransactionId(null)
   }
 
   return (
@@ -309,6 +364,44 @@ export default function NewTransactionPage() {
           {saving ? 'Menyimpan...' : 'Save Transaction'}
         </button>
       </div>
+
+      {/* ── Modal loading overlay (D-03) ── */}
+      {modalLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(30,30,30,0.2)' }}>
+          <div className="flex flex-col items-center gap-3 px-6 py-8 rounded-2xl bg-white shadow-lg">
+            <svg className="animate-spin h-8 w-8" style={{ color: '#298dff' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p className="text-sm font-semibold" style={{ fontFamily: 'Helvetica, sans-serif', color: '#1e1e1e' }}>
+              Menghitung saran alokasi...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Fetch error toast ── */}
+      {fetchError && (
+        <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
+          <div className="rounded-xl px-4 py-3 shadow-lg" style={{ backgroundColor: '#ffdad6', border: '1px solid #ba1a1a' }}>
+            <p className="text-sm" style={{ fontFamily: 'Helvetica, sans-serif', color: '#93000a' }} role="alert">
+              {fetchError}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Smart Allocation Modal ── */}
+      <SmartAllocationModal
+        open={modalOpen}
+        transaksiId={savedTransactionId ?? ''}
+        suggestion={suggestion}
+        sideIncomeAmount={sideIncomeAmount}
+        context="fresh"
+        onClose={handleModalClose}
+        onConfirmed={handleConfirmed}
+        onSkipped={handleSkipped}
+      />
     </div>
   )
 }

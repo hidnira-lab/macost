@@ -1,25 +1,71 @@
 {
-  "id_goal": "goal_001",
-  "nama_goal": "Beli Laptop",
-  "nominal_target": 8000000,
-  "nominal_terkumpul": 3200000,
-  "deadline": "2026-12-31",
-  "skor_keinginan": 5,
-  "skor_kepentingan": 4,
-  "progress_pct": 40,
-  "rank": 1,
-  "allocation_history": [
-    {
-      "id_alokasi": "alloc_001",
-      "nominal_alokasi": 1500000,
-      "tanggal_alokasi": "2026-07-01",
-      "transaksi_id": "txn_001"
-    },
-    {
-      "id_alokasi": "alloc_002",
-      "nominal_alokasi": 1700000,
-      "tanggal_alokasi": "2026-06-15",
-      "transaksi_id": "txn_002"
-    }
-  ]
+  "goal_001": {
+    "id_goal": "goal_001",
+    "nama_goal": "Beli Laptop",
+    "nominal_target": 8000000,
+    "nominal_terkumpul": 3200000,
+    "deadline": "2026-12-31",
+    "skor_keinginan": 5,
+    "skor_kepentingan": 4,
+    "progress_pct": 40,
+    "rank": 1,
+    "allocation_history": [
+      {
+        "id_alokasi": "alloc_001",
+        "nominal_alokasi": 1500000,
+        "tanggal_alokasi": "2026-07-01",
+        "transaksi_id": "txn_001"
+      },
+      {
+        "id_alokasi": "alloc_002",
+        "nominal_alokasi": 1700000,
+        "tanggal_alokasi": "2026-06-15",
+        "transaksi_id": "txn_002"
+      }
+    ]
+  },
+  "goal_002": {
+    "id_goal": "goal_002",
+    "nama_goal": "Dana Darurat",
+    "nominal_target": 2000000,
+    "nominal_terkumpul": 1300000,
+    "deadline": "2026-09-30",
+    "skor_keinginan": 4,
+    "skor_kepentingan": 5,
+    "progress_pct": 65,
+    "rank": 2,
+    "allocation_history": [
+      {
+        "id_alokasi": "alloc_003",
+        "nominal_alokasi": 500000,
+        "tanggal_alokasi": "2026-07-05",
+        "transaksi_id": "txn_003"
+      },
+      {
+        "id_alokasi": "alloc_004",
+        "nominal_alokasi": 800000,
+        "tanggal_alokasi": "2026-06-20",
+        "transaksi_id": "txn_004"
+      }
+    ]
+  },
+  "goal_003": {
+    "id_goal": "goal_003",
+    "nama_goal": "Liburan ke Bali",
+    "nominal_target": 1500000,
+    "nominal_terkumpul": 200000,
+    "deadline": "2027-01-15",
+    "skor_keinginan": 3,
+    "skor_kepentingan": 2,
+    "progress_pct": 13,
+    "rank": 3,
+    "allocation_history": [
+      {
+        "id_alokasi": "alloc_005",
+        "nominal_alokasi": 200000,
+        "tanggal_alokasi": "2026-07-10",
+        "transaksi_id": "txn_005"
+      }
+    ]
+  }
 }
