@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: core-product-loop
 status: executing
-stopped_at: Fixed allocation-suggestion latency (quick task 260709-0pc) found during 02-15 live verification; re-measuring against production next
-last_updated: "2026-07-09T00:35:00.000Z"
+stopped_at: 02-15 Task 1 complete (latency fixed 2622ms->2329ms avg, still >2000ms target, documented as open decision); Task 2 blocked on Hidayat's manual Tauri desktop walkthrough
+last_updated: "2026-07-09T00:45:00.000Z"
 last_activity: 2026-07-09
-last_activity_desc: Executed plan 02-15 Task 1 (live latency measurement) against Railway+Supabase production — found 2622ms avg (FAIL vs <=2000ms), root-caused to sequential Supabase queries, fixed via quick task 260709-0pc (commit d53b417, 75/75 tests passing), merged to main
+last_activity_desc: Re-measured allocation-suggestion latency post-fix (2329ms avg, down from 2622ms, still FAIL vs <=2000ms target) and wrote 02-15-SUMMARY.md documenting Task 1 done + Task 2 (human Tauri desktop verification) blocked
 progress:
   total_phases: 5
   completed_phases: 2
@@ -28,12 +28,12 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 
 ## Current Position
 
-Phase: 02 (core-product-loop) — EXECUTING
-Plan: 14 of 15 (02-03, 02-07, 02-08, 02-11, 02-13 verified/documented today; remaining: 02-15 — final verification/Railway check, requires Hidayat)
-Status: Ready to execute
-Last activity: 2026-07-09 -- Retroactively verified and documented 02-03, 02-07, 02-08, 02-11, 02-13 (externally implemented by Khayyira/Zarra via Cline, merged PR #12/#13) — all PASS
+Phase: 02 (core-product-loop) — EXECUTING (blocked on human checkpoint)
+Plan: 14.5 of 15 — 02-15 Task 1 (live latency) done and documented; Task 2 (human Tauri desktop walkthrough) is the ONLY remaining item in Phase 2, requires Hidayat physically at the machine
+Status: Blocked on human — nothing further is safely automatable for 02-15 Task 2
+Last activity: 2026-07-09 -- Fixed + re-measured allocation-suggestion latency (2622ms -> 2329ms avg, still above the 2000ms target — open decision for Hidayat: accept for demo or invest in a larger query-consolidation fix), wrote 02-15-SUMMARY.md
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 95% (Phase 2: 21 SUMMARY'd plans + 02-15 Task 1 done; 02-15 Task 2 open)
 
 ## Performance Metrics
 
@@ -101,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 02-core-product-loop]: 02-14: overspending_alert trailing-3-month baseline is defined relative to the selected period's start (not to 'today'), so a category is never compared against a baseline that includes its own current-period total
 - [Phase 02-core-product-loop]: 02-14: backend/main.py now registers all 6 Phase 2 routers (categories, transactions, goals, goal_settings, allocations, dashboard) alongside the unmodified Phase 1 auth/wallets routers -- backend is fully wired
 - [Phase 02-core-product-loop]: 02-14: backend pytest must be invoked via 'python -m pytest' from repo root, not bare 'pytest' -- backend/pytest.ini's presence anchors rootdir at backend/ under plain pytest, breaking 'from backend.routers import ...' imports
+- [2026-07-09, quick-260709-0pc]: GET /transactions/{id}/allocation-suggestion parallelizes get_avg_monthly_side_income + get_or_create_goal_settings via ThreadPoolExecutor (Supabase client is sync/blocking, confirmed via backend/core/supabase.py -- no asyncio.gather available). Cut live latency 2622ms->2329ms avg but did NOT reach the <=2000ms target -- remaining gap is 4 sequential Supabase round-trips (POST transaction write, transaction re-fetch, goals fetch, alokasi fetch). Further fix would need combining reads into a single Postgres RPC/view -- explicitly left as an open decision for Hidayat, not attempted unsupervised. See 02-15-SUMMARY.md.
 
 ### Pending Todos
 
