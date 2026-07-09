@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
-status: Phase 3 in progress -- 03-02 (Hidayat's part) complete: ai-insight contract extension signed off + applied, SAW-04 tolerance text fixed, AI_VISION_API_KEY live on Railway. 03-01/03-03/03-04 (Fertika/Zarra/Khayyira) still incomplete.
-stopped_at: Plan 03-02 complete
+status: Phase 3 in progress -- 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + AI_VISION_API_KEY live on Railway) both complete. 5/7 plans remaining.
+stopped_at: Completed 03-01-PLAN.md and 03-02-PLAN.md
 last_updated: "2026-07-09T14:55:00.000Z"
 last_activity: 2026-07-09
-last_activity_desc: Executed plan 03-02 inline (--interactive mode, Hidayat's part only) -- Task 0 team sign-off confirmed, Task 1 applied action_verb/related_category_id to API_CONTRACT.md + SAW-04 tolerance fix to REQUIREMENTS.md (commit d6ff665), Task 2 provisioned AI_VISION_API_KEY on Railway and confirmed /health 200. Other Wave 1 plans (03-01, 03-03, 03-04) deliberately skipped -- owned by teammates working independently.
+last_activity_desc: "03-01 (Fertika, backend/phase-3-wave-1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4/89716a1. 03-02 (Hidayat, --interactive mode): team sign-off + action_verb/related_category_id applied to API_CONTRACT.md + SAW-04 tolerance fix to REQUIREMENTS.md (commit d6ff665), AI_VISION_API_KEY provisioned on Railway, /health confirmed 200. Both executed independently in Wave 1 and merged into backend/phase-3-wave-1."
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 23
-  percent: 60
+  completed_plans: 24
+  percent: 83
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 03 — differentiators — IN PROGRESS (1/7 plans done). Hidayat's part (03-02) complete; waiting on Fertika/Zarra/Khayyira for the rest of Wave 1.
+**Current focus:** Phase 03 — differentiators — IN PROGRESS (2/7 plans executed: 03-01 Fertika, 03-02 Hidayat). Next: 03-04 backend task (Fertika, independent) or 03-03 (Zarra, independent).
 
 ## Current Position
 
 Phase: 03 (differentiators) — IN PROGRESS (2026-07-09)
-Plan: 03-02 (Hidayat) complete. 03-01 (Fertika), 03-03 (Zarra), 03-04 (Fertika+Khayyira) still incomplete in Wave 1. Wave 2 (03-05, 03-07) and Wave 3 (03-06) not started.
-Status: 03-02's two independent halves both done: (1) team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied, (2) AI_VISION_API_KEY live on Railway, health check passing. Requirements AIINS-02 and SAW-04 marked complete.
-Last activity: 2026-07-09 -- Executed plan 03-02 inline in --interactive mode, restricted to Hidayat's owned plan only (see Phase 3 Task Ownership table below). Commit d6ff665.
+Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + Railway key) executed, 5 remaining
+Status: 03-01 complete -- gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md. 03-02 complete -- team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied (action_verb/related_category_id on GET /api/ai-insight, SAW-04 tolerance 0.002), AI_VISION_API_KEY live on Railway, health check passing. See 03-02-SUMMARY.md. Requirements SCAN-01/ESTAT-01/AIINS-02/SAW-04 complete.
+Last activity: 2026-07-09 -- 03-01 (Fertika, commits 4f795cc/2d0aab4/89716a1) and 03-02 (Hidayat, commit d6ff665) executed independently in Wave 1, merged into backend/phase-3-wave-1.
 
-Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 1/7 plans executed
+Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 2/7 plans executed (03-01, 03-02 done)
 
 ## Phase 3 Task Ownership
 
@@ -90,6 +90,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | Phase 02 P12 | 6min | 2 tasks | 5 files |
 | Phase 02-core-product-loop P14 | 15min | 2 tasks | 5 files |
 | Phase 02 P06 | 5min | 1 tasks | 0 files |
+| Phase 03-differentiators P01 | 40min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,7 @@ Recent decisions affecting current work:
 - [2026-07-09, 03-02]: GET /api/ai-insight extended with required `action_verb` (enum: Alokasikan/Kurangi/Pertimbangkan) + nullable `related_category_id`, plus invariant that at least one of `related_goal_id`/`related_category_id` is non-null -- team-approved verbatim from 03-CONTRACT-CHANGE-PROPOSAL.md before 03-07 implements it. SAW-04 requirement text corrected to toleransi 0.002 (was 0.001), matching the already-shipped Phase 2 validator. See .planning/phases/03-differentiators/03-02-SUMMARY.md.
 - [2026-07-09, 03-02]: Executed only Hidayat's owned plan (03-02) via `/gsd-execute-phase 3 --interactive`, explicitly skipping 03-01/03-03/03-04 in the same wave -- the workflow has no per-owner plan filter, and those plans belong to Fertika/Zarra/Khayyira who execute independently (Cline or their own Claude Code session); running the full orchestrator would have duplicated or raced their work.
 - [2026-07-09]: Unprompted Phase 2 backend code review (by AI agent, Day's explicit authorization to continue autonomously overnight) also flagged 2 frontend items NOT yet fixed as of this entry: (1) apps/web/components/SmartAllocationModal.tsx and apps/web/components/AllocationSuggestionModal.tsx are two independently-drifted implementations of the same suggest-and-confirm modal -- the desktop-flow one (AllocationSuggestionModal) is missing amount-validation guards the mobile/pending-flow one has. Recommendation: consolidate to one component (SmartAllocationModal is more complete), or at minimum backport its allocationAmount<=0 / allocationAmount>incomeAmount guards as a stopgap. Not auto-fixed -- needs visual verification in a browser, judged too risky to do unsupervised right before a demo. (2) apps/web/app/transactions/new/page.tsx:114 sends a hardcoded, wrong-case tipe_transaksi: 'pengeluaran' on every transaction (backend ignores it, confirmed harmless today, but it's dead/wrong data plus apps/web/lib/api/types.ts makes tipe_transaksi a *required* field on TransactionCreateRequest, backwards from the "frontend only sends kategori_id" rule in CLAUDE.md). **RESOLVED same session, quick-260709-2b3** (commit dac39b8): removed from types.ts request interfaces and both call sites; tsc + lint clean, no new issues. Item (1), the SmartAllocationModal/AllocationSuggestionModal duplication: Day reviewed after waking up (2026-07-09 morning) and approved a **stopgap only** (not full consolidation, deferred post-demo). **Stopgap shipped, quick-260709-3c4** (commit 7037236): AllocationSuggestionModal's previously-silent `!suggested_amount` guard now shows a visible error and disables the "Konfirmasi Alokasi" button (`isSuggestionValid` check). Note: re-investigation during planning found the exact `allocationAmount>incomeAmount` guard from SmartAllocationModal doesn't directly transplant -- AllocationSuggestionModal has no user-editable amount (always sends `suggestion.suggested_amount` verbatim, which is server-computed as 35% of income and can never itself exceed income), so that specific guard would have been dead code here. The real gap (silent no-op with no user feedback) is what got fixed. Full component consolidation (delete one, extend the other) is still OPEN, deferred to post-demo per Day's decision.
+- [Phase ?]: 03-01: extract_statement() uses 15.0s timeout (planner default, RESEARCH.md Open Question #1); fake_gemini_response/spy_wait_for_timeout fixtures monkeypatch gemini_service's own get_gemini_client/asyncio bindings (patch-where-used), not gemini_client.py's, since gemini_service imports the name directly; no pytest-asyncio added, async tests driven via asyncio.run()
 
 ### Pending Todos
 
@@ -199,5 +201,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-07-09T14:55:00.000Z
-Stopped at: Plan 03-02 complete (Hidayat's Phase 3 Wave 1 part) — ai-insight contract extension applied, AI_VISION_API_KEY live on Railway
-Resume file: .planning/phases/03-differentiators/03-02-SUMMARY.md
+Stopped at: Completed 03-01-PLAN.md (Fertika) and 03-02-PLAN.md (Hidayat), merged into backend/phase-3-wave-1
+Resume file: None

@@ -1,6 +1,9 @@
 """Tests for GET/PUT /api/goal-settings — get-or-create default + weight-sum
 validation (02-10-PLAN.md Task 1).
 
+Also covers POST /api/goal-settings/preview (03-04-PLAN.md Task 1) and
+DEFAULT_WEIGHTS regression-lock test (03-04-PLAN.md Task 2).
+
 Uses an isolated TestClient (bare FastAPI() + goal_settings.router only),
 matching the pattern established in test_wallets.py/test_transactions.py.
 Covers the 4 behavior cases from 02-10-PLAN.md Task 1:
@@ -13,8 +16,10 @@ Covers the 4 behavior cases from 02-10-PLAN.md Task 1:
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from backend.routers import goal_settings
-from backend.services import goal_settings_service
+from backend.routers import goal_settings, goals as goals_router
+from backend.services import goal_settings_service, goal_service
+from backend.services import saw_engine
+from backend.services.goal_service import fetch_and_rank_goals
 
 DEFAULT_WEIGHTS = {
     "personal_importance": 0.225,
@@ -28,11 +33,13 @@ DEFAULT_WEIGHTS = {
 def _build_app() -> FastAPI:
     app = FastAPI()
     app.include_router(goal_settings.router, prefix="/api")
+    app.include_router(goals_router.router, prefix="/api")
     return app
 
 
 def _client_as(user_id: str, app: FastAPI) -> TestClient:
     app.dependency_overrides[goal_settings.get_current_user_id] = lambda: user_id
+    app.dependency_overrides[goals_router.get_current_user_id] = lambda: user_id
     return TestClient(app)
 
 
@@ -42,6 +49,12 @@ def _patch_supabase(monkeypatch, fake_supabase_client):
     )
     monkeypatch.setattr(
         goal_settings_service, "get_supabase_admin", lambda: fake_supabase_client
+    )
+    monkeypatch.setattr(
+        goals_router, "get_supabase_admin", lambda: fake_supabase_client
+    )
+    monkeypatch.setattr(
+        goal_service, "get_supabase_admin", lambda: fake_supabase_client
     )
 
 
@@ -266,3 +279,213 @@ def test_put_goal_settings_extra_key_returns_400_validation_error(
 
     rows = fake_supabase_client.table("goal_settings").select("*").execute().data
     assert rows[0]["weights"] == DEFAULT_WEIGHTS  # unchanged
+
+
+# =========================================================================
+# 03-04-PLAN.md Task 1: POST /api/goal-settings/preview
+# =========================================================================
+
+
+def _seed_goals_and_settings(fake_supabase_client, goals, weights):
+    """Helper to seed goals + alokasi rows + goal_settings for preview tests."""
+    fake_supabase_client.seed("goal", goals)
+    # Seed alokasi rows to match nominal_terkumpul values
+    alokasi_rows = []
+    for g in goals:
+        alokasi_rows.append(
+            {
+                "id": f"alokasi-{g['id_goal']}",
+                "goal_id": g["id_goal"],
+                "nominal_alokasi": g.get("nominal_terkumpul", 0),
+                "id_pengguna": "user-1",
+            }
+        )
+    fake_supabase_client.seed("alokasi", alokasi_rows)
+    fake_supabase_client.seed(
+        "goal_settings",
+        [{"id_pengguna": "user-1", "strategy": "quick_win", "weights": weights}],
+    )
+
+
+def test_preview_valid_weights_returns_goals_with_rank_from_candidate_weights(
+    monkeypatch, fake_supabase_client, sample_goals, sample_weights
+):
+    """POST /api/goal-settings/preview with valid weights returns 200 and
+    goals ranked using the CANDIDATE weights (not stored weights)."""
+    _seed_goals_and_settings(fake_supabase_client, sample_goals, sample_weights)
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    # Use different candidate weights to verify they are used
+    candidate_weights = {
+        "personal_importance": 0.5,
+        "progress_gap": 0.1,
+        "saving_capacity": 0.1,
+        "urgency": 0.15,
+        "target_amount": 0.15,
+    }
+    body = {"strategy": "quick_win", "weights": candidate_weights}
+    response = client.post("/api/goal-settings/preview", json=body)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "goals" in data
+    assert len(data["goals"]) == 3
+
+    # Every goal must have rank, id_goal, nama_goal, and all _to_response fields
+    for goal in data["goals"]:
+        assert "rank" in goal
+        assert "id_goal" in goal
+        assert "nama_goal" in goal
+        assert "nominal_target" in goal
+        assert "deadline" in goal
+        assert "skor_keinginan" in goal
+        assert "nominal_terkumpul" in goal
+        assert "skor_kepentingan" in goal
+        assert "progress_pct" in goal
+
+    # Verify ranking is 1, 2, 3 (no ties guaranteed for these weights)
+    ranks = [g["rank"] for g in data["goals"]]
+    assert ranks == [1, 2, 3]
+
+
+def test_preview_does_not_persist_weights(
+    monkeypatch, fake_supabase_client, sample_goals, sample_weights
+):
+    """After POST /api/goal-settings/preview with different candidate weights,
+    GET /api/goal-settings still returns the stored weights unchanged."""
+    stored_weights = {
+        "personal_importance": 0.3,
+        "progress_gap": 0.2,
+        "saving_capacity": 0.2,
+        "urgency": 0.15,
+        "target_amount": 0.15,
+    }
+    _seed_goals_and_settings(fake_supabase_client, sample_goals, stored_weights)
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    # Call preview with DIFFERENT candidate weights
+    candidate = {
+        "personal_importance": 0.5,
+        "progress_gap": 0.1,
+        "saving_capacity": 0.1,
+        "urgency": 0.15,
+        "target_amount": 0.15,
+    }
+    preview_response = client.post(
+        "/api/goal-settings/preview",
+        json={"strategy": "quick_win", "weights": candidate},
+    )
+    assert preview_response.status_code == 200
+
+    # GET /api/goal-settings must still return original stored weights
+    get_response = client.get("/api/goal-settings")
+    assert get_response.status_code == 200
+    data = get_response.json()
+    assert data["weights"] == stored_weights
+
+
+def test_preview_invalid_weights_returns_400_validation_error(
+    monkeypatch, fake_supabase_client, sample_goals, sample_weights
+):
+    """POST /api/goal-settings/preview with weights outside ±0.002 tolerance
+    returns 400 VALIDATION_ERROR — same structured-error shape as PUT."""
+    _seed_goals_and_settings(fake_supabase_client, sample_goals, sample_weights)
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "strategy": "quick_win",
+        "weights": {
+            "personal_importance": 0.5,
+            "progress_gap": 0.5,
+            "saving_capacity": 0.0,
+            "urgency": 0.0,
+            "target_amount": 0.0,  # sums to 1.0? no, 0.5+0.5 = 1.0 but we want something off
+        },
+    }
+    # Actually let's use weights summing to 0.80
+    body = {
+        "strategy": "quick_win",
+        "weights": {
+            "personal_importance": 0.3,
+            "progress_gap": 0.3,
+            "saving_capacity": 0.1,
+            "urgency": 0.05,
+            "target_amount": 0.05,  # sums to 0.80
+        },
+    }
+    response = client.post("/api/goal-settings/preview", json=body)
+
+    assert response.status_code == 400
+    error_data = response.json()
+    assert error_data["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    assert error_data["detail"]["error"]["message"] == "weights must sum to 1.0"
+
+
+def test_preview_with_stored_weights_produces_same_ranking_as_get_goals(
+    monkeypatch, fake_supabase_client, sample_goals, sample_weights
+):
+    """Preview with the exact currently-saved weights produces the same ranking
+    as GET /api/goals (sanity: both use saw_engine.rank_goals)."""
+    _seed_goals_and_settings(fake_supabase_client, sample_goals, sample_weights)
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    # GET /api/goals
+    get_response = client.get("/api/goals")
+    assert get_response.status_code == 200
+    get_goals = get_response.json()["goals"]
+    get_ranked = [(g["id_goal"], g["rank"]) for g in get_goals]
+
+    # POST /api/goal-settings/preview with the SAME weights
+    preview_response = client.post(
+        "/api/goal-settings/preview",
+        json={"strategy": "quick_win", "weights": sample_weights},
+    )
+    assert preview_response.status_code == 200
+    preview_goals = preview_response.json()["goals"]
+    preview_ranked = [(g["id_goal"], g["rank"]) for g in preview_goals]
+
+    assert get_ranked == preview_ranked
+
+
+# =========================================================================
+# 03-04-PLAN.md Task 2: SAW-05 regression-lock — DEFAULT_WEIGHTS accepted
+# =========================================================================
+
+
+def test_put_goal_settings_accepts_default_weights_verbatim(
+    monkeypatch, fake_supabase_client
+):
+    """PUT /api/goal-settings with weights exactly equal to
+    goal_settings_service.DEFAULT_WEIGHTS (summing to 0.999) must succeed
+    (200) — the ±0.002 tolerance must accept the locked n=62 defaults.
+    This locks the SAW-05 reset contract."""
+    fake_supabase_client.seed(
+        "goal_settings",
+        [{"id_pengguna": "user-1", "strategy": "quick_win", "weights": DEFAULT_WEIGHTS}],
+    )
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "strategy": "quick_win",
+        "weights": goal_settings_service.DEFAULT_WEIGHTS,
+    }
+    response = client.put("/api/goal-settings", json=body)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["weights"] == goal_settings_service.DEFAULT_WEIGHTS

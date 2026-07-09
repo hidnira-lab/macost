@@ -5,6 +5,9 @@ from backend.core.supabase import get_supabase_admin
 from backend.dependencies.auth import get_current_user_id
 from backend.models.goal_settings import GoalSettingsUpdate
 from backend.services.goal_settings_service import get_or_create_goal_settings
+from backend.services.goal_service import fetch_and_rank_goals
+from backend.services import saw_engine
+from backend.routers.goals import _to_response
 
 router = APIRouter()
 
@@ -65,3 +68,54 @@ def update_goal_settings(
 
     row = result.data[0]
     return {"strategy": row["strategy"], "weights": row["weights"]}
+
+
+# ---------------------------------------------------------------------------
+# POST /api/goal-settings/preview — re-rank goals with candidate (unsaved)
+# weights, reusing saw_engine.rank_goals + _to_response(). Never persists.
+# ---------------------------------------------------------------------------
+
+@router.post("/goal-settings/preview", response_model=dict)
+def preview_goal_settings(
+    body: dict,
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Accepts candidate `strategy` + `weights`, validates them with the same
+    ±0.002 tolerance as PUT, fetches the user's goals with all derived fields
+    via `fetch_and_rank_goals()`, strips their ranks, re-ranks with the
+    candidate weights via `saw_engine.rank_goals()`, and returns the result
+    in the same shape as GET /api/goals.
+
+    NEVER persists — subsequent GET /api/goal-settings returns the stored
+    weights unchanged.
+    """
+    try:
+        validated = GoalSettingsUpdate(**body)
+    except ValidationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "weights must sum to 1.0",
+                }
+            },
+        )
+
+    # Fetch enriched goals (with derived fields) using stored settings, then
+    # re-rank with candidate weights — avoiding a second aggregation impl.
+    enriched_goals = fetch_and_rank_goals(current_user_id)
+
+    # Strip rank from each goal so re-ranking is clean
+    unranked_goals = [
+        {k: v for k, v in g.items() if k != "rank"} for g in enriched_goals
+    ]
+
+    # Re-rank with candidate weights
+    candidate_weights = validated.weights.model_dump()
+    ranked_goals = saw_engine.rank_goals(
+        unranked_goals, candidate_weights, validated.strategy
+    )
+
+    return {"goals": [_to_response(g) for g in ranked_goals]}
