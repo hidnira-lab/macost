@@ -116,3 +116,21 @@ Verification performed:
   verification walkthrough after this fix is deployed to confirm the
   redirect-to-login now fires instead of the silent 401 stall.
 
+### Follow-up fix, same session (commit 08c8752)
+
+While retesting the unblock steps above, Day found a second, related bug
+live: after a fresh login/register, the app landed on `/wallets` instead
+of `/home`. Root cause: `apps/web/app/page.tsx` already treats `/home` as
+the canonical landing page for a token-present user (`token ? '/home' :
+'/login'`), but `apps/web/app/(auth)/login/page.tsx` and
+`apps/web/app/(auth)/register/page.tsx` both hardcoded
+`router.push('/wallets')` after a successful auth call -- never updated to
+`/home` when that page was built in Phase 2. Fixed both to `router.push('/home')`.
+`npx tsc --noEmit` clean. Committed on the same branch
+(`native/fix-401-stale-session-token`), not yet pushed.
+
+Branch now has 2 commits ahead of main: `97f91c6` (401 stale-session
+redirect fix) and `08c8752` (login/register landing-page redirect fix).
+Both are frontend-only, low-risk, TDD-verified via tsc/lint. Ready for
+Day to review and push/merge.
+
