@@ -337,7 +337,7 @@ Request:
   "weights": { "personal_importance": 0.3, "progress_gap": 0.2, "saving_capacity": 0.2, "urgency": 0.15, "target_amount": 0.15 }
 }
 ```
-> Validasi: jumlah seluruh `weights` harus = 1.0 (atau 100%). Response (400) jika tidak.
+> Validasi: jumlah seluruh `weights` harus = 1.0 (atau 100%), toleransi ±0.002. Response (400) jika tidak.
 
 Response (200): objek settings terbaru.
 
@@ -451,12 +451,18 @@ Response (200) — sukses:
     {
       "id": "string",
       "message": "Side income kamu bulan ini bisa nutup 60% goal Laptop kalau dialokasikan penuh.",
+      "action_verb": "Alokasikan",
       "related_goal_id": "string",
+      "related_category_id": null,
       "generated_at": "2026-06-27T10:00:00Z"
     }
   ]
 }
 ```
+> - `action_verb` — string, **wajib**. Enum tetap: `"Alokasikan"` | `"Kurangi"` | `"Pertimbangkan"`. Ditentukan server-side oleh generator insight.
+> - `related_category_id` — string UUID, **nullable**. Diisi jika insight merujuk ke sebuah kategori pengeluaran/pemasukan.
+> - `related_goal_id` — string UUID, **nullable** (sebelumnya dicontohkan selalu `"string"`; ditegaskan boleh `null`). Diisi jika insight merujuk ke sebuah goal.
+> - Invariant: minimal salah satu dari `related_goal_id` / `related_category_id` terisi (tidak boleh keduanya `null`).
 
 Response (200) — fallback (API LLM gagal, FR-017):
 ```json

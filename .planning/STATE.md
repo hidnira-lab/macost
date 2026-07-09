@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
-status: Phase 3 in progress -- 03-01 executed (backend Gemini integration layer), 6/7 plans remaining.
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-07-09T08:54:09.992Z"
+status: Phase 3 in progress -- 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + AI_VISION_API_KEY live on Railway) both complete. 5/7 plans remaining.
+stopped_at: Completed 03-01-PLAN.md and 03-02-PLAN.md
+last_updated: "2026-07-09T14:55:00.000Z"
 last_activity: 2026-07-09
-last_activity_desc: "Executed 03-01-PLAN.md (Fertika's backend scope, Wave 1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4/89716a1."
+last_activity_desc: "03-01 (Fertika, backend/phase-3-wave-1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4/89716a1. 03-02 (Hidayat, --interactive mode): team sign-off + action_verb/related_category_id applied to API_CONTRACT.md + SAW-04 tolerance fix to REQUIREMENTS.md (commit d6ff665), AI_VISION_API_KEY provisioned on Railway, /health confirmed 200. Both executed independently in Wave 1 and merged into backend/phase-3-wave-1."
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 23
-  percent: 79
+  completed_plans: 24
+  percent: 83
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 03 — differentiators — IN PROGRESS (1/7 plans executed). Next: 03-04 backend task (Fertika, independent of 03-02/03-03), or 03-02 (Hidayat sign-off + Railway).
+**Current focus:** Phase 03 — differentiators — IN PROGRESS (2/7 plans executed: 03-01 Fertika, 03-02 Hidayat). Next: 03-04 backend task (Fertika, independent) or 03-03 (Zarra, independent).
 
 ## Current Position
 
 Phase: 03 (differentiators) — IN PROGRESS (2026-07-09)
-Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — 03-01 executed (Fertika, backend/phase-3-wave-1 branch), 6 remaining
-Status: 03-01 (Gemini integration layer: gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas) complete -- Task 0 package-legitimacy checkpoint cleared by user, Task 1 + Task 2 executed, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md.
-Last activity: 2026-07-09 -- Executed 03-01-PLAN.md (Fertika's backend scope, Wave 1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4.
+Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + Railway key) executed, 5 remaining
+Status: 03-01 complete -- gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md. 03-02 complete -- team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied (action_verb/related_category_id on GET /api/ai-insight, SAW-04 tolerance 0.002), AI_VISION_API_KEY live on Railway, health check passing. See 03-02-SUMMARY.md. Requirements SCAN-01/ESTAT-01/AIINS-02/SAW-04 complete.
+Last activity: 2026-07-09 -- 03-01 (Fertika, commits 4f795cc/2d0aab4/89716a1) and 03-02 (Hidayat, commit d6ff665) executed independently in Wave 1, merged into backend/phase-3-wave-1.
 
-Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 1/7 plans executed (03-01 done)
+Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 2/7 plans executed (03-01, 03-02 done)
 
 ## Phase 3 Task Ownership
 
@@ -42,7 +42,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | Wave | Plan | Bagian | Owner | Catatan |
 |---|---|---|---|---|
 | 1 | 03-01 | Backend (Gemini client/service, models) | Fertika | Fondasi — semua plan lain (kecuali 03-03) bergantung pada ini |
-| 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | Sole Railway account holder; butuh sign-off tertulis dari 4 anggota tim sebelum 03-07 mulai frontend (shape kontrak baru) |
+| 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | ✅ DONE 2026-07-09 (commit d6ff665) — sign-off didapat, kontrak diterapkan, key live di Railway. 03-07 boleh mulai implement frontend shape baru. |
 | 1 | 03-03 | Frontend — Quick Access Panel (Home) | Zarra | Area Home/Dashboard, murni frontend, tidak menunggu plan lain |
 | 1 | 03-04 | Backend — `/goal-settings/preview` endpoint | Fertika | |
 | 1 | 03-04 | Frontend — `SawWeightEditor.tsx` | Khayyira | Area Goals |
@@ -130,6 +130,8 @@ Recent decisions affecting current work:
 - [2026-07-09, quick-260709-0pc]: GET /transactions/{id}/allocation-suggestion parallelizes get_avg_monthly_side_income + get_or_create_goal_settings via ThreadPoolExecutor (Supabase client is sync/blocking, confirmed via backend/core/supabase.py -- no asyncio.gather available). Cut live latency 2622ms->2329ms avg but did NOT reach the <=2000ms target -- remaining gap is 4 sequential Supabase round-trips (POST transaction write, transaction re-fetch, goals fetch, alokasi fetch). Further fix would need combining reads into a single Postgres RPC/view -- explicitly left as an open decision for Hidayat, not attempted unsupervised. See 02-15-SUMMARY.md.
 - [2026-07-09, quick-260709-1a2]: POST /api/allocations now rejects a second allocation attempt on an already-allocated transaction (400 VALIDATION_ERROR) -- previously nothing stopped double-clicking Confirm (or two open tabs) from creating phantom savings across goals. No running-sum/partial-allocation cap needed since API_CONTRACT.md has no partial-allocation concept -- rejecting any 2nd POST per transaksi_id is sufficient.
 - [2026-07-09, quick-260709-1a2]: PUT /api/goal-settings now validates weights against the exact 5-key GoalSettingsWeights model (extra="forbid") instead of a loose dict[str, float] -- previously a missing-real-key + typo'd-extra-key combo that happened to sum to ~1.0 would persist malformed weights and cause a self-inflicted 500 on every subsequent GET /api/goals (KeyError in saw_engine.rank_goals). The GoalSettingsWeights model already existed in the codebase but was dead code -- this activates it, no new model created.
+- [2026-07-09, 03-02]: GET /api/ai-insight extended with required `action_verb` (enum: Alokasikan/Kurangi/Pertimbangkan) + nullable `related_category_id`, plus invariant that at least one of `related_goal_id`/`related_category_id` is non-null -- team-approved verbatim from 03-CONTRACT-CHANGE-PROPOSAL.md before 03-07 implements it. SAW-04 requirement text corrected to toleransi 0.002 (was 0.001), matching the already-shipped Phase 2 validator. See .planning/phases/03-differentiators/03-02-SUMMARY.md.
+- [2026-07-09, 03-02]: Executed only Hidayat's owned plan (03-02) via `/gsd-execute-phase 3 --interactive`, explicitly skipping 03-01/03-03/03-04 in the same wave -- the workflow has no per-owner plan filter, and those plans belong to Fertika/Zarra/Khayyira who execute independently (Cline or their own Claude Code session); running the full orchestrator would have duplicated or raced their work.
 - [2026-07-09]: Unprompted Phase 2 backend code review (by AI agent, Day's explicit authorization to continue autonomously overnight) also flagged 2 frontend items NOT yet fixed as of this entry: (1) apps/web/components/SmartAllocationModal.tsx and apps/web/components/AllocationSuggestionModal.tsx are two independently-drifted implementations of the same suggest-and-confirm modal -- the desktop-flow one (AllocationSuggestionModal) is missing amount-validation guards the mobile/pending-flow one has. Recommendation: consolidate to one component (SmartAllocationModal is more complete), or at minimum backport its allocationAmount<=0 / allocationAmount>incomeAmount guards as a stopgap. Not auto-fixed -- needs visual verification in a browser, judged too risky to do unsupervised right before a demo. (2) apps/web/app/transactions/new/page.tsx:114 sends a hardcoded, wrong-case tipe_transaksi: 'pengeluaran' on every transaction (backend ignores it, confirmed harmless today, but it's dead/wrong data plus apps/web/lib/api/types.ts makes tipe_transaksi a *required* field on TransactionCreateRequest, backwards from the "frontend only sends kategori_id" rule in CLAUDE.md). **RESOLVED same session, quick-260709-2b3** (commit dac39b8): removed from types.ts request interfaces and both call sites; tsc + lint clean, no new issues. Item (1), the SmartAllocationModal/AllocationSuggestionModal duplication: Day reviewed after waking up (2026-07-09 morning) and approved a **stopgap only** (not full consolidation, deferred post-demo). **Stopgap shipped, quick-260709-3c4** (commit 7037236): AllocationSuggestionModal's previously-silent `!suggested_amount` guard now shows a visible error and disables the "Konfirmasi Alokasi" button (`isSuggestionValid` check). Note: re-investigation during planning found the exact `allocationAmount>incomeAmount` guard from SmartAllocationModal doesn't directly transplant -- AllocationSuggestionModal has no user-editable amount (always sends `suggestion.suggested_amount` verbatim, which is server-computed as 35% of income and can never itself exceed income), so that specific guard would have been dead code here. The real gap (silent no-op with no user feedback) is what got fixed. Full component consolidation (delete one, extend the other) is still OPEN, deferred to post-demo per Day's decision.
 - [Phase ?]: 03-01: extract_statement() uses 15.0s timeout (planner default, RESEARCH.md Open Question #1); fake_gemini_response/spy_wait_for_timeout fixtures monkeypatch gemini_service's own get_gemini_client/asyncio bindings (patch-where-used), not gemini_client.py's, since gemini_service imports the name directly; no pytest-asyncio added, async tests driven via asyncio.run()
 
@@ -198,6 +200,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-09T08:52:46.067Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-07-09T14:55:00.000Z
+Stopped at: Completed 03-01-PLAN.md (Fertika) and 03-02-PLAN.md (Hidayat), merged into backend/phase-3-wave-1
 Resume file: None

@@ -88,7 +88,7 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### SAW Weight Adjustment
 
-- [ ] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.001) (FR-014)
+- [x] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.002) (FR-014)
 - [ ] **SAW-05**: User dapat mereset bobot ke default hasil riset (n=62)
 
 #### Quick Access Panel
@@ -180,7 +180,7 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | AIINS-01 | Phase 3 | Pending |
 | AIINS-02 | Phase 3 | Complete |
 | AIINS-03 | Phase 3 | Pending |
-| SAW-04 | Phase 3 | Pending |
+| SAW-04 | Phase 3 | Complete |
 | SAW-05 | Phase 3 | Pending |
 | QAP-01 | Phase 3 | Pending |
 | VIS-01 | Phase 4 | Pending |

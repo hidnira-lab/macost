@@ -164,13 +164,13 @@ Plans:
   4. User can open SAW weight settings, adjust the five criteria weights (must sum to 100% ± 0.001), see goal ranking update in response, and reset all weights to the research-default values from the n=62 survey
   5. User sees a Quick Access Panel at the top of the Home page (post-login) with exactly 4 shortcuts — add transaction, scan receipt, top active goal (name + progress %), and current balance summary — each shortcut navigating to its target in one tap
 
-**Plans**: 1/7 plans executed
+**Plans**: 2/7 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 03-01-PLAN.md — Shared Gemini 2.5 Flash integration layer: client factory, gemini_service.py (extract_receipt/extract_statement/generate_insight), Pydantic response schemas, Wave 0 test scaffolding
-- [ ] 03-02-PLAN.md — Team sign-off checkpoint for the API_CONTRACT.md ai-insight extension + SAW-04 tolerance text fix, plus Hidayat-only AI_VISION_API_KEY provisioning on Railway
+- [x] 03-02-PLAN.md — Team sign-off checkpoint for the API_CONTRACT.md ai-insight extension + SAW-04 tolerance text fix, plus Hidayat-only AI_VISION_API_KEY provisioning on Railway
 - [ ] 03-03-PLAN.md — Quick Access Panel (QAP-01): 4-shortcut component mounted on Home, zero new endpoints
 - [ ] 03-04-PLAN.md — SAW weight customization (SAW-04/05): live re-rank preview endpoint + weight editor UI + reset-to-default
 
@@ -252,5 +252,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
 | 2. Core Product Loop | 15/15 | Complete    | 2026-07-09 |
-| 3. Differentiators | 1/7 | In Progress|  |
+| 3. Differentiators | 2/7 | In Progress|  |
 | 4. Polish | 0/TBD | Not started | - |
