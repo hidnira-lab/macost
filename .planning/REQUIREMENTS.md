@@ -83,12 +83,12 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 #### AI Financial Assistant
 
 - [ ] **AIINS-01**: User dapat melihat insight keuangan satu arah (bukan chat interaktif) dalam Bahasa Indonesia, dihasilkan dari data transaksi dan goal aktif (FR-012)
-- [ ] **AIINS-02**: Setiap insight memiliki action verb (Alokasikan, Kurangi, Pertimbangkan) dan link ke goal atau kategori yang relevan
+- [x] **AIINS-02**: Setiap insight memiliki action verb (Alokasikan, Kurangi, Pertimbangkan) dan link ke goal atau kategori yang relevan
 - [ ] **AIINS-03**: Jika LLM gagal merespons dalam >15 detik, sistem menampilkan fallback_message yang mengarahkan user ke halaman Goals (FR-017)
 
 #### SAW Weight Adjustment
 
-- [ ] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.002) (FR-014)
+- [x] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.002) (FR-014)
 - [ ] **SAW-05**: User dapat mereset bobot ke default hasil riset (n=62)
 
 #### Quick Access Panel
@@ -178,9 +178,9 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | ESTAT-02 | Phase 3 | Pending |
 | ESTAT-03 | Phase 3 | Pending |
 | AIINS-01 | Phase 3 | Pending |
-| AIINS-02 | Phase 3 | Pending |
+| AIINS-02 | Phase 3 | Complete |
 | AIINS-03 | Phase 3 | Pending |
-| SAW-04 | Phase 3 | Pending |
+| SAW-04 | Phase 3 | Complete |
 | SAW-05 | Phase 3 | Pending |
 | QAP-01 | Phase 3 | Pending |
 | VIS-01 | Phase 4 | Pending |

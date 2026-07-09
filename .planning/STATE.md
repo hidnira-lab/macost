@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
-status: Phase 3 planned -- 7 plans across 3 waves, plan-checker passed (0 blockers after 1 revision), ready for `/gsd-execute-phase 3`.
-stopped_at: Phase 3 planning complete
-last_updated: "2026-07-09T05:30:00.000Z"
+status: Phase 3 in progress -- 03-02 (Hidayat's part) complete: ai-insight contract extension signed off + applied, SAW-04 tolerance text fixed, AI_VISION_API_KEY live on Railway. 03-01/03-03/03-04 (Fertika/Zarra/Khayyira) still incomplete.
+stopped_at: Plan 03-02 complete
+last_updated: "2026-07-09T14:55:00.000Z"
 last_activity: 2026-07-09
-last_activity_desc: "Day ran /gsd-plan-phase 3 on Fertika's docs/phase-3-planning branch (discuss + UI-SPEC already done by Fertika). Research + pattern-mapper + planner produced 03-01 through 03-07-PLAN.md; plan-checker found 1 blocker (neutered tsc verify commands in 5 plans), planner revised, re-check passed clean. Requirements coverage 12/12, decision coverage 6/6."
+last_activity_desc: Executed plan 03-02 inline (--interactive mode, Hidayat's part only) -- Task 0 team sign-off confirmed, Task 1 applied action_verb/related_category_id to API_CONTRACT.md + SAW-04 tolerance fix to REQUIREMENTS.md (commit d6ff665), Task 2 provisioned AI_VISION_API_KEY on Railway and confirmed /health 200. Other Wave 1 plans (03-01, 03-03, 03-04) deliberately skipped -- owned by teammates working independently.
 progress:
-  total_phases: 7
+  total_phases: 5
   completed_phases: 3
-  total_plans: 22
-  completed_plans: 22
-  percent: 43
+  total_plans: 29
+  completed_plans: 23
+  percent: 60
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 03 — differentiators — PLANNED (7 plans, 3 waves). Next: `/gsd-execute-phase 3`.
+**Current focus:** Phase 03 — differentiators — IN PROGRESS (1/7 plans done). Hidayat's part (03-02) complete; waiting on Fertika/Zarra/Khayyira for the rest of Wave 1.
 
 ## Current Position
 
-Phase: 03 (differentiators) — PLANNED (2026-07-09)
-Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — none executed yet
-Status: Plan-checker passed after 1 revision iteration (fixed a neutered `tsc --noEmit | grep ; echo` verify pattern in 5 plans). Requirements coverage 12/12, CONTEXT.md decision coverage 6/6. Ready for `/gsd-execute-phase 3`.
-Last activity: 2026-07-09 -- Research (Gemini 2.5 Flash SDK patterns, asyncio timeout pitfall) + pattern-mapper (24/26 files have codebase analogs) + planner + plan-checker revision loop completed for Phase 3, on branch `docs/phase-3-planning` (Fertika's discuss-phase + UI-SPEC work as the starting point).
+Phase: 03 (differentiators) — IN PROGRESS (2026-07-09)
+Plan: 03-02 (Hidayat) complete. 03-01 (Fertika), 03-03 (Zarra), 03-04 (Fertika+Khayyira) still incomplete in Wave 1. Wave 2 (03-05, 03-07) and Wave 3 (03-06) not started.
+Status: 03-02's two independent halves both done: (1) team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied, (2) AI_VISION_API_KEY live on Railway, health check passing. Requirements AIINS-02 and SAW-04 marked complete.
+Last activity: 2026-07-09 -- Executed plan 03-02 inline in --interactive mode, restricted to Hidayat's owned plan only (see Phase 3 Task Ownership table below). Commit d6ff665.
 
-Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 0/7 plans executed
+Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 1/7 plans executed
 
 ## Phase 3 Task Ownership
 
@@ -42,7 +42,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | Wave | Plan | Bagian | Owner | Catatan |
 |---|---|---|---|---|
 | 1 | 03-01 | Backend (Gemini client/service, models) | Fertika | Fondasi — semua plan lain (kecuali 03-03) bergantung pada ini |
-| 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | Sole Railway account holder; butuh sign-off tertulis dari 4 anggota tim sebelum 03-07 mulai frontend (shape kontrak baru) |
+| 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | ✅ DONE 2026-07-09 (commit d6ff665) — sign-off didapat, kontrak diterapkan, key live di Railway. 03-07 boleh mulai implement frontend shape baru. |
 | 1 | 03-03 | Frontend — Quick Access Panel (Home) | Zarra | Area Home/Dashboard, murni frontend, tidak menunggu plan lain |
 | 1 | 03-04 | Backend — `/goal-settings/preview` endpoint | Fertika | |
 | 1 | 03-04 | Frontend — `SawWeightEditor.tsx` | Khayyira | Area Goals |
@@ -54,6 +54,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | 3 | 03-06 | Frontend — `/transactions/import` + `StatementReviewTable` | Khayyira | |
 
 **Catatan koordinasi:**
+
 1. Fertika memegang backend di kelima plan — beban besar untuk sisa waktu sampai expo (2026-07-14); pertimbangkan bantuan tambahan bila kewalahan.
 2. `apps/web/lib/api/types.ts` disentuh 3 orang (Zarra di 03-05, Khayyira di 03-07 dan 03-06). Di Wave 2, Zarra dan Khayyira jalan paralel dan wajib append-only ke file itu (jangan reorder/reformat) — sudah dicatat di masing-masing PLAN.md.
 3. Khayyira dan Zarra pakai Cline, bukan Claude Code — Wave 1-3 di atas mereka kerjakan manual dari `.planning/phases/03-differentiators/03-0X-PLAN.md`, bukan lewat `/gsd-execute-phase` otomatis. Fertika dan Hidayat (Claude Code) bisa pakai `/gsd-execute-phase 3` untuk bagian masing-masing.
@@ -128,6 +129,8 @@ Recent decisions affecting current work:
 - [2026-07-09, quick-260709-0pc]: GET /transactions/{id}/allocation-suggestion parallelizes get_avg_monthly_side_income + get_or_create_goal_settings via ThreadPoolExecutor (Supabase client is sync/blocking, confirmed via backend/core/supabase.py -- no asyncio.gather available). Cut live latency 2622ms->2329ms avg but did NOT reach the <=2000ms target -- remaining gap is 4 sequential Supabase round-trips (POST transaction write, transaction re-fetch, goals fetch, alokasi fetch). Further fix would need combining reads into a single Postgres RPC/view -- explicitly left as an open decision for Hidayat, not attempted unsupervised. See 02-15-SUMMARY.md.
 - [2026-07-09, quick-260709-1a2]: POST /api/allocations now rejects a second allocation attempt on an already-allocated transaction (400 VALIDATION_ERROR) -- previously nothing stopped double-clicking Confirm (or two open tabs) from creating phantom savings across goals. No running-sum/partial-allocation cap needed since API_CONTRACT.md has no partial-allocation concept -- rejecting any 2nd POST per transaksi_id is sufficient.
 - [2026-07-09, quick-260709-1a2]: PUT /api/goal-settings now validates weights against the exact 5-key GoalSettingsWeights model (extra="forbid") instead of a loose dict[str, float] -- previously a missing-real-key + typo'd-extra-key combo that happened to sum to ~1.0 would persist malformed weights and cause a self-inflicted 500 on every subsequent GET /api/goals (KeyError in saw_engine.rank_goals). The GoalSettingsWeights model already existed in the codebase but was dead code -- this activates it, no new model created.
+- [2026-07-09, 03-02]: GET /api/ai-insight extended with required `action_verb` (enum: Alokasikan/Kurangi/Pertimbangkan) + nullable `related_category_id`, plus invariant that at least one of `related_goal_id`/`related_category_id` is non-null -- team-approved verbatim from 03-CONTRACT-CHANGE-PROPOSAL.md before 03-07 implements it. SAW-04 requirement text corrected to toleransi 0.002 (was 0.001), matching the already-shipped Phase 2 validator. See .planning/phases/03-differentiators/03-02-SUMMARY.md.
+- [2026-07-09, 03-02]: Executed only Hidayat's owned plan (03-02) via `/gsd-execute-phase 3 --interactive`, explicitly skipping 03-01/03-03/03-04 in the same wave -- the workflow has no per-owner plan filter, and those plans belong to Fertika/Zarra/Khayyira who execute independently (Cline or their own Claude Code session); running the full orchestrator would have duplicated or raced their work.
 - [2026-07-09]: Unprompted Phase 2 backend code review (by AI agent, Day's explicit authorization to continue autonomously overnight) also flagged 2 frontend items NOT yet fixed as of this entry: (1) apps/web/components/SmartAllocationModal.tsx and apps/web/components/AllocationSuggestionModal.tsx are two independently-drifted implementations of the same suggest-and-confirm modal -- the desktop-flow one (AllocationSuggestionModal) is missing amount-validation guards the mobile/pending-flow one has. Recommendation: consolidate to one component (SmartAllocationModal is more complete), or at minimum backport its allocationAmount<=0 / allocationAmount>incomeAmount guards as a stopgap. Not auto-fixed -- needs visual verification in a browser, judged too risky to do unsupervised right before a demo. (2) apps/web/app/transactions/new/page.tsx:114 sends a hardcoded, wrong-case tipe_transaksi: 'pengeluaran' on every transaction (backend ignores it, confirmed harmless today, but it's dead/wrong data plus apps/web/lib/api/types.ts makes tipe_transaksi a *required* field on TransactionCreateRequest, backwards from the "frontend only sends kategori_id" rule in CLAUDE.md). **RESOLVED same session, quick-260709-2b3** (commit dac39b8): removed from types.ts request interfaces and both call sites; tsc + lint clean, no new issues. Item (1), the SmartAllocationModal/AllocationSuggestionModal duplication: Day reviewed after waking up (2026-07-09 morning) and approved a **stopgap only** (not full consolidation, deferred post-demo). **Stopgap shipped, quick-260709-3c4** (commit 7037236): AllocationSuggestionModal's previously-silent `!suggested_amount` guard now shows a visible error and disables the "Konfirmasi Alokasi" button (`isSuggestionValid` check). Note: re-investigation during planning found the exact `allocationAmount>incomeAmount` guard from SmartAllocationModal doesn't directly transplant -- AllocationSuggestionModal has no user-editable amount (always sends `suggestion.suggested_amount` verbatim, which is server-computed as 35% of income and can never itself exceed income), so that specific guard would have been dead code here. The real gap (silent no-op with no user feedback) is what got fixed. Full component consolidation (delete one, extend the other) is still OPEN, deferred to post-demo per Day's decision.
 
 ### Pending Todos
@@ -195,6 +198,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-09T04:57:23.000Z
-Stopped at: Quick task 260709-gkz complete (Phase 3 Task Ownership table added to STATE.md)
-Resume file: .planning/phases/03-differentiators/03-UI-SPEC.md
+Last session: 2026-07-09T14:55:00.000Z
+Stopped at: Plan 03-02 complete (Hidayat's Phase 3 Wave 1 part) — ai-insight contract extension applied, AI_VISION_API_KEY live on Railway
+Resume file: .planning/phases/03-differentiators/03-02-SUMMARY.md
