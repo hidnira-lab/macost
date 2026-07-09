@@ -17,7 +17,7 @@ const NAV_ITEMS: NavItem[] = [
         <path d="M9 22V12H15V22" stroke={active ? 'white' : 'rgba(30,30,30,0.45)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
       </svg>
     ),
-    href: '/dashboard',
+    href: '/home',
   },
   {
     label: 'Dashboard',
