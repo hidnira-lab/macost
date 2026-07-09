@@ -14,7 +14,7 @@ Macost delivers its MVP across four vertical phases on a 10-day timeline (target
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Working Tauri APK with auth and wallet management; all 4 developers unblocked for parallel work (completed 2026-07-04)
-- [ ] **Phase 2: Core Product Loop** - Complete end-to-end flow: side income in → SAW ranks goals → allocation suggested → user confirms → goal advances
+- [x] **Phase 2: Core Product Loop** - Complete end-to-end flow: side income in → SAW ranks goals → allocation suggested → user confirms → goal advances (completed 2026-07-09)
 - [ ] **Phase 3: Differentiators** - Receipt scan, e-statement import, AI financial insights, and SAW weight customization
 - [ ] **Phase 4: Polish** - Pixel art goal visualization and offline transaction cache for demo-day reliability
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
-| 2. Core Product Loop | 14/15 | In Progress|  |
+| 2. Core Product Loop | 15/15 | Complete    | 2026-07-09 |
 | 3. Differentiators | 0/TBD | Not started | - |
 | 4. Polish | 0/TBD | Not started | - |
