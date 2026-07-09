@@ -164,14 +164,36 @@ Plans:
   4. User can open SAW weight settings, adjust the five criteria weights (must sum to 100% ± 0.001), see goal ranking update in response, and reset all weights to the research-default values from the n=62 survey
   5. User sees a Quick Access Panel at the top of the Home page (post-login) with exactly 4 shortcuts — add transaction, scan receipt, top active goal (name + progress %), and current balance summary — each shortcut navigating to its target in one tap
 
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Shared Gemini 2.5 Flash integration layer: client factory, gemini_service.py (extract_receipt/extract_statement/generate_insight), Pydantic response schemas, Wave 0 test scaffolding
+- [ ] 03-02-PLAN.md — Team sign-off checkpoint for the API_CONTRACT.md ai-insight extension + SAW-04 tolerance text fix, plus Hidayat-only AI_VISION_API_KEY provisioning on Railway
+- [ ] 03-03-PLAN.md — Quick Access Panel (QAP-01): 4-shortcut component mounted on Home, zero new endpoints
+- [ ] 03-04-PLAN.md — SAW weight customization (SAW-04/05): live re-rank preview endpoint + weight editor UI + reset-to-default
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-05-PLAN.md — Receipt Scan end-to-end (SCAN-01/02/03): scan-receipt endpoint + upload/review/save flow
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-07-PLAN.md — AI Financial Insights end-to-end (AIINS-01/02/03): ai-insight endpoint + wired /ai page
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-06-PLAN.md — E-Statement PDF Import end-to-end (ESTAT-01/02/03): upload-statement + import-batch endpoints + review table
 
 **Key risks (from research):**
 
-- AI/vision provider is not yet selected — must decide between GPT-4o Vision and Google Cloud Vision at the very start of Phase 3; this decision gates SCAN-01 and AIINS-01 completely
-- Indonesian receipt OCR quality varies significantly by provider — run a spike test against 3-5 real struk images before committing to a provider
+- ~~AI/vision provider is not yet selected~~ — STALE per 03-CONTEXT.md; provider is locked to Google AI Studio Gemini `gemini-2.5-flash` (see CLAUDE.md AI Vision & LLM section)
+- `asyncio.wait_for()` cannot interrupt a blocking synchronous Gemini SDK call — every Gemini call must go through the SDK's async client (`client.aio.models.generate_content`), never the sync client inside `async def`, or the 10s/15s hard timeouts silently fail (03-RESEARCH.md Pitfall 2)
 - LLM latency must be capped at 15 seconds with graceful fallback — no infinite spinners; enforce hard timeout server-side, not only on the frontend
 - Quick Access Panel must stay clean/informative, not crowded — max 4 shortcuts, large thumb-reachable tap targets (per PRD Final design note)
+- `google-genai` package flagged `SUS` by the automated legitimacy heuristic (false positive — official Google SDK); gated behind a blocking human-verify checkpoint in 03-01 before install
+- Shared-file contention across `apps/web/lib/api/types.ts`/`client.ts` and `backend/routers/transactions.py` forced Waves 2-4 into a stricter sequential chain (03-05 -> 03-07 -> 03-06) than the underlying features functionally require — documented in each plan's objective
 
 **UI hint**: yes
 
