@@ -35,6 +35,30 @@ Last activity: 2026-07-09 -- Research (Gemini 2.5 Flash SDK patterns, asyncio ti
 
 Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 0/7 plans executed
 
+## Phase 3 Task Ownership
+
+Assignment basis: each plan split into backend/frontend sub-tasks per team member's original area (CLAUDE.md Pembagian Kerja) rather than assigning a whole plan to one person, since Phase 3 plans are full-stack vertical slices.
+
+| Wave | Plan | Bagian | Owner | Catatan |
+|---|---|---|---|---|
+| 1 | 03-01 | Backend (Gemini client/service, models) | Fertika | Fondasi — semua plan lain (kecuali 03-03) bergantung pada ini |
+| 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | Sole Railway account holder; butuh sign-off tertulis dari 4 anggota tim sebelum 03-07 mulai frontend (shape kontrak baru) |
+| 1 | 03-03 | Frontend — Quick Access Panel (Home) | Zarra | Area Home/Dashboard, murni frontend, tidak menunggu plan lain |
+| 1 | 03-04 | Backend — `/goal-settings/preview` endpoint | Fertika | |
+| 1 | 03-04 | Frontend — `SawWeightEditor.tsx` | Khayyira | Area Goals |
+| 2 (paralel) | 03-05 | Backend — `scan-receipt` endpoint | Fertika | |
+| 2 (paralel) | 03-05 | Frontend — `/transactions/scan` + `ReceiptReviewForm` | Zarra | Terhubung ke QAP yang dia buat di 03-03 |
+| 2 (paralel) | 03-07 | Backend — `ai_insight.py` + `insight_service.py` | Fertika | |
+| 2 (paralel) | 03-07 | Frontend — `/ai` page + `InsightCard` | Khayyira | Load-balancing; bisa digeser ke Zarra bila perlu |
+| 3 | 03-06 | Backend — `upload-statement` endpoint + `statement_service.py` | Fertika | |
+| 3 | 03-06 | Frontend — `/transactions/import` + `StatementReviewTable` | Khayyira | |
+
+**Catatan koordinasi:**
+1. Fertika memegang backend di kelima plan — beban besar untuk sisa waktu sampai expo (2026-07-14); pertimbangkan bantuan tambahan bila kewalahan.
+2. `apps/web/lib/api/types.ts` disentuh 3 orang (Zarra di 03-05, Khayyira di 03-07 dan 03-06). Di Wave 2, Zarra dan Khayyira jalan paralel dan wajib append-only ke file itu (jangan reorder/reformat) — sudah dicatat di masing-masing PLAN.md.
+3. Khayyira dan Zarra pakai Cline, bukan Claude Code — Wave 1-3 di atas mereka kerjakan manual dari `.planning/phases/03-differentiators/03-0X-PLAN.md`, bukan lewat `/gsd-execute-phase` otomatis. Fertika dan Hidayat (Claude Code) bisa pakai `/gsd-execute-phase 3` untuk bagian masing-masing.
+4. 03-02 (Hidayat) harus selesai lebih dulu sebelum Khayyira mulai frontend 03-07.
+
 ## Performance Metrics
 
 **Velocity:**
