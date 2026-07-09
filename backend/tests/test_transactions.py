@@ -6,9 +6,12 @@ of backend/main.py's central wiring (02-14-PLAN.md). Covers the 4 behavior cases
 from 02-05-PLAN.md Task 2 (D-01/Pitfall 1 server-derivation + IDOR-safe GET).
 """
 
+from unittest.mock import AsyncMock
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from backend.models.receipt import ReceiptExtraction
 from backend.routers import transactions
 
 FREELANCE_KATEGORI = {
@@ -364,3 +367,165 @@ def test_delete_transaction_owned_by_another_user_returns_204_but_does_not_delet
     remaining = fake_supabase_client.table("transaksi").select("*").execute().data
     assert len(remaining) == 1
     assert remaining[0]["id_transaksi"] == "tx-3"
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/scan-receipt — validated upload, timeout-wrapped
+# extraction, structured fallback (03-05-PLAN.md Task 1)
+# ---------------------------------------------------------------------------
+
+JPEG_MAGIC = b"\xff\xd8\xff"
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+
+def test_scan_receipt_valid_jpeg_with_successful_extraction_returns_200(
+    monkeypatch,
+):
+    """A valid JPEG under 10MB, with a mocked extract_receipt returning a
+    ReceiptExtraction, produces a 200 with the exact API_CONTRACT.md success
+    shape."""
+    mock_extract = AsyncMock(
+        return_value=ReceiptExtraction(
+            merchant="Indomaret",
+            nominal=27500,
+            tanggal_transaksi="2026-06-27",
+            items=["Aqua 600ml", "Roti Tawar"],
+            suggested_category_id="kat-makan",
+        )
+    )
+    monkeypatch.setattr(transactions, "extract_receipt", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = JPEG_MAGIC + b"fake jpeg bytes"
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.jpg", content, "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body == {
+        "extracted": True,
+        "merchant": "Indomaret",
+        "nominal": 27500,
+        "tanggal_transaksi": "2026-06-27",
+        "items": ["Aqua 600ml", "Roti Tawar"],
+        "suggested_category_id": "kat-makan",
+    }
+    mock_extract.assert_awaited_once()
+
+
+def test_scan_receipt_valid_png_is_also_accepted(monkeypatch):
+    """PNG magic bytes are accepted too, per D-01's 'JPG/PNG' scope."""
+    mock_extract = AsyncMock(
+        return_value=ReceiptExtraction(
+            merchant="Alfamart",
+            nominal=15000,
+            tanggal_transaksi="2026-06-28",
+            items=None,
+            suggested_category_id=None,
+        )
+    )
+    monkeypatch.setattr(transactions, "extract_receipt", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = PNG_MAGIC + b"fake png bytes"
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.png", content, "image/png")},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["extracted"] is True
+    mock_extract.assert_awaited_once()
+
+
+def test_scan_receipt_oversized_file_returns_400_and_never_calls_extract_receipt(
+    monkeypatch,
+):
+    """An upload over 10MB is rejected with 400 VALIDATION_ERROR BEFORE any
+    Gemini call is attempted (T-3-10)."""
+    mock_extract = AsyncMock()
+    monkeypatch.setattr(transactions, "extract_receipt", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    oversized_content = JPEG_MAGIC + (b"0" * (10 * 1024 * 1024 + 1))
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.jpg", oversized_content, "image/jpeg")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    mock_extract.assert_not_awaited()
+
+
+def test_scan_receipt_wrong_magic_number_returns_400_despite_spoofed_content_type(
+    monkeypatch,
+):
+    """A renamed .txt file with Content-Type: image/jpeg is rejected — proves
+    the endpoint doesn't trust the client-supplied content_type header alone
+    (T-3-11)."""
+    mock_extract = AsyncMock()
+    monkeypatch.setattr(transactions, "extract_receipt", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    fake_content = b"this is just plain text, not an image"
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.txt", fake_content, "image/jpeg")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    mock_extract.assert_not_awaited()
+
+
+def test_scan_receipt_extraction_failure_returns_200_with_fallback_and_calls_once(
+    monkeypatch,
+):
+    """When extract_receipt returns None (timeout/any Gemini-side failure),
+    the endpoint returns 200 with extracted:false + error_message — never a
+    500, never a retry (extract_receipt called exactly once)."""
+    mock_extract = AsyncMock(return_value=None)
+    monkeypatch.setattr(transactions, "extract_receipt", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = JPEG_MAGIC + b"fake jpeg bytes"
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.jpg", content, "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "extracted": False,
+        "error_message": "Foto kurang jelas, silakan input manual atau coba lagi",
+    }
+    assert mock_extract.await_count == 1
+
+
+def test_scan_receipt_without_token_returns_401():
+    """No override of get_current_user_id — the real JWKS-based dependency
+    runs, sees a missing bearer token, and returns 401 (same convention as
+    every other endpoint in this router)."""
+    app = _build_app()
+    client = TestClient(app)
+
+    content = JPEG_MAGIC + b"fake jpeg bytes"
+    response = client.post(
+        "/api/transactions/scan-receipt",
+        files={"image": ("receipt.jpg", content, "image/jpeg")},
+    )
+
+    assert response.status_code == 401
