@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch } from '@/lib/api/client'
+import { apiFetch, isAuthError } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
 import type { DashboardResponse } from '@/lib/api/types'
 
@@ -96,12 +96,18 @@ export default function DashboardPage() {
         `/api/dashboard?period=${period}`
       )
       setData(result)
-    } catch {
+    } catch (err) {
+      // Stale/expired session token: apiFetch already cleared it, so force a
+      // clean re-login instead of showing a dead "gagal memuat" state.
+      if (isAuthError(err)) {
+        router.push('/login')
+        return
+      }
       setError('Gagal memuat dashboard')
     } finally {
       setLoading(false)
     }
-  }, [period])
+  }, [period, router])
 
   useEffect(() => {
     async function init() {
