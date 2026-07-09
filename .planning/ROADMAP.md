@@ -164,7 +164,7 @@ Plans:
   4. User can open SAW weight settings, adjust the five criteria weights (must sum to 100% ± 0.001), see goal ranking update in response, and reset all weights to the research-default values from the n=62 survey
   5. User sees a Quick Access Panel at the top of the Home page (post-login) with exactly 4 shortcuts — add transaction, scan receipt, top active goal (name + progress %), and current balance summary — each shortcut navigating to its target in one tap
 
-**Plans**: 7 plans across 4 waves
+**Plans**: 7 plans across 3 waves
 
 Plans:
 **Wave 1**
@@ -177,12 +177,9 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [ ] 03-05-PLAN.md — Receipt Scan end-to-end (SCAN-01/02/03): scan-receipt endpoint + upload/review/save flow
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
 - [ ] 03-07-PLAN.md — AI Financial Insights end-to-end (AIINS-01/02/03): ai-insight endpoint + wired /ai page
 
-**Wave 4** *(blocked on Wave 3 completion)*
+**Wave 3** *(blocked on Wave 2 completion)*
 
 - [ ] 03-06-PLAN.md — E-Statement PDF Import end-to-end (ESTAT-01/02/03): upload-statement + import-batch endpoints + review table
 
@@ -193,7 +190,7 @@ Plans:
 - LLM latency must be capped at 15 seconds with graceful fallback — no infinite spinners; enforce hard timeout server-side, not only on the frontend
 - Quick Access Panel must stay clean/informative, not crowded — max 4 shortcuts, large thumb-reachable tap targets (per PRD Final design note)
 - `google-genai` package flagged `SUS` by the automated legitimacy heuristic (false positive — official Google SDK); gated behind a blocking human-verify checkpoint in 03-01 before install
-- Shared-file contention across `apps/web/lib/api/types.ts`/`client.ts` and `backend/routers/transactions.py` forced Waves 2-4 into a stricter sequential chain (03-05 -> 03-07 -> 03-06) than the underlying features functionally require — documented in each plan's objective
+- Shared-file contention on `apps/web/lib/api/types.ts` (03-05 and 03-07) and on `backend/routers/transactions.py`/`client.ts`/`types.ts` (03-06 vs. both) means 03-05 and 03-07 run in parallel (Wave 2, isolated worktrees, append-only edits to types.ts) while 03-06 waits for both to complete (Wave 3) — documented in each plan's objective
 
 **UI hint**: yes
 

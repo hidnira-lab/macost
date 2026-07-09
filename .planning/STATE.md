@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
-status: Phase 3 planned -- 7 plans across 4 waves, plan-checker passed (0 blockers after 1 revision), ready for `/gsd-execute-phase 3`.
+status: Phase 3 planned -- 7 plans across 3 waves, plan-checker passed (0 blockers after 1 revision), ready for `/gsd-execute-phase 3`.
 stopped_at: Phase 3 planning complete
 last_updated: "2026-07-09T05:30:00.000Z"
 last_activity: 2026-07-09
@@ -24,12 +24,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 03 — differentiators — PLANNED (7 plans, 4 waves). Next: `/gsd-execute-phase 3`.
+**Current focus:** Phase 03 — differentiators — PLANNED (7 plans, 3 waves). Next: `/gsd-execute-phase 3`.
 
 ## Current Position
 
 Phase: 03 (differentiators) — PLANNED (2026-07-09)
-Plan: 7 plans across 4 waves (03-01..03-04 Wave 1, 03-05 Wave 2, 03-07 Wave 3, 03-06 Wave 4) — none executed yet
+Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — none executed yet
 Status: Plan-checker passed after 1 revision iteration (fixed a neutered `tsc --noEmit | grep ; echo` verify pattern in 5 plans). Requirements coverage 12/12, CONTEXT.md decision coverage 6/6. Ready for `/gsd-execute-phase 3`.
 Last activity: 2026-07-09 -- Research (Gemini 2.5 Flash SDK patterns, asyncio timeout pitfall) + pattern-mapper (24/26 files have codebase analogs) + planner + plan-checker revision loop completed for Phase 3, on branch `docs/phase-3-planning` (Fertika's discuss-phase + UI-SPEC work as the starting point).
 
