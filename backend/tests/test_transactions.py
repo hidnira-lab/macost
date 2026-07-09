@@ -12,7 +12,9 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from backend.models.receipt import ReceiptExtraction
+from backend.models.statement import StatementExtractionList, StatementTransaction
 from backend.routers import transactions
+from backend.services import statement_service
 
 FREELANCE_KATEGORI = {
     "id_kategori": "kat-freelance",
@@ -529,3 +531,309 @@ def test_scan_receipt_without_token_returns_401():
     )
 
     assert response.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/upload-statement — validated PDF upload,
+# timeout-wrapped extraction, duplicate flagging, structured fallback
+# (03-06-PLAN.md Task 1)
+# ---------------------------------------------------------------------------
+
+PDF_MAGIC = b"%PDF"
+
+
+def test_upload_statement_valid_pdf_with_mocked_extraction_returns_200_with_duplicate_flags(
+    monkeypatch, fake_supabase_client
+):
+    """A valid PDF, with a mocked extract_statement returning a
+    StatementExtractionList, produces 200 with extracted_transactions where
+    is_possible_duplicate is computed by the real flag_duplicates()."""
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "tx-existing",
+                "id_pengguna": "user-1",
+                "tanggal_transaksi": "2026-06-27",
+                "nominal": 750000,
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        statement_service, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    mock_extract = AsyncMock(
+        return_value=StatementExtractionList(
+            transactions=[
+                StatementTransaction(
+                    temp_id="t-1",
+                    tanggal_transaksi="2026-06-27",
+                    deskripsi="TRANSFER MASUK - PT KLIEN ABC",
+                    nominal=750000,
+                    tipe_transaksi="Pemasukan",
+                    suggested_category_id="kat-freelance",
+                ),
+                StatementTransaction(
+                    temp_id="t-2",
+                    tanggal_transaksi="2026-06-28",
+                    deskripsi="BELANJA INDOMARET",
+                    nominal=27500,
+                    tipe_transaksi="Pengeluaran",
+                    suggested_category_id="kat-makan",
+                ),
+            ]
+        )
+    )
+    monkeypatch.setattr(transactions, "extract_statement", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = PDF_MAGIC + b"-1.4 fake pdf bytes"
+    response = client.post(
+        "/api/transactions/upload-statement",
+        files={"file": ("statement.pdf", content, "application/pdf")},
+    )
+
+    assert response.status_code == 200
+    rows = response.json()["extracted_transactions"]
+    assert len(rows) == 2
+    assert rows[0]["temp_id"] == "t-1"
+    assert rows[0]["is_possible_duplicate"] is True
+    assert rows[1]["temp_id"] == "t-2"
+    assert rows[1]["is_possible_duplicate"] is False
+    mock_extract.assert_awaited_once()
+
+
+def test_upload_statement_non_pdf_magic_number_returns_400(monkeypatch):
+    """A file whose first bytes are not %PDF is rejected with 400 BEFORE any
+    Gemini call is attempted."""
+    mock_extract = AsyncMock()
+    monkeypatch.setattr(transactions, "extract_statement", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = b"this is not a pdf file at all"
+    response = client.post(
+        "/api/transactions/upload-statement",
+        files={"file": ("statement.pdf", content, "application/pdf")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    mock_extract.assert_not_awaited()
+
+
+def test_upload_statement_oversized_file_returns_400_and_never_calls_extract_statement(
+    monkeypatch,
+):
+    """An upload exceeding 50MB is rejected with 400 BEFORE any Gemini call
+    (T-3-15)."""
+    mock_extract = AsyncMock()
+    monkeypatch.setattr(transactions, "extract_statement", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    oversized_content = PDF_MAGIC + (b"0" * (50 * 1024 * 1024 + 1))
+    response = client.post(
+        "/api/transactions/upload-statement",
+        files={"file": ("statement.pdf", oversized_content, "application/pdf")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"]["error"]["code"] == "VALIDATION_ERROR"
+    mock_extract.assert_not_awaited()
+
+
+def test_upload_statement_extraction_failure_returns_200_with_fallback(monkeypatch):
+    """When extract_statement returns None (timeout/any Gemini-side
+    failure), the endpoint returns 200 with a documented fallback shape —
+    never a 500, never a retry."""
+    mock_extract = AsyncMock(return_value=None)
+    monkeypatch.setattr(transactions, "extract_statement", mock_extract)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    content = PDF_MAGIC + b"-1.4 fake pdf bytes"
+    response = client.post(
+        "/api/transactions/upload-statement",
+        files={"file": ("statement.pdf", content, "application/pdf")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "extracted": False,
+        "error_message": (
+            "Gagal membaca file PDF. Pastikan filenya e-statement yang valid, "
+            "lalu coba lagi."
+        ),
+    }
+    assert mock_extract.await_count == 1
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/import-batch — batch create with imported/skipped
+# counts (03-06-PLAN.md Task 2)
+# ---------------------------------------------------------------------------
+
+def test_import_batch_all_valid_rows_returns_correct_imported_count(
+    monkeypatch, fake_supabase_client
+):
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI, MAKAN_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "transactions": [
+            {
+                "temp_id": "t-1",
+                "nominal": 750000,
+                "tanggal_transaksi": "2026-06-27",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-freelance",
+                "catatan": None,
+            },
+            {
+                "temp_id": "t-2",
+                "nominal": 27500,
+                "tanggal_transaksi": "2026-06-28",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-makan",
+                "catatan": None,
+            },
+            {
+                "temp_id": "t-3",
+                "nominal": 15000,
+                "tanggal_transaksi": "2026-06-29",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-makan",
+                "catatan": None,
+            },
+        ]
+    }
+    response = client.post("/api/transactions/import-batch", json=body)
+
+    assert response.status_code == 201
+    assert response.json() == {"imported_count": 3, "skipped_count": 0}
+
+    inserted = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert len(inserted) == 3
+
+
+def test_import_batch_skips_invalid_kategori_without_aborting_whole_batch(
+    monkeypatch, fake_supabase_client
+):
+    """A row with a not-found kategori_id is SKIPPED — not a 500, not an
+    aborted batch — while other valid rows still import."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "transactions": [
+            {
+                "temp_id": "t-1",
+                "nominal": 750000,
+                "tanggal_transaksi": "2026-06-27",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-freelance",
+                "catatan": None,
+            },
+            {
+                "temp_id": "t-2",
+                "nominal": 27500,
+                "tanggal_transaksi": "2026-06-28",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-tidak-ada",
+                "catatan": None,
+            },
+        ]
+    }
+    response = client.post("/api/transactions/import-batch", json=body)
+
+    assert response.status_code == 201
+    assert response.json() == {"imported_count": 1, "skipped_count": 1}
+
+
+def test_import_batch_ignores_body_tipe_transaksi_and_derives_from_kategori(
+    monkeypatch, fake_supabase_client
+):
+    """tipe_transaksi/source_label are always server-derived from kategori,
+    exactly like create_transaction — the batch endpoint never trusts a
+    client-supplied tipe_transaksi (T-3-16)."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "transactions": [
+            {
+                "temp_id": "t-1",
+                "nominal": 750000,
+                "tanggal_transaksi": "2026-06-27",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-freelance",
+                "catatan": None,
+                "tipe_transaksi": "Pengeluaran",  # mismatched — must be ignored
+            },
+        ]
+    }
+    response = client.post("/api/transactions/import-batch", json=body)
+
+    assert response.status_code == 201
+    inserted = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert inserted[0]["tipe_transaksi"] == "Pemasukan"
+    assert inserted[0]["source_label"] == "Flexible Side Income"
+
+
+def test_import_batch_requires_auth_and_scopes_inserted_rows_to_current_user(
+    monkeypatch, fake_supabase_client
+):
+    """No token -> 401 (same convention as every other endpoint). An
+    authenticated batch's inserted rows are scoped to current_user_id."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    body = {
+        "transactions": [
+            {
+                "temp_id": "t-1",
+                "nominal": 750000,
+                "tanggal_transaksi": "2026-06-27",
+                "dompet_id": "dompet-1",
+                "kategori_id": "kat-freelance",
+                "catatan": None,
+            },
+        ]
+    }
+
+    unauth_response = TestClient(app).post(
+        "/api/transactions/import-batch", json=body
+    )
+    assert unauth_response.status_code == 401
+
+    client = _client_as("user-1", app)
+    response = client.post("/api/transactions/import-batch", json=body)
+
+    assert response.status_code == 201
+    inserted = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert inserted[0]["id_pengguna"] == "user-1"
