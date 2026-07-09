@@ -70,20 +70,20 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### Receipt Scan
 
-- [ ] **SCAN-01**: User dapat mengupload foto struk; sistem mengekstrak merchant, nominal, tanggal, item, dan suggested_category_id via AI vision (FR-002)
+- [x] **SCAN-01**: User dapat mengupload foto struk; sistem mengekstrak merchant, nominal, tanggal, item, dan suggested_category_id via AI vision (FR-002)
 - [ ] **SCAN-02**: User dapat mereview dan mengoreksi hasil ekstraksi sebelum transaksi disimpan — data tidak pernah auto-save tanpa review (FR-004)
 - [ ] **SCAN-03**: Jika ekstraksi gagal (gambar buram, timeout >10 detik), sistem menampilkan pesan fallback dan arahkan ke input manual (FR-017)
 
 #### E-Statement Import
 
-- [ ] **ESTAT-01**: User dapat mengupload file PDF e-statement; sistem mengekstrak daftar transaksi dengan tanggal, deskripsi, nominal, tipe, dan suggested_category_id (FR-003)
+- [x] **ESTAT-01**: User dapat mengupload file PDF e-statement; sistem mengekstrak daftar transaksi dengan tanggal, deskripsi, nominal, tipe, dan suggested_category_id (FR-003)
 - [ ] **ESTAT-02**: User dapat mereview transaksi yang diekstrak, tandai possible duplicate, dan konfirmasi sebelum batch import
 - [ ] **ESTAT-03**: Sistem melaporkan imported_count dan skipped_count setelah batch import selesai
 
 #### AI Financial Assistant
 
 - [ ] **AIINS-01**: User dapat melihat insight keuangan satu arah (bukan chat interaktif) dalam Bahasa Indonesia, dihasilkan dari data transaksi dan goal aktif (FR-012)
-- [ ] **AIINS-02**: Setiap insight memiliki action verb (Alokasikan, Kurangi, Pertimbangkan) dan link ke goal atau kategori yang relevan
+- [x] **AIINS-02**: Setiap insight memiliki action verb (Alokasikan, Kurangi, Pertimbangkan) dan link ke goal atau kategori yang relevan
 - [ ] **AIINS-03**: Jika LLM gagal merespons dalam >15 detik, sistem menampilkan fallback_message yang mengarahkan user ke halaman Goals (FR-017)
 
 #### SAW Weight Adjustment
@@ -171,14 +171,14 @@ Pemetaan requirements ke phase roadmap. Diisi saat roadmap dibuat.
 | ALLOC-03 | Phase 2 | Complete |
 | ALLOC-04 | Phase 2 | Complete |
 | ALLOC-05 | Phase 2 | Complete |
-| SCAN-01 | Phase 3 | Pending |
+| SCAN-01 | Phase 3 | Complete |
 | SCAN-02 | Phase 3 | Pending |
 | SCAN-03 | Phase 3 | Pending |
-| ESTAT-01 | Phase 3 | Pending |
+| ESTAT-01 | Phase 3 | Complete |
 | ESTAT-02 | Phase 3 | Pending |
 | ESTAT-03 | Phase 3 | Pending |
 | AIINS-01 | Phase 3 | Pending |
-| AIINS-02 | Phase 3 | Pending |
+| AIINS-02 | Phase 3 | Complete |
 | AIINS-03 | Phase 3 | Pending |
 | SAW-04 | Phase 3 | Pending |
 | SAW-05 | Phase 3 | Pending |

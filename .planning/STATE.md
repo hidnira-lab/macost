@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
 status: Phase 3 planned -- 7 plans across 3 waves, plan-checker passed (0 blockers after 1 revision), ready for `/gsd-execute-phase 3`.
-stopped_at: Phase 3 planning complete
-last_updated: "2026-07-09T05:30:00.000Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-07-09T08:54:09.992Z"
 last_activity: 2026-07-09
-last_activity_desc: "Day ran /gsd-plan-phase 3 on Fertika's docs/phase-3-planning branch (discuss + UI-SPEC already done by Fertika). Research + pattern-mapper + planner produced 03-01 through 03-07-PLAN.md; plan-checker found 1 blocker (neutered tsc verify commands in 5 plans), planner revised, re-check passed clean. Requirements coverage 12/12, decision coverage 6/6."
+last_activity_desc: Research (Gemini 2.5 Flash SDK patterns, asyncio timeout pitfall) + pattern-mapper (24/26 files have codebase analogs) + planner + plan-checker revision loop completed for Phase 3, on branch `docs/phase-3-planning` (Fertika's discuss-phase + UI-SPEC work as the starting point).
 progress:
-  total_phases: 7
+  total_phases: 5
   completed_phases: 3
-  total_plans: 22
-  completed_plans: 22
-  percent: 43
+  total_plans: 29
+  completed_plans: 23
+  percent: 79
 ---
 
 # Project State
@@ -28,12 +28,12 @@ See: .planning/PROJECT.md (updated 2026-06-30)
 
 ## Current Position
 
-Phase: 03 (differentiators) — PLANNED (2026-07-09)
-Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — none executed yet
-Status: Plan-checker passed after 1 revision iteration (fixed a neutered `tsc --noEmit | grep ; echo` verify pattern in 5 plans). Requirements coverage 12/12, CONTEXT.md decision coverage 6/6. Ready for `/gsd-execute-phase 3`.
-Last activity: 2026-07-09 -- Research (Gemini 2.5 Flash SDK patterns, asyncio timeout pitfall) + pattern-mapper (24/26 files have codebase analogs) + planner + plan-checker revision loop completed for Phase 3, on branch `docs/phase-3-planning` (Fertika's discuss-phase + UI-SPEC work as the starting point).
+Phase: 03 (differentiators) — IN PROGRESS (2026-07-09)
+Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — 03-01 executed (Fertika, backend/phase-3-wave-1 branch), 6 remaining
+Status: 03-01 (Gemini integration layer: gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas) complete -- Task 0 package-legitimacy checkpoint cleared by user, Task 1 + Task 2 executed, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md.
+Last activity: 2026-07-09 -- Executed 03-01-PLAN.md (Fertika's backend scope, Wave 1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4.
 
-Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 0/7 plans executed
+Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 1/7 plans executed (03-01 done)
 
 ## Phase 3 Task Ownership
 
@@ -54,6 +54,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | 3 | 03-06 | Frontend — `/transactions/import` + `StatementReviewTable` | Khayyira | |
 
 **Catatan koordinasi:**
+
 1. Fertika memegang backend di kelima plan — beban besar untuk sisa waktu sampai expo (2026-07-14); pertimbangkan bantuan tambahan bila kewalahan.
 2. `apps/web/lib/api/types.ts` disentuh 3 orang (Zarra di 03-05, Khayyira di 03-07 dan 03-06). Di Wave 2, Zarra dan Khayyira jalan paralel dan wajib append-only ke file itu (jangan reorder/reformat) — sudah dicatat di masing-masing PLAN.md.
 3. Khayyira dan Zarra pakai Cline, bukan Claude Code — Wave 1-3 di atas mereka kerjakan manual dari `.planning/phases/03-differentiators/03-0X-PLAN.md`, bukan lewat `/gsd-execute-phase` otomatis. Fertika dan Hidayat (Claude Code) bisa pakai `/gsd-execute-phase 3` untuk bagian masing-masing.
@@ -89,6 +90,7 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 | Phase 02 P12 | 6min | 2 tasks | 5 files |
 | Phase 02-core-product-loop P14 | 15min | 2 tasks | 5 files |
 | Phase 02 P06 | 5min | 1 tasks | 0 files |
+| Phase 03-differentiators P01 | 40min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -129,6 +131,7 @@ Recent decisions affecting current work:
 - [2026-07-09, quick-260709-1a2]: POST /api/allocations now rejects a second allocation attempt on an already-allocated transaction (400 VALIDATION_ERROR) -- previously nothing stopped double-clicking Confirm (or two open tabs) from creating phantom savings across goals. No running-sum/partial-allocation cap needed since API_CONTRACT.md has no partial-allocation concept -- rejecting any 2nd POST per transaksi_id is sufficient.
 - [2026-07-09, quick-260709-1a2]: PUT /api/goal-settings now validates weights against the exact 5-key GoalSettingsWeights model (extra="forbid") instead of a loose dict[str, float] -- previously a missing-real-key + typo'd-extra-key combo that happened to sum to ~1.0 would persist malformed weights and cause a self-inflicted 500 on every subsequent GET /api/goals (KeyError in saw_engine.rank_goals). The GoalSettingsWeights model already existed in the codebase but was dead code -- this activates it, no new model created.
 - [2026-07-09]: Unprompted Phase 2 backend code review (by AI agent, Day's explicit authorization to continue autonomously overnight) also flagged 2 frontend items NOT yet fixed as of this entry: (1) apps/web/components/SmartAllocationModal.tsx and apps/web/components/AllocationSuggestionModal.tsx are two independently-drifted implementations of the same suggest-and-confirm modal -- the desktop-flow one (AllocationSuggestionModal) is missing amount-validation guards the mobile/pending-flow one has. Recommendation: consolidate to one component (SmartAllocationModal is more complete), or at minimum backport its allocationAmount<=0 / allocationAmount>incomeAmount guards as a stopgap. Not auto-fixed -- needs visual verification in a browser, judged too risky to do unsupervised right before a demo. (2) apps/web/app/transactions/new/page.tsx:114 sends a hardcoded, wrong-case tipe_transaksi: 'pengeluaran' on every transaction (backend ignores it, confirmed harmless today, but it's dead/wrong data plus apps/web/lib/api/types.ts makes tipe_transaksi a *required* field on TransactionCreateRequest, backwards from the "frontend only sends kategori_id" rule in CLAUDE.md). **RESOLVED same session, quick-260709-2b3** (commit dac39b8): removed from types.ts request interfaces and both call sites; tsc + lint clean, no new issues. Item (1), the SmartAllocationModal/AllocationSuggestionModal duplication: Day reviewed after waking up (2026-07-09 morning) and approved a **stopgap only** (not full consolidation, deferred post-demo). **Stopgap shipped, quick-260709-3c4** (commit 7037236): AllocationSuggestionModal's previously-silent `!suggested_amount` guard now shows a visible error and disables the "Konfirmasi Alokasi" button (`isSuggestionValid` check). Note: re-investigation during planning found the exact `allocationAmount>incomeAmount` guard from SmartAllocationModal doesn't directly transplant -- AllocationSuggestionModal has no user-editable amount (always sends `suggestion.suggested_amount` verbatim, which is server-computed as 35% of income and can never itself exceed income), so that specific guard would have been dead code here. The real gap (silent no-op with no user feedback) is what got fixed. Full component consolidation (delete one, extend the other) is still OPEN, deferred to post-demo per Day's decision.
+- [Phase ?]: 03-01: extract_statement() uses 15.0s timeout (planner default, RESEARCH.md Open Question #1); fake_gemini_response/spy_wait_for_timeout fixtures monkeypatch gemini_service's own get_gemini_client/asyncio bindings (patch-where-used), not gemini_client.py's, since gemini_service imports the name directly; no pytest-asyncio added, async tests driven via asyncio.run()
 
 ### Pending Todos
 
@@ -195,6 +198,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-09T04:57:23.000Z
-Stopped at: Quick task 260709-gkz complete (Phase 3 Task Ownership table added to STATE.md)
-Resume file: .planning/phases/03-differentiators/03-UI-SPEC.md
+Last session: 2026-07-09T08:52:46.067Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
