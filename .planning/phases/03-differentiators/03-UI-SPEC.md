@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: differentiators
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-07-09
+reviewed_at: 2026-07-09
 ---
 
 # Phase 3 — UI Design Contract
@@ -71,6 +72,8 @@ Inherited target type scale from the approved Phase 2 contract (light theme). No
 | Label / badge | 12px | Inter Bold | Action-verb badges, small-caps labels ("PILIH SEMUA", duplicate flag), % weight readouts, import-result counts |
 
 Weight set: Inter Regular / Medium / Semi Bold / Bold for UI, plus Bricolage Grotesque ExtraBold reserved exclusively for wordmark, page H1s, and hero stat numbers. Body line-height 1.5; heading line-height 1.2.
+
+> **Note (checker FLAG, non-blocking):** This inherited scale declares 6 size tiers and 5 weights, which exceeds the nominal single-screen caps (≤4 sizes, ≤2 weights). This is a **conscious carry-forward**, not drift: the scale is inherited verbatim from the approved, Figma-verified Phase 2 contract and is already shipped live (`ai/page.tsx`, `home/page.tsx`), so an additive phase cannot reduce it without regressing existing screens. Tiers are cleanly role-separated (display / h1 / section / body / secondary / label), avoiding the visual noise the cap guards against. No single new Phase-3 surface should use all tiers at once.
 
 ---
 
@@ -218,11 +221,11 @@ Per CONTEXT.md "Claude's Discretion" and CLAUDE.md's UI workflow (generate per p
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS (with non-blocking FLAG — inherited scale intentionally exceeds single-screen caps; see Typography note)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-07-09 (gsd-ui-checker — 6/6 dimensions, 1 non-blocking recommendation)
