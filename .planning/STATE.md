@@ -153,6 +153,7 @@ Recent decisions affecting current work:
 | 260709-1a2 | Fix 2 backend correctness bugs found in Phase 2 code review: (1) POST /api/allocations allowed double-allocating the same transaction (phantom savings), now rejected with 400; (2) PUT /api/goal-settings accepted malformed/typo'd weight keys causing a later self-inflicted 500 on GET /api/goals, now validated via the exact 5-key GoalSettingsWeights model | 2026-07-09 | f3e390a, 225849a | [260709-1a2-fix-double-allocation-and-goal-settings-w](./quick/260709-1a2-fix-double-allocation-and-goal-settings-w/) |
 | 260709-2b3 | Stop sending tipe_transaksi in frontend transaction request payloads (backend already ignored it; one call site sent a live-wrong hardcoded 'pengeluaran' value on every transaction) -- found in same Phase 2 code review | 2026-07-09 | dac39b8 | [260709-2b3-cleanup-tipe-transaksi-frontend](./quick/260709-2b3-cleanup-tipe-transaksi-frontend/) |
 | 260709-3c4 | Backport an amount-validation guard into AllocationSuggestionModal.tsx (visible error + disabled Confirm button when suggestion is invalid) -- Day-approved stopgap for the SmartAllocationModal/AllocationSuggestionModal duplication found in code review; full consolidation deferred post-demo | 2026-07-09 | 7037236 | [260709-3c4-backport-allocation-modal-amount-guards](./quick/260709-3c4-backport-allocation-modal-amount-guards/) |
+| 260709-g8w | Restructure Phase 3 wave assignments: 03-05 (Receipt Scan) and 03-07 (AI Financial Insights) have no functional dependency on each other, only a shared types.ts file-ownership concern -- moved 03-07 into parallel Wave 2 alongside 03-05 (isolated worktrees, append-only types.ts edits), collapsing Phase 3 from 4 waves to 3; 03-06 renumbered Wave 4->3, dependencies unchanged | 2026-07-09 | a977bcd | [260709-g8w-restructure-phase-3-wave-assignments-mer](./quick/260709-g8w-restructure-phase-3-wave-assignments-mer/) |
 
 ### Roadmap Evolution
 
@@ -169,6 +170,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-07-09T02:55:09.031Z
-Stopped at: Phase 3 UI-SPEC approved
+Last session: 2026-07-09T05:45:00.000Z
+Stopped at: Quick task 260709-g8w complete (Phase 3 wave restructure: 3 waves, 03-05+03-07 parallel Wave 2)
 Resume file: .planning/phases/03-differentiators/03-UI-SPEC.md
