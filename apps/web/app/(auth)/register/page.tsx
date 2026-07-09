@@ -28,7 +28,7 @@ export default function RegisterPage() {
         { nama, email, password }
       )
       await setToken(response.access_token)
-      router.push('/wallets')
+      router.push('/home')
     } catch (err: unknown) {
       if (isApiErrorBody(err)) {
         setError(err.error.message)
