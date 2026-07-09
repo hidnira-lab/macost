@@ -88,7 +88,7 @@ Requirements untuk MVP (target: demo siap 9-10 Juli, Expo 14 Juli 2026). Dikelom
 
 #### SAW Weight Adjustment
 
-- [ ] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.001) (FR-014)
+- [ ] **SAW-04**: User dapat menyesuaikan bobot 5 kriteria SAW secara manual; validasi: total bobot harus = 100% (toleransi 0.002) (FR-014)
 - [ ] **SAW-05**: User dapat mereset bobot ke default hasil riset (n=62)
 
 #### Quick Access Panel

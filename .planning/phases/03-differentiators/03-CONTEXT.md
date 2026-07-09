@@ -110,8 +110,8 @@ HOW to implement is what this phase clarifies; WHAT to build (the 12 requirement
 ## Deferred Ideas
 
 ### ⚠ Required Follow-Ups (prerequisites for execution — not scope creep, but must happen)
-- **API contract extension (D-03):** add `action_verb` + `related_category_id` to `GET /api/ai-insight` in `API_CONTRACT.md`, communicated to and agreed by all 4 team members BEFORE the insight feature is implemented. This is a hard project rule (contract changes require team-wide sign-off).
-- **Requirement text fix (D-05):** update SAW-04 in `.planning/REQUIREMENTS.md` from `±0.001` to `±0.002` so the requirement matches the validator tolerance and the locked 0.999-sum research defaults.
+- **API contract extension (D-03):** add `action_verb` + `related_category_id` to `GET /api/ai-insight` in `API_CONTRACT.md`, communicated to and agreed by all 4 team members BEFORE the insight feature is implemented. This is a hard project rule (contract changes require team-wide sign-off). — RESOLVED 03-02, team sign-off confirmed 2026-07-09
+- **Requirement text fix (D-05):** update SAW-04 in `.planning/REQUIREMENTS.md` from `±0.001` to `±0.002` so the requirement matches the validator tolerance and the locked 0.999-sum research defaults. — RESOLVED 03-02, team sign-off confirmed 2026-07-09
 
 ### Out-of-scope ideas (future phases)
 - Webcam/live-camera receipt capture — deferred (D-01 chose upload-only for MVP); revisit if mobile (Phase 999.1) returns.
