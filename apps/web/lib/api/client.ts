@@ -16,9 +16,16 @@
  * Auth: getToken() is imported from @/lib/auth/session. When a token is
  * available the Authorization header is set to "Bearer <token>". For public
  * endpoints (register, login) the token will be null and the header is omitted.
+ *
+ * 401 handling: a 401 response means the stored token is missing, invalid, or
+ * expired (Supabase access tokens are short-lived and this app has no refresh
+ * flow yet). On any 401 the stale token is cleared here so the user isn't
+ * stuck re-hitting a dead token, and the thrown error is tagged with
+ * `isAuthError: true` so callers can redirect to /login instead of just
+ * showing a generic error message. See isAuthError() below.
  */
 
-import { getToken } from "@/lib/auth/session";
+import { getToken, clearToken } from "@/lib/auth/session";
 
 // Static mock imports — all mock JSON files stay in apps/web/mocks/
 import goalsData from "@/mocks/goals.json";
@@ -91,6 +98,42 @@ function resolveMock(path: string): unknown {
 }
 
 // ---------------------------------------------------------------------------
+// Auth-error helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Type guard for errors thrown by apiFetch/apiMutate that originated from a
+ * 401 response. Use this in a page's catch block to redirect to /login
+ * instead of showing a generic error message:
+ *
+ *   } catch (err) {
+ *     if (isAuthError(err)) { router.push('/login'); return }
+ *     setError('Gagal memuat ...')
+ *   }
+ */
+export function isAuthError(err: unknown): boolean {
+  return typeof err === "object" && err !== null && (err as { isAuthError?: boolean }).isAuthError === true;
+}
+
+/**
+ * Parses a non-ok response's structured error body, tags 401s as auth
+ * errors, and clears the stale token so a dead token isn't reused on the
+ * next request.
+ */
+async function throwResponseError(response: Response): Promise<never> {
+  const errorBody = await response.json().catch(() => ({
+    error: { code: "UNKNOWN_ERROR", message: response.statusText },
+  }));
+
+  if (response.status === 401) {
+    await clearToken();
+    throw { ...errorBody, isAuthError: true };
+  }
+
+  throw errorBody;
+}
+
+// ---------------------------------------------------------------------------
 // apiFetch — GET reads (mock-able)
 // ---------------------------------------------------------------------------
 
@@ -131,11 +174,7 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
-    // Parse and rethrow the structured error body from FastAPI
-    const errorBody = await response.json().catch(() => ({
-      error: { code: "UNKNOWN_ERROR", message: response.statusText },
-    }));
-    throw errorBody;
+    await throwResponseError(response);
   }
 
   return response.json() as Promise<T>;
@@ -179,10 +218,7 @@ export async function apiMutate<T>(
   });
 
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({
-      error: { code: "UNKNOWN_ERROR", message: response.statusText },
-    }));
-    throw errorBody;
+    await throwResponseError(response);
   }
 
   // 204 No Content — return empty object cast to T

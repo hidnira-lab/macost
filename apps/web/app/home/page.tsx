@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch } from '@/lib/api/client'
+import { apiFetch, isAuthError } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
 import type {
   DashboardResponse,
@@ -149,12 +149,18 @@ export default function HomePage() {
       setGoals(goalsRes.goals)
       setRecentTransactions(transactionsRes.transactions.slice(0, 3))
       setCategories(categoriesRes.categories)
-    } catch {
+    } catch (err) {
+      // Stale/expired session token: apiFetch already cleared it, so force a
+      // clean re-login instead of showing a dead "gagal memuat" state.
+      if (isAuthError(err)) {
+        router.push('/login')
+        return
+      }
       setError('Gagal memuat halaman utama')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     async function init() {

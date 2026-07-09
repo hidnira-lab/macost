@@ -27,7 +27,7 @@ export default function LoginPage() {
         { email, password }
       )
       await setToken(response.access_token)
-      router.push('/wallets')
+      router.push('/home')
     } catch (err: unknown) {
       if (isApiErrorBody(err)) {
         if (err.error.code === 'ACCOUNT_LOCKED') {
