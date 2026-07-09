@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { apiFetch, apiMutate } from '@/lib/api/client'
+import { apiFetch } from '@/lib/api/client'
 import { getToken, clearToken } from '@/lib/auth/session'
-import type { GoalsResponse, Goal, GoalSettings, GoalSettingsUpdateRequest } from '@/lib/api/types'
+import type { GoalsResponse, Goal, GoalSettings } from '@/lib/api/types'
 import { Target, PiggyBank, TrendingUp, Star, Trophy, Plus, Sparkles, Bell, User } from 'lucide-react'
 import BottomNav from '@/components/BottomNav'
 
@@ -41,9 +41,8 @@ export default function GoalsPage() {
   const router = useRouter()
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
-  const [toggleLoading, setToggleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [strategy, setStrategy] = useState<'quick_win' | 'importance_first'>('quick_win')
+  const [strategy, setStrategy] = useState<'quick_win' | 'importance_first'>('importance_first')
   const [weights, setWeights] = useState<GoalSettings['weights'] | null>(null)
 
   const loadGoals = useCallback(async () => {
@@ -84,30 +83,6 @@ export default function GoalsPage() {
     router.push('/login')
   }
 
-  async function handleStrategyToggle(newStrategy: 'quick_win' | 'importance_first') {
-    if (newStrategy === strategy) return
-    if (!weights) {
-      setError('Pengaturan belum termuat, coba refresh halaman')
-      return
-    }
-    setToggleLoading(true)
-    setError(null)
-    try {
-      const body: GoalSettingsUpdateRequest = {
-        strategy: newStrategy,
-        weights,
-      }
-      await apiMutate<GoalSettings>('/api/goal-settings', 'PUT', body)
-      setStrategy(newStrategy)
-      const data = await apiFetch<GoalsResponse>('/api/goals')
-      setGoals(data.goals)
-    } catch {
-      setError('Gagal mengubah strategi prioritas')
-    } finally {
-      setToggleLoading(false)
-    }
-  }
-
   // Compute totals
   const totalTarget = goals.reduce((sum, g) => sum + g.nominal_target, 0)
   const totalCollected = goals.reduce((sum, g) => sum + g.nominal_terkumpul, 0)
@@ -145,45 +120,9 @@ export default function GoalsPage() {
           </button>
         </header>
 
-        {/* ── Strategy Toggle ── */}
-        <div className="mb-4 lg:flex">
-          <div className="flex rounded-xl p-0.5 lg:inline-flex" style={{ backgroundColor: 'rgba(30,30,30,0.05)', border: '1px solid rgba(30,30,30,0.08)' }}>
-            <button
-              onClick={() => handleStrategyToggle('quick_win')}
-              disabled={toggleLoading}
-              className={`flex-1 lg:flex-none text-sm font-semibold rounded-[10px] px-4 py-2 lg:px-6 transition-colors ${
-                strategy === 'quick_win'
-                  ? 'text-white'
-                  : 'text-[#1e1e1e] hover:text-[#1e1e1e]'
-              }`}
-              style={{
-                fontFamily: 'Helvetica, sans-serif',
-                backgroundColor: strategy === 'quick_win' ? '#298dff' : 'transparent',
-              }}
-            >
-              Quick Win
-            </button>
-            <button
-              onClick={() => handleStrategyToggle('importance_first')}
-              disabled={toggleLoading}
-              className={`flex-1 lg:flex-none text-sm font-semibold rounded-[10px] px-4 py-2 lg:px-6 transition-colors ${
-                strategy === 'importance_first'
-                  ? 'text-white'
-                  : 'text-[#1e1e1e] hover:text-[#1e1e1e]'
-              }`}
-              style={{
-                fontFamily: 'Helvetica, sans-serif',
-                backgroundColor: strategy === 'importance_first' ? '#298dff' : 'transparent',
-              }}
-            >
-              Importance-First
-            </button>
-          </div>
-        </div>
-
         {/* ── Summary/Hero Row ── */}
         <div
-          className="flex items-center justify-between mb-5 pb-4 flex-wrap gap-2 lg:flex-nowrap"
+          className="flex items-center justify-between mt-4 mb-5 pb-4 flex-wrap gap-2 lg:flex-nowrap"
           style={{ borderBottom: '1px solid rgba(30,30,30,0.15)' }}
         >
           <div>
@@ -224,6 +163,20 @@ export default function GoalsPage() {
           </div>
         </div>
 
+        {/* ── Strategy Info Bar — navigates to /goal-settings ── */}
+        <button
+          onClick={() => router.push('/goal-settings')}
+          className="mb-4 flex w-full items-center justify-between rounded-xl border border-[rgba(30,30,30,0.15)] bg-white px-4 py-3 text-left shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+        >
+          <span className="font-body text-sm text-[#1e1e1e]">
+            Diurutkan berdasarkan:{' '}
+            <span className="font-semibold text-[#298dff]">
+              {strategy === 'quick_win' ? 'Quick Win' : 'Importance First'}
+            </span>
+          </span>
+          <span className="font-semibold text-sm text-[#298dff]">Atur Prioritas {'>'}</span>
+        </button>
+
         {/* ── Error banner ── */}
         {error && (
           <div
@@ -242,9 +195,7 @@ export default function GoalsPage() {
 
         {/* ── Goal list ── */}
         <div
-          className={`grid grid-cols-1 gap-4 transition-opacity ${
-            toggleLoading ? 'opacity-50' : ''
-          }`}
+          className="grid grid-cols-1 gap-4"
         >
           {/* Empty state */}
           {goals.length === 0 && !loading && (

@@ -402,3 +402,17 @@ export function isApiErrorBody(value: unknown): value is ApiErrorBody {
   const { code, message } = maybeError as { code?: unknown; message?: unknown };
   return typeof code === "string" && typeof message === "string";
 }
+
+// ---------------------------------------------------------------------------
+// 10. Goal Settings Preview (SAW-04)
+// ---------------------------------------------------------------------------
+
+/**
+ * POST /api/goal-settings/preview — response (200).
+ *
+ * Reuses the same Goal shape as GET /api/goals, but with ranks recomputed
+ * using the candidate (unsaved) weights sent in the request body.
+ */
+export interface GoalSettingsPreviewResponse {
+  goals: Goal[];
+}
