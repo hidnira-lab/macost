@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import Response
 
 from backend.core.supabase import get_supabase_admin
@@ -11,8 +11,13 @@ from backend.models.transaction import (
     TransactionResponse,
     TransactionUpdate,
 )
+from backend.services.gemini_service import extract_receipt
 
 router = APIRouter()
+
+MAX_RECEIPT_SIZE_BYTES = 10 * 1024 * 1024
+JPEG_MAGIC = b"\xff\xd8\xff"
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
 def _row_to_response(row: dict) -> dict:
@@ -255,3 +260,63 @@ def delete_transaction(
     ).execute()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/scan-receipt — validated upload, timeout-wrapped
+# Gemini extraction, structured fallback (SCAN-01/02/03, 03-05-PLAN.md Task 1)
+# ---------------------------------------------------------------------------
+
+@router.post("/transactions/scan-receipt")
+async def scan_receipt(
+    image: UploadFile = File(...),
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Validates size (<=10MB) and magic number (JPEG/PNG) BEFORE ever calling
+    Gemini — never trusts the client-supplied content_type header alone
+    (T-3-10, T-3-11). Does not create a transaction; only extracts and
+    returns raw data for the frontend's review form to submit separately
+    through POST /api/transactions (SCAN-02: never auto-save).
+    """
+    content = await image.read()
+
+    if len(content) > MAX_RECEIPT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "File terlalu besar",
+                }
+            },
+        )
+
+    if not (content.startswith(JPEG_MAGIC) or content.startswith(PNG_MAGIC)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "Format file tidak didukung",
+                }
+            },
+        )
+
+    result = await extract_receipt(content, image.content_type or "image/jpeg")
+
+    if result is None:
+        # Terminal fallback state (D-01/T-3-13): never a 500, never a retry.
+        return {
+            "extracted": False,
+            "error_message": "Foto kurang jelas, silakan input manual atau coba lagi",
+        }
+
+    return {
+        "extracted": True,
+        "merchant": result.merchant,
+        "nominal": result.nominal,
+        "tanggal_transaksi": result.tanggal_transaksi,
+        "items": result.items,
+        "suggested_category_id": result.suggested_category_id,
+    }
