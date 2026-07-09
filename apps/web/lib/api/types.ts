@@ -402,3 +402,23 @@ export function isApiErrorBody(value: unknown): value is ApiErrorBody {
   const { code, message } = maybeError as { code?: unknown; message?: unknown };
   return typeof code === "string" && typeof message === "string";
 }
+
+// ---------------------------------------------------------------------------
+// 10. Scan Receipt
+// ---------------------------------------------------------------------------
+
+/**
+ * POST /api/transactions/scan-receipt — response (200).
+ *
+ * When extracted is true, the receipt fields are populated.
+ * When extracted is false, error_message provides the fallback text.
+ */
+export interface ScanReceiptResponse {
+  extracted: boolean;
+  merchant?: string;
+  nominal?: number;
+  tanggal_transaksi?: string;
+  items?: string[];
+  suggested_category_id?: string;
+  error_message?: string;
+}

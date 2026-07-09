@@ -228,3 +228,51 @@ export async function apiMutate<T>(
 
   return response.json() as Promise<T>;
 }
+
+// ---------------------------------------------------------------------------
+// apiUpload — multipart/form-data POST (always real API)
+// ---------------------------------------------------------------------------
+
+/**
+ * Upload a file (or FormData) to the API via multipart/form-data POST.
+ *
+ * Similar to apiMutate but tailored for file uploads:
+ * - Always uses POST.
+ * - Accepts a FormData body directly.
+ * - Does NOT set Content-Type manually — the browser sets the correct
+ *   multipart boundary automatically.
+ * - Preserves the same auth (getToken + Authorization header) and error
+ *   handling (throwResponseError) as apiMutate.
+ *
+ * Mock mode is handled at the call site (page-level USE_MOCK check), not
+ * in this function.
+ *
+ * @param path     API path starting with "/" — e.g. "/api/transactions/scan-receipt"
+ * @param formData FormData object containing the file(s) to upload
+ * @param token    Optional token override; falls back to getToken()
+ */
+export async function apiUpload<T>(
+  path: string,
+  formData: FormData,
+  token?: string
+): Promise<T> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+  const url = `${baseUrl}${path}`;
+
+  const resolvedToken = token ?? (await getToken());
+  const headers: HeadersInit = {
+    ...(resolvedToken ? { Authorization: `Bearer ${resolvedToken}` } : {}),
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    await throwResponseError(response);
+  }
+
+  return response.json() as Promise<T>;
+}
