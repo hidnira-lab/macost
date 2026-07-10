@@ -208,7 +208,17 @@ Plans:
   2. A transaction input while the device is offline is stored locally in IndexedDB and automatically syncs to the backend when connectivity is restored — the user does not need to retry manually
   3. The UI displays a clear sync status indicator (offline / syncing / synced) so users always know whether their data has reached the server
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — [BLOCKING] Backend idempotency foundation: migration 008 (idempotency_key + partial UNIQUE) + check_idempotency() helper + wire into transactions/goals/allocations routers (Hidayat)
+- [ ] 04-02-PLAN.md — Pixel art goal visualization (VIS-01): GoalPixelArt component + 5 placeholder sprites, mounted on goal detail + goal list pages (Hidayat, independent of 04-01/04-03)
+
+**Wave 2** *(blocked on 04-01 completion)*
+
+- [ ] 04-03-PLAN.md — Offline queue + sync status indicator (OFF-01/OFF-02): idb-backed IndexedDB queue, SyncStatusIndicator, wired into transaction/goal/allocation write paths (Hidayat)
 
 **Key risks (from research):**
 
