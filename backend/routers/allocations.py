@@ -7,6 +7,7 @@ from backend.core.supabase import get_supabase_admin
 from backend.dependencies.auth import get_current_user_id
 from backend.models.allocation import AllocationConfirmRequest
 from backend.services import allocation_service, goal_service
+from backend.services.idempotency import check_idempotency
 
 router = APIRouter()
 
@@ -137,6 +138,29 @@ def confirm_allocation(
     if not goal_rows:
         raise _goal_not_found()
 
+    # Idempotency check (D-03, 04-CONTEXT.md): placed AFTER the transaction/
+    # goal-ownership lookups above (so a retry of a request whose referenced
+    # transaction/goal no longer belongs to the user still correctly 404s),
+    # but BEFORE the already-allocated check — a retry of your own
+    # already-processed request is not a "double allocation", it's the same
+    # one echoed back, so _already_allocated() must NOT fire for this row.
+    existing = check_idempotency(
+        supabase, "alokasi", current_user_id, body.idempotency_key
+    )
+    if existing:
+        goals = goal_service.fetch_and_rank_goals(current_user_id)
+        existing_goal = next(g for g in goals if g["id_goal"] == existing["goal_id"])
+        return {
+            "id_alokasi": str(existing["id_alokasi"]),
+            "nominal_alokasi": existing["nominal_alokasi"],
+            "tanggal_alokasi": str(existing["tanggal_alokasi"]),
+            "goal_updated": {
+                "id_goal": existing_goal["id_goal"],
+                "nominal_terkumpul": existing_goal["nominal_terkumpul"],
+                "progress_pct": existing_goal["progress_pct"],
+            },
+        }
+
     existing_alokasi = (
         supabase.table("alokasi")
         .select("id_alokasi")
@@ -158,6 +182,7 @@ def confirm_allocation(
         "transaksi_id": body.transaksi_id,
         "nominal_alokasi": body.nominal_alokasi,
         "tanggal_alokasi": tanggal_alokasi,
+        "idempotency_key": body.idempotency_key,
     }
     result = supabase.table("alokasi").insert(insert_payload).execute()
     row = result.data[0]

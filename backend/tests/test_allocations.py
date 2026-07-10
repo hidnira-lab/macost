@@ -254,6 +254,72 @@ def test_post_allocations_rejects_when_transaction_already_allocated(
     assert len(fake_supabase_client._tables["alokasi"]) == 1
 
 
+def test_post_allocations_retried_idempotency_key_returns_original_no_double_allocation(
+    monkeypatch, fake_supabase_client
+):
+    """A retried POST with the SAME idempotency_key must return the
+    ORIGINAL alokasi row's data (same id_alokasi, same goal_updated) and
+    must NOT insert a second allocation or double-count nominal_terkumpul —
+    this is the critical money-moving path (T-4-02)."""
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    far_deadline = (datetime.now(timezone.utc).date() + timedelta(days=400)).isoformat()
+    fake_supabase_client.seed(
+        "goal",
+        [
+            {
+                "id_goal": "goal-1",
+                "id_pengguna": "user-1",
+                "nama_goal": "Beli Laptop",
+                "nominal_target": 1000000,
+                "deadline": far_deadline,
+                "skor_keinginan": 5,
+                "created_at": "2026-06-01T00:00:00+00:00",
+            }
+        ],
+    )
+    fake_supabase_client.seed(
+        "transaksi",
+        [
+            {
+                "id_transaksi": "trx-1",
+                "id_pengguna": "user-1",
+                "tipe_transaksi": "Pemasukan",
+                "source_label": "Flexible Side Income",
+                "nominal": 500000,
+                "tanggal_transaksi": "2026-06-27",
+                "created_at": "2026-06-27T10:00:00+00:00",
+            }
+        ],
+    )
+    fake_supabase_client.seed("alokasi", [])
+    fake_supabase_client.seed("goal_settings", [])
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "transaksi_id": "trx-1",
+        "goal_id": "goal-1",
+        "nominal_alokasi": 300000,
+        "idempotency_key": "idem-alokasi-1",
+    }
+
+    first_response = client.post("/api/allocations", json=body)
+    assert first_response.status_code == 201
+    first_id_alokasi = first_response.json()["id_alokasi"]
+    assert first_response.json()["goal_updated"]["nominal_terkumpul"] == 300000
+
+    second_response = client.post("/api/allocations", json=body)
+    assert second_response.status_code == 201
+    assert second_response.json()["id_alokasi"] == first_id_alokasi
+    # Not double-counted — still 300000, not 600000.
+    assert second_response.json()["goal_updated"]["nominal_terkumpul"] == 300000
+
+    alokasi_rows = fake_supabase_client._tables["alokasi"]
+    assert len(alokasi_rows) == 1
+
+
 # ---------------------------------------------------------------------------
 # POST /api/allocations/{transaction_id}/skip — zero DB writes
 # ---------------------------------------------------------------------------

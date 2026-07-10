@@ -12,6 +12,7 @@ from backend.models.transaction import (
     TransactionUpdate,
 )
 from backend.services.gemini_service import extract_receipt, extract_statement
+from backend.services.idempotency import check_idempotency
 from backend.services.statement_service import flag_duplicates
 
 router = APIRouter()
@@ -90,6 +91,24 @@ def create_transaction(
     # is structurally never read when building the insert payload below.
     tipe_transaksi, source_label = _derive_transaction_fields(kategori)
 
+    # Idempotency check (D-03, 04-CONTEXT.md): a retried offline-queue sync
+    # carrying the same idempotency_key for this user must return the
+    # ORIGINAL row instead of inserting again. The database's partial UNIQUE
+    # index (migration 008) is the actual atomic safety net — this SELECT is
+    # only a fast-path optimization to avoid a wasted round-trip/conflict.
+    existing = check_idempotency(
+        supabase, "transaksi", current_user_id, body.idempotency_key
+    )
+    if existing:
+        existing_allocation_suggestion_available = (
+            existing["tipe_transaksi"] == "Pemasukan"
+            and existing.get("source_label") == "Flexible Side Income"
+        )
+        return {
+            **_row_to_response(existing),
+            "allocation_suggestion_available": existing_allocation_suggestion_available,
+        }
+
     # id_transaksi/created_at are generated here (rather than relying on the
     # DB's gen_random_uuid()/NOW() defaults) so the inserted row is always
     # immediately retrievable with a stable id/timestamp, in both the fake
@@ -110,6 +129,7 @@ def create_transaction(
         "source_label": source_label,
         "catatan": body.catatan,
         "created_at": created_at,
+        "idempotency_key": body.idempotency_key,
     }
 
     result = supabase.table("transaksi").insert(insert_payload).execute()
