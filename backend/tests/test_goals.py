@@ -88,6 +88,88 @@ def test_post_goal_deadline_in_past_returns_422(monkeypatch, fake_supabase_clien
 
 
 # ---------------------------------------------------------------------------
+# POST /api/goals, PUT /api/goals/{id} — idempotency_key (04-01-PLAN.md Task 2)
+# ---------------------------------------------------------------------------
+
+def test_post_goal_retried_idempotency_key_returns_original_no_duplicate(
+    monkeypatch, fake_supabase_client
+):
+    """A retried POST with the SAME idempotency_key must return the ORIGINAL
+    goal and must NOT create a second row."""
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    far_deadline = (date.today() + timedelta(days=400)).isoformat()
+    body = {
+        "nama_goal": "Beli Laptop",
+        "nominal_target": 8000000,
+        "deadline": far_deadline,
+        "skor_keinginan": 5,
+        "idempotency_key": "idem-goal-1",
+    }
+
+    first_response = client.post("/api/goals", json=body)
+    assert first_response.status_code == 201
+    first_id = first_response.json()["id_goal"]
+
+    second_response = client.post("/api/goals", json=body)
+    assert second_response.status_code == 201
+    assert second_response.json()["id_goal"] == first_id
+
+    rows = fake_supabase_client.table("goal").select("*").execute().data
+    assert len(rows) == 1
+
+
+def test_put_goal_retried_idempotency_key_returns_original_no_duplicate_update(
+    monkeypatch, fake_supabase_client
+):
+    """A retried PUT with the SAME idempotency_key must return the ORIGINAL
+    (already-updated) goal without re-running the update."""
+    far_deadline = (date.today() + timedelta(days=400)).isoformat()
+    fake_supabase_client.seed(
+        "goal",
+        [
+            {
+                "id_goal": "goal-1",
+                "id_pengguna": "user-1",
+                "nama_goal": "Beli Laptop",
+                "nominal_target": 8000000,
+                "deadline": far_deadline,
+                "skor_keinginan": 5,
+                "created_at": "2026-06-01T00:00:00+00:00",
+            },
+        ],
+    )
+    _patch_supabase(monkeypatch, fake_supabase_client)
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    new_deadline = (date.today() + timedelta(days=500)).isoformat()
+    body = {
+        "nama_goal": "Beli Laptop Gaming",
+        "nominal_target": 9000000,
+        "deadline": new_deadline,
+        "skor_keinginan": 4,
+        "idempotency_key": "idem-goal-update-1",
+    }
+
+    first_response = client.put("/api/goals/goal-1", json=body)
+    assert first_response.status_code == 200
+    assert first_response.json()["nama_goal"] == "Beli Laptop Gaming"
+
+    second_response = client.put("/api/goals/goal-1", json=body)
+    assert second_response.status_code == 200
+    assert second_response.json()["nama_goal"] == "Beli Laptop Gaming"
+    assert second_response.json()["id_goal"] == "goal-1"
+
+    rows = fake_supabase_client.table("goal").select("*").execute().data
+    assert len(rows) == 1
+
+
+# ---------------------------------------------------------------------------
 # GET /api/goals — real SAW ranking, batched aggregation (no N+1)
 # ---------------------------------------------------------------------------
 

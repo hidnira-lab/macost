@@ -195,6 +195,109 @@ def test_get_transactions_filtered_by_category_never_leaks_other_users_rows(
 
 
 # ---------------------------------------------------------------------------
+# POST /api/transactions — idempotency_key (04-01-PLAN.md Task 2)
+# ---------------------------------------------------------------------------
+
+def test_post_transaction_with_idempotency_key_creates_once(
+    monkeypatch, fake_supabase_client
+):
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "nominal": 500000,
+        "tanggal_transaksi": "2026-06-27",
+        "dompet_id": "dompet-1",
+        "kategori_id": "kat-freelance",
+        "catatan": None,
+        "idempotency_key": "idem-key-1",
+    }
+    response = client.post("/api/transactions", json=body)
+
+    assert response.status_code == 201
+    assert response.json()["allocation_suggestion_available"] is True
+
+    rows = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert len(rows) == 1
+    assert rows[0]["idempotency_key"] == "idem-key-1"
+
+
+def test_post_transaction_retried_idempotency_key_returns_original_no_duplicate(
+    monkeypatch, fake_supabase_client
+):
+    """A retried POST with the SAME idempotency_key (same body otherwise)
+    must return the ORIGINAL row's data and must NOT create a second row."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+    client = _client_as("user-1", app)
+
+    body = {
+        "nominal": 500000,
+        "tanggal_transaksi": "2026-06-27",
+        "dompet_id": "dompet-1",
+        "kategori_id": "kat-freelance",
+        "catatan": None,
+        "idempotency_key": "idem-key-retry",
+    }
+    first_response = client.post("/api/transactions", json=body)
+    assert first_response.status_code == 201
+    first_id = first_response.json()["id_transaksi"]
+
+    second_response = client.post("/api/transactions", json=body)
+    assert second_response.status_code == 201
+    assert second_response.json()["id_transaksi"] == first_id
+
+    rows = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert len(rows) == 1
+
+
+def test_post_transaction_idempotency_key_scoped_per_user_no_cross_user_collision(
+    monkeypatch, fake_supabase_client
+):
+    """Two different users each POST with the identical idempotency_key
+    value — both must succeed independently, 2 distinct rows must exist."""
+    fake_supabase_client.seed("kategori", [FREELANCE_KATEGORI])
+    monkeypatch.setattr(
+        transactions, "get_supabase_admin", lambda: fake_supabase_client
+    )
+
+    app = _build_app()
+
+    body = {
+        "nominal": 500000,
+        "tanggal_transaksi": "2026-06-27",
+        "dompet_id": "dompet-1",
+        "kategori_id": "kat-freelance",
+        "catatan": None,
+        "idempotency_key": "shared-key",
+    }
+
+    user1_client = _client_as("user-1", app)
+    user1_response = user1_client.post("/api/transactions", json=body)
+    assert user1_response.status_code == 201
+
+    user2_client = _client_as("user-2", app)
+    user2_response = user2_client.post("/api/transactions", json=body)
+    assert user2_response.status_code == 201
+
+    assert (
+        user1_response.json()["id_transaksi"] != user2_response.json()["id_transaksi"]
+    )
+
+    rows = fake_supabase_client.table("transaksi").select("*").execute().data
+    assert len(rows) == 2
+
+
+# ---------------------------------------------------------------------------
 # PUT /api/transactions/{id} — re-derives labels, IDOR-safe (02-09-PLAN.md)
 # ---------------------------------------------------------------------------
 

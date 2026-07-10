@@ -8,6 +8,7 @@ from backend.core.supabase import get_supabase_admin
 from backend.dependencies.auth import get_current_user_id
 from backend.models.goal import GoalCreate, GoalUpdate
 from backend.services.goal_service import fetch_and_rank_goals
+from backend.services.idempotency import check_idempotency
 
 router = APIRouter()
 
@@ -46,6 +47,19 @@ def create_goal(body: GoalCreate, current_user_id: str = Depends(get_current_use
     so the response is always internally consistent with what GET would show.
     """
     supabase = get_supabase_admin()
+
+    # Idempotency check (D-03, 04-CONTEXT.md): a retried offline-queue sync
+    # carrying the same idempotency_key for this user must return the
+    # ORIGINAL goal instead of creating a duplicate. Re-fetch via
+    # fetch_and_rank_goals (not the raw row) so rank/progress_pct stay
+    # consistent with what GET would show, matching the post-insert
+    # re-fetch pattern already used below.
+    existing = check_idempotency(supabase, "goal", current_user_id, body.idempotency_key)
+    if existing:
+        goals = fetch_and_rank_goals(current_user_id)
+        existing_goal = next(g for g in goals if g["id_goal"] == existing["id_goal"])
+        return _to_response(existing_goal)
+
     new_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
 
@@ -57,6 +71,7 @@ def create_goal(body: GoalCreate, current_user_id: str = Depends(get_current_use
         "deadline": body.deadline.isoformat(),
         "skor_keinginan": body.skor_keinginan,
         "created_at": created_at,
+        "idempotency_key": body.idempotency_key,
     }
     supabase.table("goal").insert(insert_payload).execute()
 
@@ -106,6 +121,16 @@ def update_goal(
     current_user_id: str = Depends(get_current_user_id),
 ):
     supabase = get_supabase_admin()
+
+    # Idempotency check (D-03, 04-CONTEXT.md): a retried offline-queue sync
+    # carrying the same idempotency_key for this user must return the
+    # ORIGINAL (already-updated) goal instead of running the update again.
+    existing = check_idempotency(supabase, "goal", current_user_id, body.idempotency_key)
+    if existing:
+        goals = fetch_and_rank_goals(current_user_id)
+        existing_goal = next(g for g in goals if g["id_goal"] == existing["id_goal"])
+        return _to_response(existing_goal)
+
     result = (
         supabase.table("goal")
         .update(
@@ -114,6 +139,7 @@ def update_goal(
                 "nominal_target": body.nominal_target,
                 "deadline": body.deadline.isoformat(),
                 "skor_keinginan": body.skor_keinginan,
+                "idempotency_key": body.idempotency_key,
             }
         )
         .eq("id_goal", goal_id)

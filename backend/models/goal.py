@@ -8,6 +8,11 @@ class GoalCreate(BaseModel):
     nominal_target: int = Field(gt=0)
     deadline: date
     skor_keinginan: int = Field(ge=1, le=5)
+    # D-03 (04-CONTEXT.md) — client-generated UUID, used by the backend to
+    # no-op a retried offline-queue sync (see backend/services/idempotency.py).
+    # Nullable — online/non-offline callers omit this field entirely
+    # (Pitfall 4, 04-RESEARCH.md). Inherited by GoalUpdate automatically.
+    idempotency_key: str | None = None
 
     @field_validator("deadline")
     @classmethod

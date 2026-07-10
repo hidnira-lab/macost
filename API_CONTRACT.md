@@ -143,11 +143,14 @@ Request:
   "metode_input": "Manual",
   "dompet_id": "string",
   "kategori_id": "string",
-  "catatan": "string | null"
+  "catatan": "string | null",
+  "idempotency_key": "string (UUID) | null"
 }
 ```
 
 > Catatan: `source` (Allowance/Side Income) **tidak dikirim manual oleh frontend** — sistem menentukannya otomatis dari `flag_pemasukan` milik kategori yang dipilih (sesuai FR-005). Frontend cukup kirim `kategori_id`.
+
+> `idempotency_key` (opsional, nullable, UUID string): field baru untuk mendukung offline sync (OFF-01, D-03 Phase 4) — hanya diisi oleh write yang berasal dari offline queue. Client generate UUID sekali per write; kalau request yang sama di-retry dengan `idempotency_key` yang sama, backend mengembalikan row yang sudah ada alih-alih membuat duplikat. Online caller yang normal **boleh omit field ini sepenuhnya** — tidak ada perubahan behavior.
 
 Response (201):
 ```json
@@ -286,10 +289,13 @@ Request:
   "nama_goal": "string",
   "nominal_target": 8000000,
   "deadline": "2026-12-31",
-  "skor_keinginan": 5
+  "skor_keinginan": 5,
+  "idempotency_key": "string (UUID) | null"
 }
 ```
 Response (201): objek goal (skor_kepentingan dihitung otomatis dari deadline, lihat PRD §10.1).
+
+> `idempotency_key` (opsional, nullable, UUID string, Phase 4 D-03) — sama seperti di `POST /api/transactions`: hanya diisi offline queue, retry dengan key yang sama mengembalikan goal yang sudah ada, bukan duplikat.
 
 ### GET /api/goals/{id}
 Response (200): objek goal + field tambahan:
@@ -303,7 +309,7 @@ Response (200): objek goal + field tambahan:
 ```
 
 ### PUT /api/goals/{id}
-Request: sama seperti POST. Response (200): objek goal terbaru.
+Request: sama seperti POST (termasuk `idempotency_key` opsional). Response (200): objek goal terbaru.
 
 ### DELETE /api/goals/{id}
 Response (204): no content.
@@ -376,9 +382,13 @@ Request:
 {
   "transaksi_id": "string",
   "goal_id": "string",
-  "nominal_alokasi": 175000
+  "nominal_alokasi": 175000,
+  "idempotency_key": "string (UUID) | null"
 }
 ```
+
+> `idempotency_key` (opsional, nullable, UUID string, Phase 4 D-03) — sama seperti di `POST /api/transactions`/`POST /api/goals`: hanya diisi offline queue. Ini endpoint money-moving paling kritis — retry dengan key yang sama mengembalikan alokasi yang sudah ada, TIDAK pernah double-allocate.
+
 Response (201):
 ```json
 {
