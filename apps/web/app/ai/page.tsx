@@ -33,9 +33,7 @@ export default function AiAssistantPage() {
             backgroundColor: '#ffffff',
             border: '1px solid rgba(30,30,30,0.15)',
           }}
-          onClick={() => {
-            // Placeholder — AI Insights akan diimplementasikan kemudian
-          }}
+          onClick={() => router.push('/ai/insights')}
         >
           <div className="px-4 pt-4 pb-4">
             <div className="flex items-start gap-3">

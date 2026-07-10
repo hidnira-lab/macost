@@ -1,0 +1,40 @@
+{
+  "extracted_transactions": [
+    {
+      "temp_id": "tmp_001",
+      "tanggal_transaksi": "2026-07-08",
+      "deskripsi": "Indomaret Caturtunggal",
+      "nominal": 45000,
+      "tipe_transaksi": "Pengeluaran",
+      "suggested_category_id": "cat_makan",
+      "is_possible_duplicate": false
+    },
+    {
+      "temp_id": "tmp_002",
+      "tanggal_transaksi": "2026-07-07",
+      "deskripsi": "Transfer dari Mama",
+      "nominal": 500000,
+      "tipe_transaksi": "Pemasukan",
+      "suggested_category_id": "cat_kiriman",
+      "is_possible_duplicate": false
+    },
+    {
+      "temp_id": "tmp_003",
+      "tanggal_transaksi": "2026-07-06",
+      "deskripsi": "Gojek",
+      "nominal": 15000,
+      "tipe_transaksi": "Pengeluaran",
+      "suggested_category_id": "cat_transport",
+      "is_possible_duplicate": true
+    },
+    {
+      "temp_id": "tmp_004",
+      "tanggal_transaksi": "2026-07-05",
+      "deskripsi": "Mie Ayam Pak Budi",
+      "nominal": 12000,
+      "tipe_transaksi": "Pengeluaran",
+      "suggested_category_id": "cat_makan",
+      "is_possible_duplicate": false
+    }
+  ]
+}
