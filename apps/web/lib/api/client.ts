@@ -38,6 +38,7 @@ import dashboardData from "@/mocks/dashboard.json";
 import allocationsPendingData from "@/mocks/allocations-pending.json";
 import categoriesData from "@/mocks/categories.json";
 import aiInsightData from "@/mocks/ai-insight.json";
+import uploadStatementData from "@/mocks/upload-statement.json";
 
 // ---------------------------------------------------------------------------
 // Mock resolver
@@ -94,6 +95,9 @@ function resolveMock(path: string): unknown {
 
   // /api/ai-insight
   if (path === "/api/ai-insight") return aiInsightData;
+
+  // /api/transactions/upload-statement
+  if (path === "/api/transactions/upload-statement") return uploadStatementData;
 
   throw new Error(
     `[apiFetch] No mock registered for path: "${path}". ` +

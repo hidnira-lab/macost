@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch, isAuthError } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
 import type { DashboardResponse } from '@/lib/api/types'
+import { FileText } from 'lucide-react'
 
 const USE_MOCK = typeof window !== 'undefined'
   ? new URLSearchParams(window.location.search).get('mock') ?? process.env.NEXT_PUBLIC_USE_MOCK === 'true'
@@ -318,7 +319,7 @@ export default function DashboardPage() {
             </section>
 
             {/* ─── 2. Active Goal Progress ───────────────────────── */}
-            <section className="lg:col-start-2 lg:row-start-2 lg:row-span-3">
+            <section className="lg:col-start-2 lg:row-start-2">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
                 Goal Progress
               </h3>
@@ -382,7 +383,28 @@ export default function DashboardPage() {
               )}
             </section>
 
-            {/* ─── 3. Monthly Trend ─────────────────────────────── */}
+            {/* ─── 3. Import E-Statement ────────────────────────── */}
+            <section className="lg:col-start-2 lg:row-start-3">
+              <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
+                Import e-Statement
+              </h3>
+              <button
+                onClick={() => router.push('/transactions/import')}
+                className="w-full rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-4 text-left shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
+                aria-label="Import E-Statement"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(41,141,255,0.14)]">
+                    <FileText className="h-6 w-6 text-[#298dff]" />
+                  </span>
+                  <p className="font-body text-sm text-[rgba(30,30,30,0.65)]">
+                    Unggah riwayat transaksi bank atau dompet elektronik Anda untuk sinkronisasi otomatis.
+                  </p>
+                </div>
+              </button>
+            </section>
+
+            {/* ─── 4. Monthly Trend ─────────────────────────────── */}
             <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-start-1 lg:row-start-3">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
                 Tren Bulanan
@@ -453,7 +475,7 @@ export default function DashboardPage() {
               )}
             </section>
 
-            {/* ─── 4. Overspending Alert ────────────────────────── */}
+            {/* ─── 5. Overspending Alert ────────────────────────── */}
             {showAlert && (
               <section className="bg-[#ffdad6] border border-[#ba1a1a] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-span-2 lg:row-start-1">
                 <div className="flex gap-3">
@@ -483,7 +505,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* ─── 5. Total Balance (most prominent) ────────────── */}
+            {/* ─── 6. Total Balance (most prominent) ────────────── */}
             <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-6 md:p-8 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-center lg:col-start-1 lg:row-start-4">
               <p className="text-sm font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
                 Total Saldo

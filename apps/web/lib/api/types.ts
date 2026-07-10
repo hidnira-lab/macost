@@ -419,6 +419,7 @@ export interface GoalSettingsPreviewResponse {
   goals: Goal[];
 }
 
+// ---------------------------------------------------------------------------
 // 11. Scan Receipt
 // ---------------------------------------------------------------------------
 
@@ -436,4 +437,57 @@ export interface ScanReceiptResponse {
   items?: string[];
   suggested_category_id?: string;
   error_message?: string;
+}
+
+// ---------------------------------------------------------------------------
+// 12. E-Statement PDF Import (ESTAT-01/02/03)
+// ---------------------------------------------------------------------------
+
+/**
+ * A single extracted transaction row from the upload-statement endpoint.
+ * temp_id is a client-side tracing ID, never persisted.
+ */
+export interface ExtractedStatementTransaction {
+  temp_id: string;
+  tanggal_transaksi: string;
+  deskripsi: string;
+  nominal: number;
+  tipe_transaksi: string;
+  suggested_category_id?: string;
+  is_possible_duplicate: boolean;
+}
+
+/**
+ * POST /api/transactions/upload-statement — response (200).
+ *
+ * Success case: extracted_transactions array.
+ * Fallback case (Gemini failure): extracted false + error_message.
+ */
+export type UploadStatementResponse =
+  | { extracted_transactions: ExtractedStatementTransaction[] }
+  | { extracted: false; error_message: string };
+
+/**
+ * POST /api/transactions/import-batch — request body.
+ *
+ * Each item extends ExtractedStatementTransaction with the user-resolved
+ * kategori_id, dompet_id, and optional catatan. The temp_id is ignored
+ * by the server (used only for client-side row tracking).
+ */
+export interface ImportBatchRequest {
+  transactions: Array<
+    ExtractedStatementTransaction & {
+      kategori_id: string;
+      dompet_id: string;
+      catatan: string | null;
+    }
+  >;
+}
+
+/**
+ * POST /api/transactions/import-batch — response (201).
+ */
+export interface ImportBatchResponse {
+  imported_count: number;
+  skipped_count: number;
 }
