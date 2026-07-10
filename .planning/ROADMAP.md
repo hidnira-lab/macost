@@ -208,13 +208,13 @@ Plans:
   2. A transaction input while the device is offline is stored locally in IndexedDB and automatically syncs to the backend when connectivity is restored — the user does not need to retry manually
   3. The UI displays a clear sync status indicator (offline / syncing / synced) so users always know whether their data has reached the server
 
-**Plans**: 3 plans
+**Plans**: 2/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — [BLOCKING] Backend idempotency foundation: migration 008 (idempotency_key + partial UNIQUE) + check_idempotency() helper + wire into transactions/goals/allocations routers (Hidayat)
-- [ ] 04-02-PLAN.md — Pixel art goal visualization (VIS-01): GoalPixelArt component + 5 placeholder sprites, mounted on goal detail + goal list pages (Hidayat, independent of 04-01/04-03)
+- [x] 04-01-PLAN.md — [BLOCKING] Backend idempotency foundation: migration 008 (idempotency_key + partial UNIQUE) + check_idempotency() helper + wire into transactions/goals/allocations routers (Hidayat)
+- [x] 04-02-PLAN.md — Pixel art goal visualization (VIS-01): GoalPixelArt component + 5 placeholder sprites, mounted on goal detail + goal list pages (Hidayat, independent of 04-01/04-03)
 
 **Wave 2** *(blocked on 04-01 completion)*
 
@@ -263,4 +263,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
 | 2. Core Product Loop | 15/15 | Complete    | 2026-07-09 |
 | 3. Differentiators | 7/7 | Complete    | 2026-07-09 |
-| 4. Polish | 0/TBD | Not started | - |
+| 4. Polish | 2/3 | In Progress|  |
