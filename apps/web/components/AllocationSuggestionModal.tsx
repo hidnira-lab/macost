@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiMutate } from '@/lib/api/client'
+import { isApiErrorBody } from '@/lib/api/types'
 import type {
   AllocationSuggestionResponse,
   AllocationConfirmRequest,
   AllocationConfirmResponse,
   AllocationSkipResponse,
 } from '@/lib/api/types'
+import { enqueue } from '@/lib/offline/queue'
 
 export interface AllocationSuggestionModalProps {
   open: boolean
@@ -46,16 +48,41 @@ export default function AllocationSuggestionModal({
     }
     setBusy(true)
     setError(null)
-    try {
-      const body: AllocationConfirmRequest = {
-        transaksi_id: transaksiId,
-        goal_id: suggestion.suggested_goal_id,
-        nominal_alokasi: suggestion.suggested_amount,
+
+    const body: AllocationConfirmRequest = {
+      transaksi_id: transaksiId,
+      goal_id: suggestion.suggested_goal_id,
+      nominal_alokasi: suggestion.suggested_amount,
+    }
+
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+
+    if (isOffline) {
+      try {
+        await enqueue({ kind: 'allocation_confirm', payload: body })
+        onResolved()
+      } catch {
+        setError('Gagal menyimpan alokasi. Coba lagi.')
+      } finally {
+        setBusy(false)
       }
+      return
+    }
+
+    try {
       await apiMutate<AllocationConfirmResponse>('/api/allocations', 'POST', body)
       onResolved()
-    } catch {
-      setError('Gagal menyimpan alokasi. Coba lagi.')
+    } catch (err) {
+      if (!isApiErrorBody(err)) {
+        try {
+          await enqueue({ kind: 'allocation_confirm', payload: body })
+          onResolved()
+        } catch {
+          setError('Gagal menyimpan alokasi. Coba lagi.')
+        }
+      } else {
+        setError('Gagal menyimpan alokasi. Coba lagi.')
+      }
     } finally {
       setBusy(false)
     }
@@ -64,6 +91,21 @@ export default function AllocationSuggestionModal({
   async function handleSkip() {
     setBusy(true)
     setError(null)
+
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+
+    if (isOffline) {
+      try {
+        await enqueue({ kind: 'allocation_skip', transactionId: transaksiId })
+        onResolved()
+      } catch {
+        setError('Gagal melewati saran alokasi. Coba lagi.')
+      } finally {
+        setBusy(false)
+      }
+      return
+    }
+
     try {
       await apiMutate<AllocationSkipResponse>(
         `/api/allocations/${transaksiId}/skip`,
@@ -71,8 +113,17 @@ export default function AllocationSuggestionModal({
         null
       )
       onResolved()
-    } catch {
-      setError('Gagal melewati saran alokasi. Coba lagi.')
+    } catch (err) {
+      if (!isApiErrorBody(err)) {
+        try {
+          await enqueue({ kind: 'allocation_skip', transactionId: transaksiId })
+          onResolved()
+        } catch {
+          setError('Gagal melewati saran alokasi. Coba lagi.')
+        }
+      } else {
+        setError('Gagal melewati saran alokasi. Coba lagi.')
+      }
     } finally {
       setBusy(false)
     }

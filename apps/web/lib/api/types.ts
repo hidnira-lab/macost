@@ -109,6 +109,12 @@ export interface TransactionCreateRequest {
   dompet_id: string;
   kategori_id: string;
   catatan: string | null;
+  /**
+   * Client-generated UUID (04-CONTEXT.md D-03) — set only when this request
+   * originated from the offline queue's sync() replay (lib/offline/queue.ts).
+   * Omitted entirely for normal online submissions.
+   */
+  idempotency_key?: string;
 }
 
 /**
@@ -182,6 +188,12 @@ export interface GoalCreateRequest {
   deadline: string;
   /** User's desire score 1–5 */
   skor_keinginan: number;
+  /**
+   * Client-generated UUID (04-CONTEXT.md D-03) — set only when this request
+   * originated from the offline queue's sync() replay (lib/offline/queue.ts).
+   * Omitted entirely for normal online submissions.
+   */
+  idempotency_key?: string;
 }
 
 /** PUT /api/goals/{id} — request body (same shape as create) */
@@ -265,6 +277,12 @@ export interface AllocationConfirmRequest {
   transaksi_id: string;
   goal_id: string;
   nominal_alokasi: number;
+  /**
+   * Client-generated UUID (04-CONTEXT.md D-03) — set only when this request
+   * originated from the offline queue's sync() replay (lib/offline/queue.ts).
+   * Omitted entirely for normal online submissions.
+   */
+  idempotency_key?: string;
 }
 
 /** Updated goal summary returned in POST /api/allocations */

@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch, apiMutate } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
+import { isApiErrorBody } from '@/lib/api/types'
 import type { Category, Wallet, Transaction, AllocationSuggestionResponse } from '@/lib/api/types'
 import SmartAllocationModal from '@/components/SmartAllocationModal'
+import { enqueue } from '@/lib/offline/queue'
 
 const USE_MOCK = typeof window !== 'undefined'
   ? process.env.NEXT_PUBLIC_USE_MOCK === 'true'
@@ -82,6 +84,25 @@ export default function NewTransactionPage() {
     init()
   }, [router])
 
+  // Deferred allocation-suggestion modal (D-02): if a transaction queued
+  // offline from THIS page later syncs while this page happens to still be
+  // mounted, OfflineSyncProvider dispatches this event with the resolved
+  // suggestion — open the same modal the online path already uses.
+  useEffect(() => {
+    function handleDeferredSuggestion(e: Event) {
+      const detail = (e as CustomEvent<{
+        transaksiId: string
+        suggestion: AllocationSuggestionResponse
+      }>).detail
+      setSavedTransactionId(detail.transaksiId)
+      setSuggestion(detail.suggestion)
+      setSideIncomeAmount(detail.suggestion.suggested_amount)
+      setModalOpen(true)
+    }
+    window.addEventListener('macost:allocation-suggestion', handleDeferredSuggestion)
+    return () => window.removeEventListener('macost:allocation-suggestion', handleDeferredSuggestion)
+  }, [])
+
   const amountNum = parseInt(amount.replace(/[^0-9]/g, ''), 10) || 0
 
   function formatAmount(val: string): string {
@@ -106,19 +127,35 @@ export default function NewTransactionPage() {
     }
     setSaving(true)
     setError(null)
+
+    const payload = {
+      nominal: amountNum,
+      tanggal_transaksi: toISODate(dateValue),
+      dompet_id: selectedWallet,
+      kategori_id: selectedCategory,
+      metode_input: 'manual',
+      catatan: note || null,
+    }
+
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+
+    if (isOffline) {
+      // Offline: queue the write and acknowledge locally. The allocation
+      // suggestion modal (if any) is deferred until sync() confirms this
+      // transaction landed server-side — never shown here (D-02).
+      try {
+        await enqueue({ kind: 'transaction', payload })
+        setSavingSuccess(true)
+      } catch {
+        setError('Gagal menyimpan transaksi. Coba lagi.')
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+
     try {
-      const saved = await apiMutate<Transaction>(
-        '/api/transactions',
-        'POST',
-        {
-          nominal: amountNum,
-          tanggal_transaksi: toISODate(dateValue),
-          dompet_id: selectedWallet,
-          kategori_id: selectedCategory,
-          metode_input: 'manual',
-          catatan: note || null,
-        }
-      )
+      const saved = await apiMutate<Transaction>('/api/transactions', 'POST', payload)
 
       setSavingSuccess(true)
       setSavedTransactionId(saved.id_transaksi)
@@ -140,8 +177,21 @@ export default function NewTransactionPage() {
           setModalLoading(false)
         }
       }
-    } catch {
-      setError('Gagal menyimpan transaksi. Coba lagi.')
+    } catch (err) {
+      // A network-level failure (dead host, no route, DNS/CORS) throws a
+      // plain Error/TypeError with no `error` property — isApiErrorBody
+      // distinguishes that from a real structured API error. Only the
+      // network-level case falls back to the offline queue.
+      if (!isApiErrorBody(err)) {
+        try {
+          await enqueue({ kind: 'transaction', payload })
+          setSavingSuccess(true)
+        } catch {
+          setError('Gagal menyimpan transaksi. Coba lagi.')
+        }
+      } else {
+        setError('Gagal menyimpan transaksi. Coba lagi.')
+      }
     } finally {
       setSaving(false)
     }
