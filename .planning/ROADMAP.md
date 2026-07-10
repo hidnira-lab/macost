@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Working Tauri APK with auth and wallet management; all 4 developers unblocked for parallel work (completed 2026-07-04)
 - [x] **Phase 2: Core Product Loop** - Complete end-to-end flow: side income in → SAW ranks goals → allocation suggested → user confirms → goal advances (completed 2026-07-09)
-- [ ] **Phase 3: Differentiators** - Receipt scan, e-statement import, AI financial insights, and SAW weight customization
+- [x] **Phase 3: Differentiators** - Receipt scan, e-statement import, AI financial insights, and SAW weight customization
 - [ ] **Phase 4: Polish** - Pixel art goal visualization and offline transaction cache for demo-day reliability
 
 ## Phase Details
@@ -103,26 +103,26 @@ Plans:
 
 - [x] 02-01-PLAN.md — Schema migrations (kategori/transaksi/goal/alokasi/goal_settings) + backend pytest infrastructure (Fertika, Wave 1)
 - [x] 02-02-PLAN.md — Goals list (SAW-ranked) + strategy toggle + mock plumbing (Khayyira, Wave 1)
-- [ ] 02-03-PLAN.md — Dashboard page: 5 KPIs fixed order + period filter (Zarra, Wave 1)
+- [x] 02-03-PLAN.md — Dashboard page: 5 KPIs fixed order + period filter (Zarra, Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 02-04-PLAN.md — saw_engine.py: pure SAW ranking, edge-case guards, TC-01 strategy re-weighting (Fertika, TDD, Wave 2)
 - [x] 02-05-PLAN.md — Categories + Transactions create/list (server-derived source_label) (Fertika, Wave 2)
 - [x] 02-06-PLAN.md — [BLOCKING] Push Phase 2 Supabase migrations to live project (Hidayat-only, Wave 2)
-- [ ] 02-07-PLAN.md — Goal detail + create/edit form (Khayyira, Wave 2)
-- [ ] 02-08-PLAN.md — AllocationSuggestionModal + Pending Allocations page (Khayyira, Wave 2)
+- [x] 02-07-PLAN.md — Goal detail + create/edit form (Khayyira, Wave 2)
+- [x] 02-08-PLAN.md — AllocationSuggestionModal + Pending Allocations page (Khayyira, Wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 02-09-PLAN.md — Transactions edit/delete + wallet balance derived-SUM (Fertika, Wave 3)
 - [x] 02-10-PLAN.md — Goal Settings + Goals CRUD with real-time SAW ranking (Fertika, Wave 3)
-- [ ] 02-11-PLAN.md — Transaction quick-entry form + allocation-suggestion save sequencing (Zarra, Wave 3)
+- [x] 02-11-PLAN.md — Transaction quick-entry form + allocation-suggestion save sequencing (Zarra, Wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [x] 02-12-PLAN.md — Smart Allocation service + suggest/confirm/skip/pending endpoints (Fertika, Wave 4)
-- [ ] 02-13-PLAN.md — Transaction history/filter/edit/delete + wallet balance refresh (Zarra, Wave 4)
+- [x] 02-13-PLAN.md — Transaction history/filter/edit/delete + wallet balance refresh (Zarra, Wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -130,7 +130,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 02-15-PLAN.md — USE_MOCK=false integration test + latency measurement + Tauri desktop smoke test (Hidayat, Wave 6)
+- [x] 02-15-PLAN.md — USE_MOCK=false integration test + latency measurement + Tauri desktop smoke test (Hidayat, Wave 6)
 
 **Team ownership (parallel tracks):**
 
@@ -164,24 +164,24 @@ Plans:
   4. User can open SAW weight settings, adjust the five criteria weights (must sum to 100% ± 0.001), see goal ranking update in response, and reset all weights to the research-default values from the n=62 survey
   5. User sees a Quick Access Panel at the top of the Home page (post-login) with exactly 4 shortcuts — add transaction, scan receipt, top active goal (name + progress %), and current balance summary — each shortcut navigating to its target in one tap
 
-**Plans**: 2/7 plans executed
+**Plans**: 7/7 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 03-01-PLAN.md — Shared Gemini 2.5 Flash integration layer: client factory, gemini_service.py (extract_receipt/extract_statement/generate_insight), Pydantic response schemas, Wave 0 test scaffolding
 - [x] 03-02-PLAN.md — Team sign-off checkpoint for the API_CONTRACT.md ai-insight extension + SAW-04 tolerance text fix, plus Hidayat-only AI_VISION_API_KEY provisioning on Railway
-- [ ] 03-03-PLAN.md — Quick Access Panel (QAP-01): 4-shortcut component mounted on Home, zero new endpoints
-- [ ] 03-04-PLAN.md — SAW weight customization (SAW-04/05): live re-rank preview endpoint + weight editor UI + reset-to-default
+- [x] 03-03-PLAN.md — Quick Access Panel (QAP-01): 4-shortcut component mounted on Home, zero new endpoints
+- [x] 03-04-PLAN.md — SAW weight customization (SAW-04/05): live re-rank preview endpoint + weight editor UI + reset-to-default
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-05-PLAN.md — Receipt Scan end-to-end (SCAN-01/02/03): scan-receipt endpoint + upload/review/save flow
-- [ ] 03-07-PLAN.md — AI Financial Insights end-to-end (AIINS-01/02/03): ai-insight endpoint + wired /ai page
+- [x] 03-05-PLAN.md — Receipt Scan end-to-end (SCAN-01/02/03): scan-receipt endpoint + upload/review/save flow
+- [x] 03-07-PLAN.md — AI Financial Insights end-to-end (AIINS-01/02/03): ai-insight endpoint + wired /ai page
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-06-PLAN.md — E-Statement PDF Import end-to-end (ESTAT-01/02/03): upload-statement + import-batch endpoints + review table
+- [x] 03-06-PLAN.md — E-Statement PDF Import end-to-end (ESTAT-01/02/03): upload-statement + import-batch endpoints + review table
 
 **Key risks (from research):**
 
@@ -252,5 +252,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4. Phase 1's native/APK task 
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-07-04 |
 | 2. Core Product Loop | 15/15 | Complete    | 2026-07-09 |
-| 3. Differentiators | 2/7 | In Progress|  |
+| 3. Differentiators | 7/7 | Complete    | 2026-07-09 |
 | 4. Polish | 0/TBD | Not started | - |
