@@ -1,0 +1,29 @@
+{
+  "insight_available": true,
+  "insights": [
+    {
+      "id": "insight_001",
+      "message": "Your side income this month is looking great. If you keep this up, it could cover 60% of your Laptop goal by next week.",
+      "action_verb": "Alokasikan",
+      "related_goal_id": "goal_002",
+      "related_category_id": null,
+      "generated_at": "2026-07-09T20:00:00Z"
+    },
+    {
+      "id": "insight_002",
+      "message": "You've spent more on Food this week than your usual average. Consider meal prepping or cooking at home for the next few days to stay on track with your budget.",
+      "action_verb": "Kurangi",
+      "related_goal_id": null,
+      "related_category_id": "cat_001",
+      "generated_at": "2026-07-09T20:00:00Z"
+    },
+    {
+      "id": "insight_003",
+      "message": "You have Rp 500.000 sitting in your main wallet untouched for 14 days. Moving this to a \"Pocket\" could earn you minor interest.",
+      "action_verb": "Pertimbangkan",
+      "related_goal_id": "goal_003",
+      "related_category_id": null,
+      "generated_at": "2026-07-09T20:00:00Z"
+    }
+  ]
+}

@@ -11,7 +11,7 @@ import type {
 import SmartAllocationModal from '@/components/SmartAllocationModal'
 import SuggestionCard from '@/components/SuggestionCard'
 import BottomNav from '@/components/BottomNav'
-import { Bell, User, Sparkles, AlertTriangle } from 'lucide-react'
+import { Sparkles, AlertTriangle, ArrowLeft, Bell } from 'lucide-react'
 
 export default function PendingAllocationsPage() {
   const router = useRouter()
@@ -120,46 +120,48 @@ export default function PendingAllocationsPage() {
         - md (768px+): px-6
         - lg (1024px+): max-w-2xl centered mx-auto px-8
       */}
-      <div className="px-4 md:px-6 lg:max-w-2xl lg:mx-auto lg:px-8">
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between pt-8 pb-5">
+      <div className="mx-auto w-full px-4 md:max-w-2xl md:px-6 lg:max-w-5xl lg:px-8 pb-28 md:pb-32 lg:pb-32">
+        {/* ── Header (TopAppBar) ── */}
+        <header className="sticky top-0 z-10 -mx-4 flex h-16 items-center justify-between border-b border-[rgba(30,30,30,0.08)] bg-[rgba(252,252,252,0.8)] px-4 backdrop-blur-[6px] md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+          <button
+            onClick={() => router.push('/ai')}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[rgba(30,30,30,0.05)]"
+            aria-label="Kembali ke AI Hub"
+          >
+            <ArrowLeft className="w-5 h-5" style={{ color: '#1e1e1e' }} />
+          </button>
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#298dff]">
+            Macost
+          </h1>
+          <button
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[rgba(30,30,30,0.05)]"
+            aria-label="Notifikasi"
+          >
+            <Bell className="w-4 h-4" style={{ color: '#1e1e1e' }} />
+          </button>
+        </header>
+
+        {/* ── Page title + subtitle ── */}
+        <div className="mt-6 mb-5">
           <h1
             className="text-2xl font-bold"
             style={{
               fontFamily: "'Neulis', sans-serif",
-              color: '#298dff',
+              color: '#1e1e1e',
             }}
           >
             Saran Tertunda
           </h1>
-          <div className="flex items-center gap-3">
-            <button
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(30,30,30,0.05)' }}
-              aria-label="Notifikasi"
-            >
-              <Bell className="w-4 h-4" style={{ color: '#1e1e1e' }} />
-            </button>
-            <button
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: '#298dff' }}
-              aria-label="Profil"
-            >
-              <User className="w-4 h-4 text-white" />
-            </button>
-          </div>
+          <p
+            className="text-sm mt-1"
+            style={{
+              fontFamily: 'Helvetica, sans-serif',
+              color: 'rgba(30,30,30,0.65)',
+            }}
+          >
+            Saran Smart Allocation yang menunggu konfirmasi kamu.
+          </p>
         </div>
-
-        {/* ── Subtitle ── */}
-        <p
-          className="text-sm mb-5"
-          style={{
-            fontFamily: 'Helvetica, sans-serif',
-            color: 'rgba(30,30,30,0.65)',
-          }}
-        >
-          Saran Smart Allocation yang menunggu konfirmasi kamu.
-        </p>
 
         {/* ── Error banner ── */}
         {error && (

@@ -392,7 +392,7 @@ export default function GoalsPage() {
         {goals.length > 0 && (
           <button
             onClick={() => router.push('/goals/new')}
-            className="fixed bottom-24 right-4 md:right-6 lg:right-[calc(50%-512px+2rem)] w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+            className="fixed bottom-24 right-4 md:right-6 lg:right-[calc(50%-512px+2rem)] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #298dff, #065fc5)',
             }}

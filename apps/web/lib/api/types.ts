@@ -358,7 +358,9 @@ export interface DashboardResponse {
 export interface AiInsight {
   id: string;
   message: string;
-  related_goal_id: string;
+  action_verb: "Alokasikan" | "Kurangi" | "Pertimbangkan";
+  related_goal_id: string | null;
+  related_category_id: string | null;
   generated_at: string;
 }
 

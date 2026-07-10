@@ -178,6 +178,15 @@ export default function SawWeightEditor({
         )}
       </div>
 
+      {/* ── Info ──────────────────────────────────────────────────────── */}
+      <p
+        className="font-body text-sm"
+        style={{ color: 'rgba(30,30,30,0.65)' }}
+      >
+        Bobot ini digunakan untuk menghitung urutan prioritas{' '}
+        <strong>semua goal</strong>.
+      </p>
+
       {/* ── 5 Criterion Cards ────────────────────────────────────────── */}
       <div className="flex flex-col gap-4">
         {CRITERIA_LABELS.map(({ key, label, color }) => {
