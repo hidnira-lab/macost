@@ -11,9 +11,9 @@ import {
   Edit3,
   Trash2,
   PiggyBank,
-  Target,
   RotateCcw,
 } from 'lucide-react'
+import GoalPixelArt from '@/components/GoalPixelArt'
 
 function formatRp(value: number) {
   return `Rp ${value.toLocaleString('id-ID')}`
@@ -141,7 +141,7 @@ export default function GoalDetailPage() {
             opacity: 0.8,
           }}
         >
-          <Target className="w-20 h-20 text-white/30" />
+          <GoalPixelArt progressPct={goal.progress_pct} size="detail" />
           <div
             className="absolute inset-0"
             style={{ mixBlendMode: 'overlay', backgroundColor: 'rgba(255,255,255,0.1)' }}

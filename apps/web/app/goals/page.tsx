@@ -7,6 +7,7 @@ import { getToken, clearToken } from '@/lib/auth/session'
 import type { GoalsResponse, Goal, GoalSettings } from '@/lib/api/types'
 import { Target, PiggyBank, TrendingUp, Star, Trophy, Plus, Sparkles, Bell, User } from 'lucide-react'
 import BottomNav from '@/components/BottomNav'
+import GoalPixelArt from '@/components/GoalPixelArt'
 
 /** Shared tailwind classes for the circular goal icon */
 const iconRingClass =
@@ -287,16 +288,19 @@ export default function GoalsPage() {
                         </p>
                       </div>
                     </div>
-                    <span
-                      className="inline-flex items-center gap-1 text-[11px] font-bold rounded-full px-2.5 py-1 shrink-0"
-                      style={{
-                        backgroundColor: '#ff8929',
-                        color: '#ffffff',
-                      }}
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      Prioritas #1
-                    </span>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <GoalPixelArt progressPct={goal.progress_pct} size="card" />
+                      <span
+                        className="inline-flex items-center gap-1 text-[11px] font-bold rounded-full px-2.5 py-1"
+                        style={{
+                          backgroundColor: '#ff8929',
+                          color: '#ffffff',
+                        }}
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        Prioritas #1
+                      </span>
+                    </div>
                   </div>
 
                   {/* Progress bar */}
@@ -354,17 +358,20 @@ export default function GoalsPage() {
                     </p>
                   </div>
 
-                  {/* Rank badge */}
-                  <span
-                    className="text-xs font-semibold rounded-full px-2.5 py-0.5 shrink-0 self-start"
-                    style={{
-                      fontFamily: 'Helvetica, sans-serif',
-                      backgroundColor: 'rgba(30,30,30,0.05)',
-                      color: 'rgba(30,30,30,0.65)',
-                    }}
-                  >
-                    #{goal.rank}
-                  </span>
+                  {/* Pixel art + rank badge */}
+                  <div className="flex flex-col items-end gap-1 shrink-0 self-start">
+                    <GoalPixelArt progressPct={goal.progress_pct} size="card" />
+                    <span
+                      className="text-xs font-semibold rounded-full px-2.5 py-0.5"
+                      style={{
+                        fontFamily: 'Helvetica, sans-serif',
+                        backgroundColor: 'rgba(30,30,30,0.05)',
+                        color: 'rgba(30,30,30,0.65)',
+                      }}
+                    >
+                      #{goal.rank}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Progress bar */}
