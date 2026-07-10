@@ -17,6 +17,11 @@ class TransactionCreate(BaseModel):
     # looked-up kategori row (see backend/routers/transactions.py). The
     # handler must never read this field when building the insert payload.
     tipe_transaksi: str | None = None
+    # D-03 (04-CONTEXT.md) — client-generated UUID, used by the backend to
+    # no-op a retried offline-queue sync (see backend/services/idempotency.py).
+    # Nullable — online/non-offline callers omit this field entirely
+    # (Pitfall 4, 04-RESEARCH.md).
+    idempotency_key: str | None = None
 
 
 class TransactionUpdate(BaseModel):

@@ -15,6 +15,11 @@ class AllocationConfirmRequest(BaseModel):
     transaksi_id: str
     goal_id: str
     nominal_alokasi: int = Field(gt=0)
+    # D-03 (04-CONTEXT.md) — client-generated UUID, used by the backend to
+    # no-op a retried offline-queue sync (see backend/services/idempotency.py).
+    # Nullable — online/non-offline callers omit this field entirely
+    # (Pitfall 4, 04-RESEARCH.md).
+    idempotency_key: str | None = None
 
 
 class GoalUpdated(BaseModel):
