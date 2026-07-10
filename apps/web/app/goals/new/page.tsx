@@ -4,7 +4,9 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { apiMutate, apiFetch } from '@/lib/api/client'
 import { getToken } from '@/lib/auth/session'
+import { isApiErrorBody } from '@/lib/api/types'
 import type { GoalCreateRequest, GoalDetailResponse } from '@/lib/api/types'
+import { enqueue } from '@/lib/offline/queue'
 import {
   Plus,
   Calendar,
@@ -115,14 +117,33 @@ function GoalForm() {
     setSubmitting(true)
     setError(null)
 
-    try {
-      const body: GoalCreateRequest = {
-        nama_goal: nama.trim(),
-        nominal_target: target,
-        deadline,
-        skor_keinginan: importance,
-      }
+    const body: GoalCreateRequest = {
+      nama_goal: nama.trim(),
+      nominal_target: target,
+      deadline,
+      skor_keinginan: importance,
+    }
 
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+
+    if (isOffline) {
+      try {
+        if (isEdit && editId) {
+          await enqueue({ kind: 'goal_update', goalId: editId, payload: body })
+          router.push(`/goals/${editId}`)
+        } else {
+          await enqueue({ kind: 'goal_create', payload: body })
+          router.push('/goals')
+        }
+      } catch {
+        setError('Gagal menyimpan goal. Coba lagi.')
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
+
+    try {
       if (isEdit && editId) {
         await apiMutate(`/api/goals/${editId}`, 'PUT', body)
         router.push(`/goals/${editId}`)
@@ -130,8 +151,24 @@ function GoalForm() {
         await apiMutate('/api/goals', 'POST', body)
         router.push('/goals')
       }
-    } catch {
-      setError('Gagal menyimpan goal. Coba lagi.')
+    } catch (err) {
+      // Network-level failure (not a structured API error) falls back to
+      // the offline queue instead of surfacing the generic save error.
+      if (!isApiErrorBody(err)) {
+        try {
+          if (isEdit && editId) {
+            await enqueue({ kind: 'goal_update', goalId: editId, payload: body })
+            router.push(`/goals/${editId}`)
+          } else {
+            await enqueue({ kind: 'goal_create', payload: body })
+            router.push('/goals')
+          }
+        } catch {
+          setError('Gagal menyimpan goal. Coba lagi.')
+        }
+      } else {
+        setError('Gagal menyimpan goal. Coba lagi.')
+      }
     } finally {
       setSubmitting(false)
     }

@@ -24,15 +24,26 @@ interface QueuedItemBase {
   attempts: number;
 }
 
-export type QueuedItem =
-  | (QueuedItemBase & { kind: "transaction"; payload: TransactionCreateRequest })
-  | (QueuedItemBase & { kind: "goal_create"; payload: GoalCreateRequest })
-  | (QueuedItemBase & { kind: "goal_update"; goalId: string; payload: GoalUpdateRequest })
-  | (QueuedItemBase & { kind: "allocation_confirm"; payload: AllocationConfirmRequest })
-  | (QueuedItemBase & { kind: "allocation_skip"; transactionId: string });
+type NewTransactionItem = { kind: "transaction"; payload: TransactionCreateRequest };
+type NewGoalCreateItem = { kind: "goal_create"; payload: GoalCreateRequest };
+type NewGoalUpdateItem = { kind: "goal_update"; goalId: string; payload: GoalUpdateRequest };
+type NewAllocationConfirmItem = { kind: "allocation_confirm"; payload: AllocationConfirmRequest };
+type NewAllocationSkipItem = { kind: "allocation_skip"; transactionId: string };
 
 /** Input shape for enqueue() — caller supplies everything except the base fields. */
-export type NewQueuedItem = Omit<QueuedItem, "id" | "createdAt" | "attempts">;
+export type NewQueuedItem =
+  | NewTransactionItem
+  | NewGoalCreateItem
+  | NewGoalUpdateItem
+  | NewAllocationConfirmItem
+  | NewAllocationSkipItem;
+
+export type QueuedItem =
+  | (QueuedItemBase & NewTransactionItem)
+  | (QueuedItemBase & NewGoalCreateItem)
+  | (QueuedItemBase & NewGoalUpdateItem)
+  | (QueuedItemBase & NewAllocationConfirmItem)
+  | (QueuedItemBase & NewAllocationSkipItem);
 
 /** Sync status derived client-side from navigator.onLine + queue length (OFF-02). */
 export type SyncStatus = "offline" | "syncing" | "synced";
