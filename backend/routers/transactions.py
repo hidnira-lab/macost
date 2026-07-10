@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import Response
 
 from backend.core.supabase import get_supabase_admin
@@ -11,8 +11,29 @@ from backend.models.transaction import (
     TransactionResponse,
     TransactionUpdate,
 )
+from backend.services.gemini_service import extract_receipt, extract_statement
+from backend.services.statement_service import flag_duplicates
 
 router = APIRouter()
+
+MAX_RECEIPT_SIZE_BYTES = 10 * 1024 * 1024
+JPEG_MAGIC = b"\xff\xd8\xff"
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+MAX_STATEMENT_SIZE_BYTES = 50 * 1024 * 1024
+PDF_MAGIC = b"%PDF"
+
+
+def _derive_transaction_fields(kategori: dict) -> tuple[str, str | None]:
+    """Server-derives tipe_transaksi/source_label from a kategori row — never
+    from client-supplied tipe_transaksi (D-01/Pitfall 1, T-2-02, T-3-16).
+    Shared by create_transaction, update_transaction, and import_batch so
+    this derivation isn't duplicated a third time."""
+    tipe_transaksi = kategori["tipe"]
+    source_label = (
+        kategori.get("flag_pemasukan") if tipe_transaksi == "Pemasukan" else None
+    )
+    return tipe_transaksi, source_label
 
 
 def _row_to_response(row: dict) -> dict:
@@ -67,10 +88,7 @@ def create_transaction(
 
     # tipe_transaksi/source_label are ALWAYS derived here — body.tipe_transaksi
     # is structurally never read when building the insert payload below.
-    tipe_transaksi = kategori["tipe"]
-    source_label = (
-        kategori.get("flag_pemasukan") if tipe_transaksi == "Pemasukan" else None
-    )
+    tipe_transaksi, source_label = _derive_transaction_fields(kategori)
 
     # id_transaksi/created_at are generated here (rather than relying on the
     # DB's gen_random_uuid()/NOW() defaults) so the inserted row is always
@@ -197,10 +215,7 @@ def update_transaction(
         )
     kategori = kategori_rows[0]
 
-    tipe_transaksi = kategori["tipe"]
-    source_label = (
-        kategori.get("flag_pemasukan") if tipe_transaksi == "Pemasukan" else None
-    )
+    tipe_transaksi, source_label = _derive_transaction_fields(kategori)
 
     update_payload = {
         "tipe_transaksi": tipe_transaksi,
@@ -255,3 +270,183 @@ def delete_transaction(
     ).execute()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/scan-receipt — validated upload, timeout-wrapped
+# Gemini extraction, structured fallback (SCAN-01/02/03, 03-05-PLAN.md Task 1)
+# ---------------------------------------------------------------------------
+
+@router.post("/transactions/scan-receipt")
+async def scan_receipt(
+    image: UploadFile = File(...),
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Validates size (<=10MB) and magic number (JPEG/PNG) BEFORE ever calling
+    Gemini — never trusts the client-supplied content_type header alone
+    (T-3-10, T-3-11). Does not create a transaction; only extracts and
+    returns raw data for the frontend's review form to submit separately
+    through POST /api/transactions (SCAN-02: never auto-save).
+    """
+    content = await image.read()
+
+    if len(content) > MAX_RECEIPT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "File terlalu besar",
+                }
+            },
+        )
+
+    if not (content.startswith(JPEG_MAGIC) or content.startswith(PNG_MAGIC)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "Format file tidak didukung",
+                }
+            },
+        )
+
+    result = await extract_receipt(content, image.content_type or "image/jpeg")
+
+    if result is None:
+        # Terminal fallback state (D-01/T-3-13): never a 500, never a retry.
+        return {
+            "extracted": False,
+            "error_message": "Foto kurang jelas, silakan input manual atau coba lagi",
+        }
+
+    return {
+        "extracted": True,
+        "merchant": result.merchant,
+        "nominal": result.nominal,
+        "tanggal_transaksi": result.tanggal_transaksi,
+        "items": result.items,
+        "suggested_category_id": result.suggested_category_id,
+    }
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/upload-statement — validated PDF upload,
+# timeout-wrapped Gemini extraction, duplicate flagging, structured fallback
+# (ESTAT-01/02/03, 03-06-PLAN.md Task 1)
+# ---------------------------------------------------------------------------
+
+@router.post("/transactions/upload-statement")
+async def upload_statement(
+    file: UploadFile = File(...),
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Validates size (<=50MB) and magic number (%PDF) BEFORE ever calling
+    Gemini (T-3-15) — never trusts the client-supplied content_type header
+    alone. On success, flags duplicates via statement_service.flag_duplicates
+    (id_pengguna-scoped, T-3-14). The fallback shape on Gemini failure is a
+    documented, backward-compatible ADDITION to API_CONTRACT.md's
+    upload-statement section, mirroring scan-receipt's extracted/error_message
+    pattern for consistency.
+    """
+    content = await file.read()
+
+    if len(content) > MAX_STATEMENT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "File terlalu besar",
+                }
+            },
+        )
+
+    if not content.startswith(PDF_MAGIC):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": {
+                    "code": "VALIDATION_ERROR",
+                    "message": "Format file tidak didukung",
+                }
+            },
+        )
+
+    result = await extract_statement(content)
+
+    if result is None:
+        # Terminal fallback state (D-01/T-3-13 pattern reused): never a 500,
+        # never a retry.
+        return {
+            "extracted": False,
+            "error_message": (
+                "Gagal membaca file PDF. Pastikan filenya e-statement yang "
+                "valid, lalu coba lagi."
+            ),
+        }
+
+    rows = [row.model_dump() for row in result.transactions]
+    flagged_rows = flag_duplicates(current_user_id, rows)
+
+    return {"extracted_transactions": flagged_rows}
+
+
+# ---------------------------------------------------------------------------
+# POST /api/transactions/import-batch — batch create with imported/skipped
+# counts (ESTAT-03, 03-06-PLAN.md Task 2)
+# ---------------------------------------------------------------------------
+
+@router.post("/transactions/import-batch", status_code=status.HTTP_201_CREATED)
+def import_batch(
+    body: dict,
+    current_user_id: str = Depends(get_current_user_id),
+):
+    """
+    Each row's kategori_id is looked up independently; a not-found kategori
+    SKIPS that row (never raises, never aborts the rest of the batch).
+    tipe_transaksi/source_label are re-derived from kategori exactly like
+    create_transaction — a client-supplied tipe_transaksi is never trusted
+    (T-3-16). temp_id is accepted but never persisted (client-side tracing
+    only).
+    """
+    supabase = get_supabase_admin()
+    incoming_transactions = body.get("transactions", [])
+
+    imported_count = 0
+    skipped_count = 0
+
+    for item in incoming_transactions:
+        kategori_rows = (
+            supabase.table("kategori")
+            .select("*")
+            .eq("id_kategori", item["kategori_id"])
+            .execute()
+        ).data
+        if not kategori_rows:
+            skipped_count += 1
+            continue
+
+        kategori = kategori_rows[0]
+        tipe_transaksi, source_label = _derive_transaction_fields(kategori)
+
+        insert_payload = {
+            "id_transaksi": str(uuid.uuid4()),
+            "id_pengguna": current_user_id,
+            "tipe_transaksi": tipe_transaksi,
+            "nominal": item["nominal"],
+            "tanggal_transaksi": item["tanggal_transaksi"],
+            "metode_input": item.get("metode_input", "Manual"),
+            "dompet_id": item["dompet_id"],
+            "kategori_id": item["kategori_id"],
+            "source_label": source_label,
+            "catatan": item.get("catatan"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        supabase.table("transaksi").insert(insert_payload).execute()
+        imported_count += 1
+
+    return {"imported_count": imported_count, "skipped_count": skipped_count}

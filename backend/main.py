@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routers import (
+    ai_insight,
     allocations,
     auth,
     categories,
@@ -39,6 +40,7 @@ app.include_router(goals.router, prefix="/api")
 app.include_router(goal_settings.router, prefix="/api")
 app.include_router(allocations.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
+app.include_router(ai_insight.router, prefix="/api")
 
 
 @app.get("/")

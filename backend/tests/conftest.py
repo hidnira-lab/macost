@@ -9,6 +9,8 @@ import uuid
 
 import pytest
 
+from backend.services import gemini_service
+
 
 class _FakeResult:
     """Mimics supabase-py's execute() return value — a `.data` list."""
@@ -175,3 +177,87 @@ def sample_weights() -> dict:
         "urgency": 0.178,
         "target_amount": 0.162,
     }
+
+
+class _FakeGeminiResponse:
+    """Mimics google-genai's `GenerateContentResponse` — just the `.text`
+    attribute that gemini_service.py reads via `response.text`."""
+
+    def __init__(self, text: str):
+        self.text = text
+
+
+class _FakeGeminiModels:
+    """Mimics `client.aio.models` — the object whose `.generate_content`
+    coroutine is awaited inside `asyncio.wait_for` by every gemini_service.py
+    function. Configurable per-test via the `fake_gemini_response` fixture's
+    returned factory: either a successful JSON `.text` or a raised exception,
+    never both."""
+
+    def __init__(self):
+        self.return_text: str | None = None
+        self.raise_exception: Exception | None = None
+        self.calls: list[dict] = []
+
+    async def generate_content(self, **kwargs):
+        self.calls.append(kwargs)
+        if self.raise_exception is not None:
+            raise self.raise_exception
+        return _FakeGeminiResponse(self.return_text)
+
+
+class _FakeGeminiAio:
+    def __init__(self, models: _FakeGeminiModels):
+        self.models = models
+
+
+class _FakeGeminiClient:
+    """Never hits the live Gemini API — stands in for `genai.Client()`."""
+
+    def __init__(self):
+        self.models = _FakeGeminiModels()
+        self.aio = _FakeGeminiAio(self.models)
+
+
+@pytest.fixture
+def fake_gemini_response(monkeypatch):
+    """Monkeypatches `backend.services.gemini_service.get_gemini_client` (the
+    call site actually used inside gemini_service.py, per "patch where used")
+    so no test hits the real Gemini API. Mirrors `FakeSupabaseClient`'s
+    "seed then assert" fixture philosophy.
+
+    Usage:
+        fake_gemini_response(text='{"merchant": "X", ...}')   # success path
+        fake_gemini_response(exception=asyncio.TimeoutError())  # timeout path
+        fake_gemini_response(exception=Exception("rate limited"))  # any-failure path
+    """
+    fake_client = _FakeGeminiClient()
+    monkeypatch.setattr(gemini_service, "get_gemini_client", lambda: fake_client)
+
+    def _configure(*, text: str | None = None, exception: Exception | None = None):
+        """Configures the stub's next response, then returns the fake
+        client itself (e.g. `fake.models.calls` for call-count assertions)."""
+        fake_client.models.return_text = text
+        fake_client.models.raise_exception = exception
+        return fake_client
+
+    return _configure
+
+
+@pytest.fixture
+def spy_wait_for_timeout(monkeypatch):
+    """Wraps `asyncio.wait_for` with a spy that records the `timeout=` kwarg
+    it was called with, then delegates to the real implementation — lets a
+    test assert the exact SCAN-03/AIINS-03 timeout constants without
+    reimplementing asyncio.wait_for's semantics."""
+    import asyncio
+
+    captured: dict = {}
+    real_wait_for = asyncio.wait_for
+
+    async def _spy(coro, timeout=None):
+        captured["timeout"] = timeout
+        return await real_wait_for(coro, timeout=timeout)
+
+    monkeypatch.setattr(gemini_service.asyncio, "wait_for", _spy)
+    return captured

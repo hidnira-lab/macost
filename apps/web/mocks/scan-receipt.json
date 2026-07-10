@@ -1,0 +1,12 @@
+{
+  "extracted": true,
+  "merchant": "Indomaret",
+  "nominal": 27500,
+  "tanggal_transaksi": "2026-06-27",
+  "items": [
+    "Aqua 600ml",
+    "Roti Tawar",
+    "Indomie Goreng"
+  ],
+  "suggested_category_id": "cat-makan-minum"
+}

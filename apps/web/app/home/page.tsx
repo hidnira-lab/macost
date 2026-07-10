@@ -13,9 +13,9 @@ import type {
   CategoriesResponse,
   Category,
 } from '@/lib/api/types'
+import QuickAccessPanel from '@/components/QuickAccessPanel'
 import {
   Plus,
-  ScanLine,
   Target,
   PiggyBank,
   TrendingUp,
@@ -137,6 +137,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  /** SAW rank-1 goal — goals are already SAW-ranked server-side */
+  const topGoal = goals.find((g) => g.rank === 1)
+
   const loadHome = useCallback(async () => {
     try {
       const [dashboard, goalsRes, transactionsRes, categoriesRes] = await Promise.all([
@@ -150,8 +153,6 @@ export default function HomePage() {
       setRecentTransactions(transactionsRes.transactions.slice(0, 3))
       setCategories(categoriesRes.categories)
     } catch (err) {
-      // Stale/expired session token: apiFetch already cleared it, so force a
-      // clean re-login instead of showing a dead "gagal memuat" state.
       if (isAuthError(err)) {
         router.push('/login')
         return
@@ -215,52 +216,63 @@ export default function HomePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+        {/* ── Two-column layout ── */}
+        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+          {/* ── Left column: Quick Access ── */}
           <div className="flex flex-col gap-6">
-            {/* ── Remaining Budget ── */}
-            <section className="pt-4">
-              <p className="font-body text-xs font-bold uppercase tracking-wide text-[rgba(30,30,30,0.65)]">
-                Sisa Anggaran
-              </p>
-              <p className="font-display mt-1 text-[32px] font-extrabold leading-tight text-[#1e1e1e]">
-                Rp {remainingBudget.toLocaleString('id-ID')}
-              </p>
-            </section>
-
-            {/* ── Quick Actions (bento) ── */}
-            <section className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => router.push('/transactions')}
-                className="flex h-32 flex-col items-start justify-between rounded-xl p-4 text-left shadow-[0_4px_4px_0_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #298dff, #065fc5)' }}
-              >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(255,255,255,0.1)] backdrop-blur-sm">
-                  <Plus className="h-4 w-4 text-white" />
-                </span>
-                <span>
-                  <span className="font-display block text-xl font-semibold text-[#fcfcfc]">Tambah</span>
-                  <span className="font-body block text-xs font-bold text-[rgba(255,255,255,0.65)]">Transaksi</span>
-                </span>
-              </button>
-              <button
-                disabled
-                className="flex h-32 cursor-not-allowed flex-col items-start justify-between rounded-xl border border-[rgba(30,30,30,0.15)] bg-[rgba(30,30,30,0.05)] p-4 text-left opacity-70 shadow-[0_4px_4px_0_rgba(0,0,0,0.05)]"
-                title="Segera hadir"
-              >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(41,141,255,0.14)]">
-                  <ScanLine className="h-5 w-5 text-[#298dff]" />
-                </span>
-                <span>
-                  <span className="font-display block text-xl font-semibold text-[#1e1e1e]">Scan</span>
-                  <span className="font-body block text-xs font-bold text-[rgba(30,30,30,0.65)]">Struk</span>
-                </span>
-              </button>
-            </section>
+            <QuickAccessPanel remainingBudget={remainingBudget} />
           </div>
 
+          {/* ── Right column: Top Active Goal + Goal Aktif + Terbaru ── */}
           <div className="flex flex-col gap-6">
+            {/* ── Top Active Goal (SAW rank-1) ── */}
+            <section>
+              <h2 className="font-display mb-4 text-xl font-semibold text-[#1e1e1e]">Top Active Goal</h2>
+              <button
+                onClick={() => router.push(topGoal ? `/goals/${topGoal.id_goal}` : '/goals/new')}
+                className="w-full rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-4 text-left shadow-[0_4px_4px_0_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
+                aria-label={topGoal ? `Goal prioritas: ${topGoal.nama_goal}` : 'Buat goal baru'}
+              >
+                {topGoal ? (
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="font-body text-base font-semibold text-[#1e1e1e]">{topGoal.nama_goal}</p>
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(255,137,41,0.14)]">
+                        <Target className="h-5 w-5 text-[#ff8929]" />
+                      </span>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between">
+                        <p className="font-body text-xs font-bold uppercase tracking-wide text-[rgba(30,30,30,0.65)]">Progress</p>
+                        <span className="font-body text-xs font-bold text-[#ff8929]">{topGoal.progress_pct}%</span>
+                      </div>
+                      <div className="mt-1 h-3 w-full overflow-hidden rounded-full bg-[rgba(30,30,30,0.05)]">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${Math.min(topGoal.progress_pct, 100)}%`,
+                            background: 'linear-gradient(135deg, #964900, #ff8929)',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(30,30,30,0.05)]">
+                      <Target className="h-5 w-5 text-[rgba(30,30,30,0.45)]" />
+                    </span>
+                    <div>
+                      <p className="font-display text-lg font-semibold text-[rgba(30,30,30,0.45)]">Belum ada goal</p>
+                      <p className="font-body text-xs font-bold text-[rgba(30,30,30,0.45)]">Buat goal sekarang</p>
+                    </div>
+                  </div>
+                )}
+              </button>
+            </section>
+
             {/* ── Active Goals ── */}
-            <section className="pt-4">
+            <section>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-display text-xl font-semibold text-[#1e1e1e]">Goal Aktif</h3>
                 <button onClick={() => router.push('/goals')} aria-label="Lihat semua goal">
