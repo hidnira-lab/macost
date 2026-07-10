@@ -246,80 +246,188 @@ export default function DashboardPage() {
         )}
 
         {data && !loading && (
-          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
-            {/* ─── 1. Expense Breakdown ──────────────────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 md:p-6 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-start-1 lg:row-start-2">
-              <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
-                Expense Breakdown
-              </h3>
-              {categories.length === 0 ? (
-                <div className="text-center py-6">
-                  <p className="text-[rgba(30,30,30,0.65)] text-sm font-body">
-                    Belum ada pengeluaran
-                  </p>
-                  <p className="text-[rgba(30,30,30,0.65)] text-sm mt-1 font-body">
-                    Belum ada transaksi pengeluaran bulan ini.
-                  </p>
-                  <button className="mt-3 px-4 py-2 bg-[#298dff] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity font-body">
-                    + Tambah transaksi pertama
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-6">
-                  {/* Donut */}
-                  <div className="relative w-[160px] h-[160px] shrink-0">
-                    <div
-                      className="w-full h-full rounded-full"
-                      style={{
-                        background: donutConic(
-                          categories.map((c) => ({ pct: c.pct, color: c.color }))
-                        ),
-                      }}
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="w-[120px] h-[120px] rounded-full bg-white flex flex-col items-center justify-center">
-                        <p className="text-base font-semibold text-[#1e1e1e] font-body">
-                          Rp {(totalExpense / 1_000_000).toFixed(1)}M
-                        </p>
-                        <p className="text-xs font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
-                          TOTAL
-                        </p>
+          <div className="flex flex-col gap-6 md:grid md:grid-cols-2 md:gap-6 md:items-start lg:grid-cols-2">
+            {/* ─── Kolom Kiri (flex-col independen) ─────────────── */}
+            <div className="flex flex-col gap-6 md:col-start-1 md:row-start-2 lg:col-start-1 lg:row-start-2">
+              {/* Import e-Statement */}
+              <section>
+                <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
+                  Import e-Statement
+                </h3>
+                <button
+                  onClick={() => router.push('/transactions/import')}
+                  className="w-full rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-4 text-left shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
+                  aria-label="Import E-Statement"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(41,141,255,0.14)]">
+                      <FileText className="h-6 w-6 text-[#298dff]" />
+                    </span>
+                    <p className="font-body text-sm text-[rgba(30,30,30,0.65)]">
+                      Unggah riwayat transaksi bank atau dompet elektronik Anda untuk sinkronisasi otomatis.
+                    </p>
+                  </div>
+                </button>
+              </section>
+
+              {/* Expense Breakdown */}
+              <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 md:p-6 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
+                  Expense Breakdown
+                </h3>
+                {categories.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-[rgba(30,30,30,0.65)] text-sm font-body">
+                      Belum ada pengeluaran
+                    </p>
+                    <p className="text-[rgba(30,30,30,0.65)] text-sm mt-1 font-body">
+                      Belum ada transaksi pengeluaran bulan ini.
+                    </p>
+                    <button className="mt-3 px-4 py-2 bg-[#298dff] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity font-body">
+                      + Tambah transaksi pertama
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-6">
+                    {/* Donut */}
+                    <div className="relative w-[160px] h-[160px] shrink-0">
+                      <div
+                        className="w-full h-full rounded-full"
+                        style={{
+                          background: donutConic(
+                            categories.map((c) => ({ pct: c.pct, color: c.color }))
+                          ),
+                        }}
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div className="w-[120px] h-[120px] rounded-full bg-white flex flex-col items-center justify-center">
+                          <p className="text-base font-semibold text-[#1e1e1e] font-body">
+                            Rp {(totalExpense / 1_000_000).toFixed(1)}M
+                          </p>
+                          <p className="text-xs font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
+                            TOTAL
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {/* Legend */}
-                  <div className="w-full flex flex-col gap-3">
-                    {categories.map((cat) => (
-                      <div
-                        key={cat.kategori_id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className="w-[32px] h-[32px] rounded-full flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: `${cat.color}20` }}
-                          >
+                    {/* Legend */}
+                    <div className="w-full flex flex-col gap-3">
+                      {categories.map((cat) => (
+                        <div
+                          key={cat.kategori_id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
                             <span
-                              className="w-[10px] h-[10px] rounded-full"
-                              style={{ backgroundColor: cat.color }}
-                            />
-                          </span>
-                          <span className="text-base text-[#1e1e1e] truncate font-body">
-                            {cat.nama_kategori}
+                              className="w-[32px] h-[32px] rounded-full flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: `${cat.color}20` }}
+                            >
+                              <span
+                                className="w-[10px] h-[10px] rounded-full"
+                                style={{ backgroundColor: cat.color }}
+                              />
+                            </span>
+                            <span className="text-base text-[#1e1e1e] truncate font-body">
+                              {cat.nama_kategori}
+                            </span>
+                          </div>
+                          <span className="text-sm font-semibold text-[#1e1e1e] shrink-0 ml-2 font-body">
+                            {cat.pct}%
                           </span>
                         </div>
-                        <span className="text-sm font-semibold text-[#1e1e1e] shrink-0 ml-2 font-body">
-                          {cat.pct}%
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* Tren Bulanan */}
+              <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
+                  Tren Bulanan
+                </h3>
+                {data.monthly_trend && data.monthly_trend.length > 0 ? (
+                  <>
+                    {/* Chart area */}
+                    <div className="flex items-end justify-between gap-1 md:gap-2 h-[128px]">
+                      {data.monthly_trend.map((m, idx) => {
+                        const maxVal = Math.max(
+                          ...data.monthly_trend.flatMap((t) => [t.income, t.expense]),
+                          1
+                        )
+                        const inH = (m.income / maxVal) * 100
+                        const outH = (m.expense / maxVal) * 100
+                        const monthLabel = new Date(m.month + '-01').toLocaleString(
+                          'id-ID',
+                          { month: 'short' }
+                        )
+                        return (
+                          <div
+                            key={m.month}
+                            className="flex flex-col items-center justify-end gap-1 flex-1"
+                          >
+                            <div className="flex items-end gap-[3px]">
+                              <div
+                                className="w-[10px] md:w-[12px] rounded-t-sm"
+                                style={{
+                                  height: `${Math.max(inH * 1.28, 4)}px`,
+                                  backgroundColor: 'rgba(41,141,255,0.35)',
+                                }}
+                              />
+                              <div
+                                className="w-[10px] md:w-[12px] rounded-t-sm"
+                                style={{
+                                  height: `${Math.max(outH * 1.28, 4)}px`,
+                                  backgroundColor: '#298dff',
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] mt-1 font-body">
+                              {monthLabel}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-[rgba(30,30,30,0.08)]">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[rgba(41,141,255,0.35)]" />
+                        <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
+                          Masuk
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </section>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#298dff]" />
+                        <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
+                          Keluar
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[rgba(30,30,30,0.65)] text-sm text-center py-6 font-body">
+                    Belum ada data tren
+                  </p>
+                )}
+              </section>
 
-            {/* ─── 2. Active Goal Progress ───────────────────────── */}
-            <section className="lg:col-start-2 lg:row-start-2">
+              {/* Total Balance */}
+              <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-6 md:p-8 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-center">
+                <p className="text-sm font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
+                  Total Saldo
+                </p>
+                <p
+                  className="text-[32px] md:text-[40px] font-extrabold text-[#1e1e1e] mt-2 leading-tight font-display"
+                  style={{ fontWeight: 800 }}
+                >
+                  Rp {data.total_balance.toLocaleString('id-ID')}
+                </p>
+              </section>
+            </div>
+
+            {/* ─── Kolom Kanan (Goal Progress) ───────────────────── */}
+            <section className="md:col-start-2 md:row-start-2 lg:col-start-2 lg:row-start-2">
               <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
                 Goal Progress
               </h3>
@@ -383,101 +491,9 @@ export default function DashboardPage() {
               )}
             </section>
 
-            {/* ─── 3. Import E-Statement ────────────────────────── */}
-            <section className="lg:col-start-2 lg:row-start-3">
-              <h3 className="text-xl font-semibold text-[#1e1e1e] mb-3 font-display">
-                Import e-Statement
-              </h3>
-              <button
-                onClick={() => router.push('/transactions/import')}
-                className="w-full rounded-xl border border-[rgba(30,30,30,0.15)] bg-white p-4 text-left shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-opacity hover:opacity-90"
-                aria-label="Import E-Statement"
-              >
-                <div className="flex items-center gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(41,141,255,0.14)]">
-                    <FileText className="h-6 w-6 text-[#298dff]" />
-                  </span>
-                  <p className="font-body text-sm text-[rgba(30,30,30,0.65)]">
-                    Unggah riwayat transaksi bank atau dompet elektronik Anda untuk sinkronisasi otomatis.
-                  </p>
-                </div>
-              </button>
-            </section>
-
-            {/* ─── 4. Monthly Trend ─────────────────────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-start-1 lg:row-start-3">
-              <h3 className="text-xl font-semibold text-[#1e1e1e] mb-4 font-display">
-                Tren Bulanan
-              </h3>
-              {data.monthly_trend && data.monthly_trend.length > 0 ? (
-                <>
-                  {/* Chart area */}
-                  <div className="flex items-end justify-between gap-1 md:gap-2 h-[128px]">
-                    {data.monthly_trend.map((m, idx) => {
-                      const maxVal = Math.max(
-                        ...data.monthly_trend.flatMap((t) => [t.income, t.expense]),
-                        1
-                      )
-                      const inH = (m.income / maxVal) * 100
-                      const outH = (m.expense / maxVal) * 100
-                      const monthLabel = new Date(m.month + '-01').toLocaleString(
-                        'id-ID',
-                        { month: 'short' }
-                      )
-                      return (
-                        <div
-                          key={m.month}
-                          className="flex flex-col items-center justify-end gap-1 flex-1"
-                        >
-                          <div className="flex items-end gap-[3px]">
-                            <div
-                              className="w-[10px] md:w-[12px] rounded-t-sm"
-                              style={{
-                                height: `${Math.max(inH * 1.28, 4)}px`,
-                                backgroundColor: 'rgba(41,141,255,0.35)',
-                              }}
-                            />
-                            <div
-                              className="w-[10px] md:w-[12px] rounded-t-sm"
-                              style={{
-                                height: `${Math.max(outH * 1.28, 4)}px`,
-                                backgroundColor: '#298dff',
-                              }}
-                            />
-                          </div>
-                          <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] mt-1 font-body">
-                            {monthLabel}
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  {/* Legend */}
-                  <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-[rgba(30,30,30,0.08)]">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[rgba(41,141,255,0.35)]" />
-                      <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
-                        Masuk
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#298dff]" />
-                      <span className="text-xs font-bold text-[rgba(30,30,30,0.65)] font-body">
-                        Keluar
-                      </span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <p className="text-[rgba(30,30,30,0.65)] text-sm text-center py-6 font-body">
-                  Belum ada data tren
-                </p>
-              )}
-            </section>
-
-            {/* ─── 5. Overspending Alert ────────────────────────── */}
+            {/* ─── Overspending Alert (full-width) ──────────────── */}
             {showAlert && (
-              <section className="bg-[#ffdad6] border border-[#ba1a1a] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] lg:col-span-2 lg:row-start-1">
+              <section className="bg-[#ffdad6] border border-[#ba1a1a] rounded-xl p-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] md:col-span-2 md:row-start-1 lg:col-span-2 lg:row-start-1">
                 <div className="flex gap-3">
                   <div className="shrink-0 pt-0.5">
                     <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -504,19 +520,6 @@ export default function DashboardPage() {
                 </div>
               </section>
             )}
-
-            {/* ─── 6. Total Balance (most prominent) ────────────── */}
-            <section className="bg-white border border-[rgba(30,30,30,0.15)] rounded-xl p-6 md:p-8 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] text-center lg:col-start-1 lg:row-start-4">
-              <p className="text-sm font-bold text-[rgba(30,30,30,0.65)] uppercase tracking-wide font-body">
-                Total Saldo
-              </p>
-              <p
-                className="text-[32px] md:text-[40px] font-extrabold text-[#1e1e1e] mt-2 leading-tight font-display"
-                style={{ fontWeight: 800 }}
-              >
-                Rp {data.total_balance.toLocaleString('id-ID')}
-              </p>
-            </section>
           </div>
         )}
       </div>

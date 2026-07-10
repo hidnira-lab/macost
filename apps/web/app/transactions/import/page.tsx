@@ -127,7 +127,7 @@ export default function ImportStatementPage() {
             Upload your bank or e-wallet transaction history to auto-sync.
           </p>
 
-          {/* ── Upload Area (idle state) ── */}
+          {/* ── Upload Area (hanya saat idle) ── */}
           {state === 'idle' && (
             <div
               onClick={() => fileInputRef.current?.click()}
@@ -162,96 +162,117 @@ export default function ImportStatementPage() {
             </div>
           )}
 
-          {/* ── Uploading state ── */}
-          {state === 'uploading' && (
-            <div className="flex flex-col items-center gap-6 py-12">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-[#298dff] border-t-transparent">
-                <svg className="h-12 w-12 animate-spin text-[#298dff]" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4 31.4" strokeLinecap="round" />
-                </svg>
+          {/* ── Preview Transactions (SELALU muncul di bawah upload area) ── */}
+          <div className="flex flex-col gap-4">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[rgba(30,30,30,0.08)] pb-2">
+              <h2 className="font-display text-xl font-semibold text-[#1e1e1e]">
+                Preview Transactions
+              </h2>
+              <div className="flex items-center gap-3">
+                {state === 'review' && (
+                  <>
+                    <span className="font-body text-xs font-bold text-[rgba(30,30,30,0.65)]">
+                      Found {extractedRows.length} items
+                    </span>
+                    <button
+                      onClick={handleRetry}
+                      className="font-body rounded-lg bg-[rgba(30,30,30,0.08)] px-3 py-1.5 text-sm font-semibold text-[#1e1e1e] transition-colors hover:bg-[rgba(30,30,30,0.12)]"
+                    >
+                      Upload file lain
+                    </button>
+                  </>
+                )}
               </div>
-              <p className="font-body text-base font-semibold text-[#1e1e1e]">
-                Membaca statement…
-              </p>
             </div>
-          )}
 
-          {/* ── Empty state ── */}
-          {state === 'empty' && (
-            <div className="flex flex-col items-center gap-4 py-8">
-              <div className="rounded-xl border border-[rgba(30,30,30,0.15)] bg-white px-8 py-8 text-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+            {/* ── idle → empty state ── */}
+            {state === 'idle' && (
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[rgba(30,30,30,0.15)] bg-white px-8 py-12">
+                <p className="font-body text-sm text-[rgba(30,30,30,0.65)]">
+                  Upload File PDF untuk menambah histori
+                </p>
+              </div>
+            )}
+
+            {/* ── uploading → loading spinner ── */}
+            {state === 'uploading' && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#298dff] border-t-transparent">
+                  <svg className="h-8 w-8 animate-spin text-[#298dff]" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                  </svg>
+                </div>
                 <p className="font-body text-base font-semibold text-[#1e1e1e]">
-                  Tidak ada transaksi ditemukan
+                  Membaca statement…
                 </p>
-                <p className="font-body mt-2 text-sm text-[rgba(30,30,30,0.65)]">
-                  Kami tidak menemukan transaksi di PDF ini. Coba file lain atau input manual.
-                </p>
-                <div className="mt-4 flex gap-3 justify-center">
-                  <button
-                    onClick={handleRetry}
-                    className="font-body rounded-xl bg-[#298dff] px-6 py-3 text-base font-bold text-white transition-opacity hover:opacity-90"
-                  >
-                    Coba file lain
-                  </button>
-                  <button
-                    onClick={() => router.push('/transactions')}
-                    className="font-body rounded-xl border border-[rgba(30,30,30,0.15)] px-6 py-3 text-base font-semibold text-[#1e1e1e] transition-colors hover:bg-[rgba(30,30,30,0.05)]"
-                  >
-                    Input Manual
-                  </button>
-                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Error state ── */}
-          {state === 'error' && (
-            <div className="flex flex-col items-center gap-4 py-8">
-              <div className="w-full max-w-sm">
-                <div className="rounded-xl border border-[#ba1a1a] bg-[#ffdad6] px-4 py-4">
-                  <p className="font-body text-sm text-[#93000a]" role="alert">
-                    {errorMessage ?? 'Gagal membaca file PDF. Pastikan filenya e-statement yang valid, lalu coba lagi.'}
-                  </p>
-                </div>
-                <div className="mt-4 flex gap-3">
-                  <button
-                    onClick={handleRetry}
-                    className="font-body flex-1 rounded-xl bg-[#298dff] px-6 py-4 text-lg font-bold text-white transition-opacity hover:opacity-90"
-                  >
-                    Coba Lagi
-                  </button>
-                  <button
-                    onClick={() => router.push('/transactions')}
-                    className="font-body flex-1 rounded-xl border border-[rgba(30,30,30,0.15)] px-6 py-4 text-lg font-semibold text-[#1e1e1e] transition-colors hover:bg-[rgba(30,30,30,0.05)]"
-                  >
-                    Input Manual
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── Review state ── */}
-          {state === 'review' && (
-            <div className="flex flex-col gap-6">
-              {/* Header: Preview Transactions */}
-              <div className="flex items-center justify-between border-b border-[rgba(30,30,30,0.08)] pb-2">
-                <h2 className="font-display text-xl font-semibold text-[#1e1e1e]">
-                  Preview Transactions
-                </h2>
-                <span className="font-body text-xs font-bold text-[rgba(30,30,30,0.65)]">
-                  Found {extractedRows.length} items
-                </span>
-              </div>
-
-              {/* Review table */}
+            {/* ── review → StatementReviewTable ── */}
+            {state === 'review' && (
               <div className="rounded-xl border border-[rgba(30,30,30,0.15)] bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
                 <div className="px-4 py-4">
                   <StatementReviewTable rows={extractedRows} />
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* ── empty → pesan empty ── */}
+            {state === 'empty' && (
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="w-full rounded-xl border border-[rgba(30,30,30,0.15)] bg-white px-8 py-8 text-center shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]">
+                  <p className="font-body text-base font-semibold text-[#1e1e1e]">
+                    Tidak ada transaksi ditemukan
+                  </p>
+                  <p className="font-body mt-2 text-sm text-[rgba(30,30,30,0.65)]">
+                    Kami tidak menemukan transaksi di PDF ini. Coba file lain atau input manual.
+                  </p>
+                  <div className="mt-4 flex gap-3 justify-center">
+                    <button
+                      onClick={handleRetry}
+                      className="font-body rounded-xl bg-[#298dff] px-6 py-3 text-base font-bold text-white transition-opacity hover:opacity-90"
+                    >
+                      Coba file lain
+                    </button>
+                    <button
+                      onClick={() => router.push('/transactions')}
+                      className="font-body rounded-xl border border-[rgba(30,30,30,0.15)] px-6 py-3 text-base font-semibold text-[#1e1e1e] transition-colors hover:bg-[rgba(30,30,30,0.05)]"
+                    >
+                      Input Manual
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── error → pesan error ── */}
+            {state === 'error' && (
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="w-full max-w-sm">
+                  <div className="rounded-xl border border-[#ba1a1a] bg-[#ffdad6] px-4 py-4">
+                    <p className="font-body text-sm text-[#93000a]" role="alert">
+                      {errorMessage ?? 'Gagal membaca file PDF. Pastikan filenya e-statement yang valid, lalu coba lagi.'}
+                    </p>
+                  </div>
+                  <div className="mt-4 flex gap-3">
+                    <button
+                      onClick={handleRetry}
+                      className="font-body flex-1 rounded-xl bg-[#298dff] px-6 py-4 text-lg font-bold text-white transition-opacity hover:opacity-90"
+                    >
+                      Coba Lagi
+                    </button>
+                    <button
+                      onClick={() => router.push('/transactions')}
+                      className="font-body flex-1 rounded-xl border border-[rgba(30,30,30,0.15)] px-6 py-4 text-lg font-semibold text-[#1e1e1e] transition-colors hover:bg-[rgba(30,30,30,0.05)]"
+                    >
+                      Input Manual
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
