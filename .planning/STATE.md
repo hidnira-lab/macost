@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: differentiators
-status: Phase 3 in progress -- 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + AI_VISION_API_KEY live on Railway) both complete. 5/7 plans remaining.
-stopped_at: Completed 03-01-PLAN.md and 03-02-PLAN.md
-last_updated: "2026-07-09T14:55:00.000Z"
-last_activity: 2026-07-09
-last_activity_desc: "03-01 (Fertika, backend/phase-3-wave-1): google-genai dependency + gemini_client.py + gemini_service.py + 3 Pydantic response schemas (receipt, statement, insight) + 18 new tests, commits 4f795cc/2d0aab4/89716a1. 03-02 (Hidayat, --interactive mode): team sign-off + action_verb/related_category_id applied to API_CONTRACT.md + SAW-04 tolerance fix to REQUIREMENTS.md (commit d6ff665), AI_VISION_API_KEY provisioned on Railway, /health confirmed 200. Both executed independently in Wave 1 and merged into backend/phase-3-wave-1."
+status: Phase 3 complete -- all 7 plans (03-01 through 03-07) executed and merged to main via PRs #16-#19; backend 123/123 tests passing, frontend static export builds clean.
+stopped_at: Completed all 7 Phase 3 plans (03-01..03-07); 03-04/05/06/07 executed manually via Cline by Khayyira/Zarra/Fertika, reconciled retroactively via quick task 260710-m9d
+last_updated: "2026-07-10T09:06:11.000Z"
+last_activity: 2026-07-10
+last_activity_desc: "Reconciliation (quick task 260710-m9d): wrote 4 retroactive SUMMARY.md files for 03-04/05/06/07 (SAW weight editor, receipt scan, e-statement import, AI insights), corrected STATE.md progress from 2/7 to 7/7 Phase 3 plans, all merged to main via PRs #16-#19."
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 29
-  completed_plans: 24
-  percent: 83
+  completed_plans: 29
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30)
 
 **Core value:** Saat side income masuk, sistem langsung menyarankan alokasi ke goal prioritas tertinggi (SAW) — dengan suggest-and-confirm yang tidak pernah auto-execute
-**Current focus:** Phase 03 — differentiators — IN PROGRESS (2/7 plans executed: 03-01 Fertika, 03-02 Hidayat). Next: 03-04 backend task (Fertika, independent) or 03-03 (Zarra, independent).
+**Current focus:** Phase 03 — differentiators — COMPLETE (7/7 plans executed: 03-01 Fertika, 03-02 Hidayat, 03-03 Zarra, 03-04 Fertika+Khayyira, 03-05 Fertika+Zarra, 03-06 Fertika+Khayyira, 03-07 Fertika+Khayyira). All 4 team branches merged to main via PRs #16-#19.
 
 ## Current Position
 
-Phase: 03 (differentiators) — IN PROGRESS (2026-07-09)
-Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — 03-01 (Fertika, backend Gemini integration layer) and 03-02 (Hidayat, contract sign-off + Railway key) executed, 5 remaining
-Status: 03-01 complete -- gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md. 03-02 complete -- team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied (action_verb/related_category_id on GET /api/ai-insight, SAW-04 tolerance 0.002), AI_VISION_API_KEY live on Railway, health check passing. See 03-02-SUMMARY.md. Requirements SCAN-01/ESTAT-01/AIINS-02/SAW-04 complete.
-Last activity: 2026-07-09 -- 03-01 (Fertika, commits 4f795cc/2d0aab4/89716a1) and 03-02 (Hidayat, commit d6ff665) executed independently in Wave 1, merged into backend/phase-3-wave-1.
+Phase: 03 (differentiators) — COMPLETE (2026-07-10)
+Plan: 7 plans across 3 waves (03-01..03-04 Wave 1, 03-05 + 03-07 Wave 2 (parallel), 03-06 Wave 3) — all 7 executed and merged to main via PRs #16-#19
+Status: All 7 Phase 3 plans complete:
+- 03-01 (Fertika) -- gemini_client.py, gemini_service.py, receipt/statement/insight Pydantic schemas, 18 new tests passing, full backend suite (97 tests) green. See 03-01-SUMMARY.md.
+- 03-02 (Hidayat) -- team sign-off + API_CONTRACT.md/REQUIREMENTS.md contract change applied (action_verb/related_category_id on GET /api/ai-insight, SAW-04 tolerance 0.002), AI_VISION_API_KEY live on Railway, health check passing. See 03-02-SUMMARY.md.
+- 03-03 (Zarra) -- Quick Access Panel: vertical 3-shortcut layout (Tambah Transaksi, Scan Struk, Sisa Anggaran) on Home, Top Active Goal moved into right column, BottomNav Home link bug fixed. See 03-03-SUMMARY.md.
+- 03-04 (Fertika backend + Khayyira frontend, via Cline) -- POST /api/goal-settings/preview (candidate-weight re-rank, no persistence) + SawWeightEditor.tsx live weight editor with reset-to-default. See 03-04-SUMMARY.md.
+- 03-05 (Fertika backend + Zarra frontend, via Cline) -- POST /api/transactions/scan-receipt (magic-number+size validated, Gemini-backed, 10s timeout) + /transactions/scan review-before-save flow. See 03-05-SUMMARY.md.
+- 03-06 (Fertika backend + Khayyira frontend, via Cline) -- POST /api/transactions/upload-statement + import-batch (duplicate-flagged, IDOR-safe) + /transactions/import review table with duplicate-aware default selection. See 03-06-SUMMARY.md.
+- 03-07 (Fertika backend + Khayyira frontend, via Cline) -- GET /api/ai-insight (15s timeout, action_verb + goal/category link) + wired /ai page with InsightCard, one-way feed only. See 03-07-SUMMARY.md.
 
-Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 2/7 plans executed (03-01, 03-02 done)
+Requirements complete: SCAN-01/02/03, ESTAT-01/02/03, AIINS-01/02/03, SAW-04/05, QAP-01.
+Last activity: 2026-07-10 -- STATE.md reconciled to reflect all 7 Phase 3 plans complete (quick task 260710-m9d); underlying code was merged to main across PRs #16-#19 on 2026-07-09.
+
+Progress: [██████████] 100% (Phase 2: 22/22 plans complete) | Phase 3: 7/7 plans executed (COMPLETE)
 
 ## Phase 3 Task Ownership
 
@@ -41,23 +50,23 @@ Assignment basis: each plan split into backend/frontend sub-tasks per team membe
 
 | Wave | Plan | Bagian | Owner | Catatan |
 |---|---|---|---|---|
-| 1 | 03-01 | Backend (Gemini client/service, models) | Fertika | Fondasi — semua plan lain (kecuali 03-03) bergantung pada ini |
+| 1 | 03-01 | Backend (Gemini client/service, models) | Fertika | ✅ DONE (commits 4f795cc, 2d0aab4, 89716a1) — Fondasi — semua plan lain (kecuali 03-03) bergantung pada ini |
 | 1 | 03-02 | API_CONTRACT.md amendment + Railway `AI_VISION_API_KEY` | Hidayat | ✅ DONE 2026-07-09 (commit d6ff665) — sign-off didapat, kontrak diterapkan, key live di Railway. 03-07 boleh mulai implement frontend shape baru. |
-| 1 | 03-03 | Frontend — Quick Access Panel (Home) | Zarra | Area Home/Dashboard, murni frontend, tidak menunggu plan lain |
-| 1 | 03-04 | Backend — `/goal-settings/preview` endpoint | Fertika | |
-| 1 | 03-04 | Frontend — `SawWeightEditor.tsx` | Khayyira | Area Goals |
-| 2 (paralel) | 03-05 | Backend — `scan-receipt` endpoint | Fertika | |
-| 2 (paralel) | 03-05 | Frontend — `/transactions/scan` + `ReceiptReviewForm` | Zarra | Terhubung ke QAP yang dia buat di 03-03 |
-| 2 (paralel) | 03-07 | Backend — `ai_insight.py` + `insight_service.py` | Fertika | |
-| 2 (paralel) | 03-07 | Frontend — `/ai` page + `InsightCard` | Khayyira | Load-balancing; bisa digeser ke Zarra bila perlu |
-| 3 | 03-06 | Backend — `upload-statement` endpoint + `statement_service.py` | Fertika | |
-| 3 | 03-06 | Frontend — `/transactions/import` + `StatementReviewTable` | Khayyira | |
+| 1 | 03-03 | Frontend — Quick Access Panel (Home) | Zarra | ✅ DONE — Area Home/Dashboard, murni frontend, tidak menunggu plan lain |
+| 1 | 03-04 | Backend — `/goal-settings/preview` endpoint | Fertika | ✅ DONE (commit 3e0e5da) |
+| 1 | 03-04 | Frontend — `SawWeightEditor.tsx` | Khayyira | ✅ DONE (commit 1ff4da0) — Area Goals |
+| 2 (paralel) | 03-05 | Backend — `scan-receipt` endpoint | Fertika | ✅ DONE (commits 5dcafb5, 5a0e1b3) |
+| 2 (paralel) | 03-05 | Frontend — `/transactions/scan` + `ReceiptReviewForm` | Zarra | ✅ DONE (commit cb90d20) — Terhubung ke QAP yang dia buat di 03-03 |
+| 2 (paralel) | 03-07 | Backend — `ai_insight.py` + `insight_service.py` | Fertika | ✅ DONE (commits 35b0410, 8e9ad00) |
+| 2 (paralel) | 03-07 | Frontend — `/ai` page + `InsightCard` | Khayyira | ✅ DONE (commit 67e4c6b) — Load-balancing; bisa digeser ke Zarra bila perlu |
+| 3 | 03-06 | Backend — `upload-statement` endpoint + `statement_service.py` | Fertika | ✅ DONE (commits b2437b3, 7ce028c) |
+| 3 | 03-06 | Frontend — `/transactions/import` + `StatementReviewTable` | Khayyira | ✅ DONE (commits 4f53d5b, 2b609e7) |
 
 **Catatan koordinasi:**
 
 1. Fertika memegang backend di kelima plan — beban besar untuk sisa waktu sampai expo (2026-07-14); pertimbangkan bantuan tambahan bila kewalahan.
 2. `apps/web/lib/api/types.ts` disentuh 3 orang (Zarra di 03-05, Khayyira di 03-07 dan 03-06). Di Wave 2, Zarra dan Khayyira jalan paralel dan wajib append-only ke file itu (jangan reorder/reformat) — sudah dicatat di masing-masing PLAN.md.
-3. Khayyira dan Zarra pakai Cline, bukan Claude Code — Wave 1-3 di atas mereka kerjakan manual dari `.planning/phases/03-differentiators/03-0X-PLAN.md`, bukan lewat `/gsd-execute-phase` otomatis. Fertika dan Hidayat (Claude Code) bisa pakai `/gsd-execute-phase 3` untuk bagian masing-masing.
+3. Khayyira dan Zarra pakai Cline, bukan Claude Code — Wave 1-3 di atas mereka kerjakan manual dari `.planning/phases/03-differentiators/03-0X-PLAN.md`, bukan lewat `/gsd-execute-phase` otomatis. Fertika dan Hidayat (Claude Code) bisa pakai `/gsd-execute-phase 3` untuk bagian masing-masing. Semua 4 branch (backend/phase-3-wave-1, frontend/phase-03-quick-access-panel, frontend/phase-03-receipt-scan, frontend/phase-3-differentiators) sudah merged ke main via PR #16-#19; SUMMARY.md untuk 03-04/05/06/07 direkonsiliasi retroaktif via quick task 260710-m9d pada 2026-07-10.
 4. 03-02 (Hidayat) harus selesai lebih dulu sebelum Khayyira mulai frontend 03-07.
 
 ## Performance Metrics
